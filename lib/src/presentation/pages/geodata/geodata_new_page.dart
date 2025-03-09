@@ -62,7 +62,6 @@ class _GeodataCreatePageInternal extends StatelessWidget {
         backgroundColor: Theme.of(context).canvasColor,
         appBar: GeoAppBar(
           title: const Text('Nuevo Punto de Interés'),
-          iconTheme: Theme.of(context).iconTheme,
         ),
         body: BlocBuilder<GeodataCreateCubit, GeodataCreateState>(
           bloc: context.read<GeodataCreateCubit>(),
@@ -115,7 +114,7 @@ class _GeodataCategorySelectionBody extends StatelessWidget {
             child: Center(
               child: Text(
                 'Seleccione una categoría para el nuevo punto.',
-                style: Theme.of(context).textTheme.headline6,
+                style: Theme.of(context).textTheme.titleLarge,
                 textScaleFactor: 0.9,
               ),
             ),

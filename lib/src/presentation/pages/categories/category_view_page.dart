@@ -47,7 +47,6 @@ class _CategoryViewPageInternal extends StatelessWidget {
       backgroundColor: Theme.of(context).canvasColor,
       appBar: GeoAppBar(
         title: const Text('Detalles de la Categoría'),
-        iconTheme: Theme.of(context).iconTheme,
         actions: [
           IconButton(
             icon: const Icon(
@@ -258,7 +257,7 @@ class _CategoryViewBasicInfo extends StatelessWidget {
           Center(
             child: Text(
               'Columnas',
-              style: Theme.of(context).textTheme.headline6,
+              style: Theme.of(context).textTheme.titleLarge,
             ),
           ),
           ...[

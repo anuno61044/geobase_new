@@ -18,11 +18,12 @@ class Routes {
         StaticSelectionLocation(),
         NotFoundLocation(),
       ],
-    ),
+    ).call,
     initialPath: '/map',
   );
 
-  static void _listener(RouteInformation routeInformation, BeamerDelegate delegate){
+  static void _listener(
+      RouteInformation routeInformation, BeamerDelegate delegate) {
     log('BeamTo: ${routeInformation.location}');
   }
 

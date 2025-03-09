@@ -46,7 +46,6 @@ class _CategoryEditPageInternal extends StatelessWidget {
         backgroundColor: Theme.of(context).canvasColor,
         appBar: GeoAppBar(
           title: const Text('Editar Categoría'),
-          iconTheme: Theme.of(context).iconTheme,
         ),
         body: FormBlocListener<CategoryEditFormBloc, Unit, String>(
           formBloc: context.read<CategoryEditFormBloc>(),

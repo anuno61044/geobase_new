@@ -31,7 +31,7 @@ extension ListFieldBlocOfTextFieldBlocsExtension
     );
     currentField.addValidators([
       _notRequiredLastIfIsNotAlone(currentField),
-      ...validationBuilders.map((e) => e(this, currentField)).toList(),
+      ...validationBuilders.map((e) => e(this, currentField)),
     ]);
 
     addFieldBloc(

@@ -37,8 +37,7 @@ Left<Failure, T> catchMethod<T>(Object e) {
     message: e.toString(),
   );
   switch (e.runtimeType) {
-    case PlatformException:
-      final except = e as PlatformException;
+    case PlatformException except:
       switch (except.code) {
         case 'PERMISSION_DENIED':
           error = Failure.permissionDenied(message: except.message);

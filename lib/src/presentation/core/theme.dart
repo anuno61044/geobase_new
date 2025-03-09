@@ -27,33 +27,40 @@ const TextStyle titleTextStyle = TextStyle(
 const TextStyle bodyTextStyle = TextStyle(color: subtitlesColor);
 
 final TextTheme textTheme = light.textTheme.copyWith(
-  headline4: titleTextStyle.copyWith(fontSize: 24),
-  headline5: titleTextStyle.copyWith(fontSize: 22),
-  headline6: titleTextStyle.copyWith(fontSize: 20),
-  subtitle1: titleTextStyle.copyWith(fontSize: 17),
-  subtitle2: titleTextStyle.copyWith(fontSize: 16),
-  bodyText1: bodyTextStyle.copyWith(fontSize: 18),
-  bodyText2: bodyTextStyle.copyWith(fontSize: 15),
-  button: bodyTextStyle,
+  headlineMedium: titleTextStyle.copyWith(fontSize: 24),
+  headlineSmall: titleTextStyle.copyWith(fontSize: 22),
+  titleLarge: titleTextStyle.copyWith(fontSize: 20),
+  titleMedium: titleTextStyle.copyWith(fontSize: 17),
+  titleSmall: titleTextStyle.copyWith(fontSize: 16),
+  bodyLarge: bodyTextStyle.copyWith(fontSize: 18),
+  bodyMedium: bodyTextStyle.copyWith(fontSize: 15),
+  labelLarge: bodyTextStyle,
 );
 
 final TextTheme primaryTextTheme = textTheme.copyWith(
-  headline4: titleTextStyle.copyWith(color: Colors.white),
-  headline5: titleTextStyle.copyWith(color: Colors.white),
-  headline6: titleTextStyle.copyWith(color: Colors.white),
-  subtitle1: titleTextStyle.copyWith(color: Colors.white),
-  subtitle2: titleTextStyle.copyWith(color: Colors.white),
-  bodyText1: bodyTextStyle.copyWith(color: Colors.white),
-  bodyText2: bodyTextStyle.copyWith(color: Colors.white),
-  button: bodyTextStyle.copyWith(color: Colors.white),
+  headlineMedium: titleTextStyle.copyWith(color: Colors.white),
+  headlineSmall: titleTextStyle.copyWith(color: Colors.white),
+  titleLarge: titleTextStyle.copyWith(color: Colors.white),
+  titleMedium: titleTextStyle.copyWith(color: Colors.white),
+  titleSmall: titleTextStyle.copyWith(color: Colors.white),
+  bodyLarge: bodyTextStyle.copyWith(color: Colors.white),
+  bodyMedium: bodyTextStyle.copyWith(color: Colors.white),
+  labelLarge: bodyTextStyle.copyWith(color: Colors.white),
 );
 
 final ThemeData geobaseLightTheme = light.copyWith(
+  colorScheme: light.colorScheme.copyWith(
+    primary: primaryBrandColor,
+    secondary: secondaryBrandColor,
+    background: backgroundColor,
+    surface: backgroundColor,
+    error: const Color(0xFFE53935),
+  ),
   dialogTheme: light.dialogTheme.copyWith(
     backgroundColor: backgroundColor,
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-    titleTextStyle: textTheme.headline6,
-    contentTextStyle: textTheme.subtitle1,
+    titleTextStyle: textTheme.titleLarge,
+    contentTextStyle: textTheme.titleMedium,
   ),
   progressIndicatorTheme: light.progressIndicatorTheme.copyWith(),
   checkboxTheme: light.checkboxTheme.copyWith(
@@ -78,7 +85,6 @@ final ThemeData geobaseLightTheme = light.copyWith(
   highlightColor: highlightColor,
   scaffoldBackgroundColor: backgroundColor,
   canvasColor: backgroundColor,
-  backgroundColor: backgroundColor,
 
   buttonTheme: light.buttonTheme.copyWith(
     buttonColor: primaryBrandColor,
@@ -90,7 +96,7 @@ final ThemeData geobaseLightTheme = light.copyWith(
   textTheme: textTheme,
   primaryTextTheme: primaryTextTheme,
   // ignore: deprecated_member_use
-  accentTextTheme: primaryTextTheme,
+  // accentTextTheme: primaryTextTheme,
   iconTheme: light.iconTheme.copyWith(
     color: primaryBrandColor,
   ),
@@ -120,7 +126,7 @@ final ThemeData geobaseLightTheme = light.copyWith(
     ),
     errorBorder: OutlineInputBorder(
       borderSide: BorderSide(
-        color: light.errorColor,
+        color: light.colorScheme.error,
       ),
       borderRadius: const BorderRadius.all(Radius.circular(18)),
     ),
@@ -153,7 +159,7 @@ final ThemeData geobaseLightTheme = light.copyWith(
       ),
       textStyle: MaterialStateProperty.all<TextStyle>(
         bodyTextStyle.copyWith(
-          color: light.backgroundColor,
+          color: light.colorScheme.background,
           fontWeight: FontWeight.w700,
         ),
       ),
@@ -177,7 +183,7 @@ final ThemeData geobaseLightTheme = light.copyWith(
       backgroundColor: MaterialStateProperty.all<Color>(primaryBrandColor),
       textStyle: MaterialStateProperty.all<TextStyle>(
         bodyTextStyle.copyWith(
-          color: light.backgroundColor,
+          color: light.colorScheme.background,
           fontWeight: FontWeight.w700,
         ),
       ),

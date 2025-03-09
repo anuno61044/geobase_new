@@ -50,7 +50,6 @@ class _GeodataViewPageInternal extends StatelessWidget {
       backgroundColor: Theme.of(context).canvasColor,
       appBar: GeoAppBar(
         title: const Text('Detalles del Punto'),
-        iconTheme: Theme.of(context).iconTheme,
         actions: [
           IconButton(
             icon: const Icon(
@@ -210,14 +209,14 @@ class _GeodataViewBasicInfo extends StatelessWidget {
             ListTile(
               title: Text(
                 'Sin Campos',
-                style: Theme.of(context).textTheme.headline6,
+                style: Theme.of(context).textTheme.titleLarge,
               ),
             ),
           if (geodata.fields.isNotEmpty)
             Center(
               child: Text(
                 'Campos',
-                style: Theme.of(context).textTheme.headline6,
+                style: Theme.of(context).textTheme.titleLarge,
               ),
             ),
           ...[

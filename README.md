@@ -1,9 +1,11 @@
+![icon](assets/readme_resources/readme_icon.png)
 # GeoBase - Flutter Geospatial Management App [![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC_BY--NC--SA_4.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 
 Welcome to **GeoBase**, a Flutter-based application designed to manage geographical information locally on your device. GeoBase provides a flexible and customizable platform for storing, visualizing, and interacting with geospatial data. Currently focused on Android devices, with future plans to support iOS.
 
 ---
-
+![screenshoot](assets/readme_resources/screenshot2.png)
+![screenshoot](assets/readme_resources/screenshot1.png)
 ## Table of Contents
 
 - [Introduction](#introduction)

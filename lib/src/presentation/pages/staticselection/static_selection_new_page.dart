@@ -37,7 +37,6 @@ class _StaticSelectionNewInternalPage extends StatelessWidget {
       backgroundColor: Theme.of(context).canvasColor,
       appBar: GeoAppBar(
         title: const Text('Nueva Selección'),
-        iconTheme: Theme.of(context).iconTheme,
       ),
       body: const _Body(),
     );
@@ -141,7 +140,7 @@ class _OptionsInput extends StatelessWidget {
             const Divider(),
             Text(
               'Opciones*',
-              style: Theme.of(context).textTheme.headline6,
+              style: Theme.of(context).textTheme.titleLarge,
             ),
             ListView.builder(
               shrinkWrap: true,

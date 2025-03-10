@@ -52,7 +52,6 @@ class _GeodataEditPageInternal extends StatelessWidget {
         backgroundColor: Theme.of(context).canvasColor,
         appBar: GeoAppBar(
           title: const Text('Editar información del Punto'),
-          iconTheme: Theme.of(context).iconTheme,
         ),
         body: BlocBuilder<GeodataEditCubit, GeodataEditState>(
           bloc: context.read(),

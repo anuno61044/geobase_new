@@ -10,11 +10,8 @@ class GeoAppBar extends AppBar {
     super.flexibleSpace,
     super.elevation = 4.0,
     super.shape,
-    super.backgroundColor,
-    super.brightness,
     super.iconTheme,
     super.actionsIconTheme,
-    super.textTheme,
     super.primary = true,
     super.centerTitle = true,
     super.titleSpacing = NavigationToolbar.kMiddleSpacing,
@@ -29,7 +26,7 @@ class GeoAppBar extends AppBar {
 }
 
 class AppBarBackButton extends StatelessWidget {
-  const AppBarBackButton({Key? key, this.color}) : super(key: key);
+  const AppBarBackButton({super.key, this.color});
 
   final Color? color;
 

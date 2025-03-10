@@ -1,0 +1,27 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Flutter Debug",
+      "type": "dart",
+      "request": "launch",
+      "flutterMode": "debug",
+      "program": "lib/main.dart",
+      "env": {
+        "JAVA_HOME": "/Library/Java/JavaVirtualMachines/jdk-19.jdk/Contents/Home"
+      },
+      "args": []
+    },
+    {
+      "name": "Flutter Release",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "release",
+      "program": "lib/main.dart",
+      "env": {
+        "JAVA_HOME": "/Library/Java/JavaVirtualMachines/jdk-19.jdk/Contents/Home"
+      },
+      "args": []
+    }
+  ]
+}

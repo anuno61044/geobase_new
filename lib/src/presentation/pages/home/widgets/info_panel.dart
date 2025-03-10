@@ -67,13 +67,14 @@ class _InternalPanel extends StatelessWidget {
                                 ),
                                 Text(
                                   state.geodata.category.name,
-                                  style: Theme.of(context).textTheme.subtitle1,
+                                  style:
+                                      Theme.of(context).textTheme.titleMedium,
                                 ),
                               ],
                             ),
                             Text(
                               '(${state.geodata.latitude.toStringAsFixed(6)}, ${state.geodata.longitude.toStringAsFixed(6)})',
-                              style: Theme.of(context).textTheme.subtitle2,
+                              style: Theme.of(context).textTheme.titleSmall,
                               textScaleFactor: 0.95,
                             ),
                           ],
@@ -91,8 +92,9 @@ class _InternalPanel extends StatelessWidget {
                                   ListTile(
                                     title: Text(
                                       'Sin Campos',
-                                      style:
-                                          Theme.of(context).textTheme.headline6,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleLarge,
                                     ),
                                   ),
                                 if (state.geodata.fields.isNotEmpty) ...[

@@ -47,7 +47,6 @@ class _StaticSelectioViewInternalPage extends StatelessWidget {
       backgroundColor: Theme.of(context).canvasColor,
       appBar: GeoAppBar(
         title: const Text('Detalles de la Selección Estática'),
-        iconTheme: Theme.of(context).iconTheme,
         actions: [
           IconButton(
             icon: const Icon(

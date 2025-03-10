@@ -37,7 +37,6 @@ class _MapServerInternalPage extends StatelessWidget {
       backgroundColor: Theme.of(context).canvasColor,
       appBar: GeoAppBar(
         title: const Text('Servidor de Mapas'),
-        iconTheme: Theme.of(context).iconTheme,
       ),
       body: BlocProvider<MapConfigurationFormBloc>(
         create: (context) => getIt<MapConfigurationFormBloc>(),
@@ -206,7 +205,7 @@ class _WMSLayersInput extends StatelessWidget {
                   const Divider(),
                   Text(
                     'Capas del mapa*',
-                    style: Theme.of(context).textTheme.headline6,
+                    style: Theme.of(context).textTheme.titleLarge,
                   ),
                   ListView.builder(
                     shrinkWrap: true,
@@ -250,7 +249,7 @@ class _SubdomainsInput extends StatelessWidget {
                   const Divider(),
                   Text(
                     'Subdominios*',
-                    style: Theme.of(context).textTheme.headline6,
+                    style: Theme.of(context).textTheme.titleLarge,
                   ),
                   ListView.builder(
                     shrinkWrap: true,

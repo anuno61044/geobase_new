@@ -33,7 +33,6 @@ class _OptionsInternalPage extends StatelessWidget {
         backgroundColor: Theme.of(context).canvasColor,
         appBar: GeoAppBar(
           title: const Text('Opciones'),
-          iconTheme: Theme.of(context).iconTheme,
         ),
         body: const _Body(),
       ),
@@ -46,7 +45,7 @@ class _Body extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final headline6 = Theme.of(context).textTheme.headline6;
+    final titleLarge = Theme.of(context).textTheme.titleLarge;
     return SingleChildScrollView(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -54,7 +53,7 @@ class _Body extends StatelessWidget {
           ListTile(
             title: Text(
               'Categorías',
-              style: headline6,
+              style: titleLarge,
             ),
             trailing: const Icon(Icons.category),
             onTap: () => context.beamToNamed('/categories'),
@@ -62,14 +61,14 @@ class _Body extends StatelessWidget {
           ExpansionTile(
             title: Text(
               'Tipos',
-              style: headline6,
+              style: titleLarge,
             ),
             children: [
               ListTile(
                 title: Text(
                   'Selección Stática (StaticSelection)',
-                  style: headline6?.copyWith(
-                    color: headline6.color?.withOpacity(0.7),
+                  style: titleLarge?.copyWith(
+                    color: titleLarge.color?.withOpacity(0.7),
                   ),
                 ),
                 trailing: const Icon(Icons.account_tree_rounded),
@@ -80,7 +79,7 @@ class _Body extends StatelessWidget {
           ListTile(
             title: Text(
               'Servidor de Mapas',
-              style: headline6,
+              style: titleLarge,
             ),
             trailing: const Icon(Icons.map_outlined),
             onTap: () => context.beamToNamed('/options/mapserver'),

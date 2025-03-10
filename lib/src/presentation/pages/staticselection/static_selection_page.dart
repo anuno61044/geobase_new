@@ -40,7 +40,6 @@ class _StaticSelectionListInternalPage extends StatelessWidget {
         backgroundColor: Theme.of(context).canvasColor,
         appBar: GeoAppBar(
           title: const Text('Selecciones Estáticas'),
-          iconTheme: Theme.of(context).iconTheme,
           actions: [
             IconButton(
               onPressed: () => context.read<StaticSelectionListCubit>().fetch(),

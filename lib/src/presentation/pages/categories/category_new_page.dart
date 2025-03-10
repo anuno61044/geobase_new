@@ -42,7 +42,6 @@ class _CategoryCreatePageInternal extends StatelessWidget {
         backgroundColor: Theme.of(context).canvasColor,
         appBar: GeoAppBar(
           title: const Text('Nueva Categoría'),
-          iconTheme: Theme.of(context).iconTheme,
         ),
         body: FormBlocListener<CategoryCreateFormBloc, Unit, String>(
           formBloc: context.read<CategoryCreateFormBloc>(),

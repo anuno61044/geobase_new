@@ -46,7 +46,6 @@ class _GeodataPageInternal extends StatelessWidget {
         backgroundColor: Theme.of(context).canvasColor,
         appBar: GeoAppBar(
           title: const Text('Datos Almacenados'),
-          iconTheme: Theme.of(context).iconTheme,
         ),
         body: const _Body(),
         floatingActionButton: BlocProvider<CategoriesShowerCubit>(
@@ -177,7 +176,7 @@ class _GeodataWidget extends StatelessWidget {
     final color = geodata.color != null
         ? Color(geodata.color!).withOpacity(0.5)
         : Colors.white;
-    final subtitle2 = Theme.of(context).textTheme.subtitle2;
+    final titleSmall = Theme.of(context).textTheme.titleSmall;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10),
       child: Card(
@@ -190,8 +189,8 @@ class _GeodataWidget extends StatelessWidget {
           child: ListTile(
             title: SelectableText(
               '${geodata.category.name}\n${geodata.location.visualString()}',
-              style: subtitle2?.copyWith(
-                color: subtitle2.color?.getContrastColor(color),
+              style: titleSmall?.copyWith(
+                color: titleSmall.color?.getContrastColor(color),
               ),
             ),
             subtitle: SelectableText(

@@ -42,7 +42,6 @@ class _CategoriesPageInternal extends StatelessWidget {
         backgroundColor: Theme.of(context).canvasColor,
         appBar: GeoAppBar(
           title: const Text('Lista de Categorías'),
-          iconTheme: Theme.of(context).iconTheme,
         ),
         body: _Body(),
         floatingActionButton: const _FloatingActionButton(),
@@ -183,7 +182,7 @@ class _CategoryWidget extends StatelessWidget {
     final color = category.color != null
         ? Color(category.color!).withOpacity(0.5)
         : Colors.white;
-    final subtitle2 = Theme.of(context).textTheme.subtitle2;
+    final titleSmall = Theme.of(context).textTheme.titleSmall;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10),
       child: Card(
@@ -196,8 +195,8 @@ class _CategoryWidget extends StatelessWidget {
           child: ListTile(
             title: SelectableText(
               category.name,
-              style: subtitle2?.copyWith(
-                color: subtitle2.color?.getContrastColor(color),
+              style: titleSmall?.copyWith(
+                color: titleSmall.color?.getContrastColor(color),
               ),
             ),
             subtitle: SelectableText(category.description ?? ''),

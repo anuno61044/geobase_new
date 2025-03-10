@@ -1,6 +1,5 @@
 # GeoBase - Flutter Geospatial Management App [![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC_BY--NC--SA_4.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 
-
 Welcome to **GeoBase**, a Flutter-based application designed to manage geographical information locally on your device. GeoBase provides a flexible and customizable platform for storing, visualizing, and interacting with geospatial data. Currently focused on Android devices, with future plans to support iOS.
 
 ---
@@ -45,33 +44,51 @@ GeoBase is a mobile application built with **Flutter** that allows users to mana
 
 To run GeoBase, you need the following:
 
-- **Flutter SDK**: Ensure you have Flutter installed on your machine. Follow the official [Flutter installation guide](https://flutter.dev/docs/get-started/install) if you haven't already.
+- **Flutter SDK**: Ensure you have Flutter _3.10.3_ installed on your machine. Follow the official [Flutter installation guide](https://flutter.dev/docs/get-started/install) if you haven't already.
 - **Android Device or Emulator**: The app is currently optimized for Android. Make sure you have an Android device or emulator set up.
+- **Android SDK ^24**: The app is currently running on SDK _24 up to 34_.
+- **JDK Version 19**
+- **Gradle Version 7.6**
 
 ### Installation
 
-1. **Clone the Repository**:
-  ```bash
-  git clone https://github.com/lagcleaner/geobase.git
-  cd geobase
-  ```
+1. Clone the Repository:
+
+```bash
+git clone https://github.com/lagcleaner/geobase.git
+cd geobase
+```
+
 2. Install Dependencies:
-  ```bash
-  Copy
-  flutter pub get
-  ```
+
+```bash
+Copy
+flutter pub get
+```
+
+2. Run build_runner:
+
+```bash
+Copy
+flutter pub run build_runner build
+```
+
 3. Run the App:
-  ```bash
-  Copy
-  flutter run
-  ```
+
+```bash
+Copy
+flutter run
+```
+
 4. Build the APK (optional):
-  ```bash
-  Copy
-  flutter build apk
-  ```
+
+```bash
+Copy
+flutter build apk
+```
 
 ---
+
 ## Usage
 
 ### Adding Geographical Data

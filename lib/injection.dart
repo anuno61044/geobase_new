@@ -9,5 +9,5 @@ final GetIt getIt = GetIt.instance;
 
 @injectableInit
 void configureInjection(String env) {
-  $initGetIt(getIt, environment: env);
+  getIt.init(environment: env);
 }

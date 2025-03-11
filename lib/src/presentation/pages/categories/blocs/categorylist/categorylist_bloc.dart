@@ -5,9 +5,9 @@ import 'package:geobase/src/domain/entities/entities.dart';
 import 'package:geobase/src/domain/services/services.dart';
 import 'package:rxdart/rxdart.dart';
 
+part 'categorylist_bloc.freezed.dart';
 part 'categorylist_event.dart';
 part 'categorylist_state.dart';
-part 'categorylist_bloc.freezed.dart';
 
 @injectable
 class CategoryListBloc extends Bloc<CategoryListEvent, CategoryListState> {
@@ -17,10 +17,6 @@ class CategoryListBloc extends Bloc<CategoryListEvent, CategoryListState> {
       (event, emit) async {
         await event.when(
           fetched: (query) async {
-            if (query.isEmpty) {
-              emit(const CategoryListState.initial());
-              return;
-            }
             emit(const CategoryListState.fetchInProgress());
             final response = await categoryService.loadCategoriesWhere(
               FilterCategoriesOptionsEntity(nameSubstring: query),

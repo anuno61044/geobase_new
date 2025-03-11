@@ -68,6 +68,8 @@ class CategoriesRepository implements ICategoriesRepository {
       if (filters != null) {
         if ((filters.nameSubstring ?? '') != '') {
           response = await provider.getByNameSubstring(filters.nameSubstring!);
+        } else if (filters.nameSubstring == '') {
+          response = await provider.getAll();
         } else {
           // TODO: implement
           throw UnimplementedError();

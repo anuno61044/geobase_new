@@ -22,7 +22,8 @@ class CategoriesPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => getIt<CategoryListBloc>(),
+      create: (_) =>
+          getIt<CategoryListBloc>()..add(CategoryListEvent.fetched(query: '')),
       child: const _CategoriesPageInternal(),
     );
   }

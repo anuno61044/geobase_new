@@ -7,8 +7,8 @@ const secondaryBrandColor = Color(0xff386db9);
 const highlightColor = Color(0xff90e2f5);
 const alternativeHighlightColor = Color(0xff89aee4);
 //per texts
-const titlesAndParagraphsColor = Color(0xff5d6f6f);
-const subtitlesColor = Color(0xffa1b5b5);
+const titlesAndParagraphsColor = Color.fromARGB(255, 72, 86, 86);
+const subtitlesColor = Color.fromARGB(255, 115, 129, 129);
 const linesColor = Color(0xffdff1f1);
 //per background
 const backgroundColor = Color(0xfffbffff);
@@ -27,17 +27,20 @@ const TextStyle titleTextStyle = TextStyle(
 const TextStyle bodyTextStyle = TextStyle(color: subtitlesColor);
 
 final TextTheme textTheme = light.textTheme.copyWith(
+  headlineLarge: titleTextStyle.copyWith(fontSize: 25),
   headlineMedium: titleTextStyle.copyWith(fontSize: 24),
   headlineSmall: titleTextStyle.copyWith(fontSize: 22),
   titleLarge: titleTextStyle.copyWith(fontSize: 20),
   titleMedium: titleTextStyle.copyWith(fontSize: 17),
   titleSmall: titleTextStyle.copyWith(fontSize: 16),
   bodyLarge: bodyTextStyle.copyWith(fontSize: 18),
-  bodyMedium: bodyTextStyle.copyWith(fontSize: 15),
+  bodyMedium: bodyTextStyle.copyWith(fontSize: 16),
+  bodySmall: bodyTextStyle.copyWith(fontSize: 14),
   labelLarge: bodyTextStyle,
 );
 
 final TextTheme primaryTextTheme = textTheme.copyWith(
+  headlineLarge: titleTextStyle.copyWith(color: Colors.white),
   headlineMedium: titleTextStyle.copyWith(color: Colors.white),
   headlineSmall: titleTextStyle.copyWith(color: Colors.white),
   titleLarge: titleTextStyle.copyWith(color: Colors.white),
@@ -45,6 +48,7 @@ final TextTheme primaryTextTheme = textTheme.copyWith(
   titleSmall: titleTextStyle.copyWith(color: Colors.white),
   bodyLarge: bodyTextStyle.copyWith(color: Colors.white),
   bodyMedium: bodyTextStyle.copyWith(color: Colors.white),
+  bodySmall: bodyTextStyle.copyWith(color: Colors.white),
   labelLarge: bodyTextStyle.copyWith(color: Colors.white),
 );
 

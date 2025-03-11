@@ -200,7 +200,13 @@ class _CategoryWidget extends StatelessWidget {
                 color: titleSmall.color?.getContrastColor(color),
               ),
             ),
-            subtitle: SelectableText(category.description ?? ''),
+            subtitle: Text(category.description ?? ''),
+            onTap: () {
+              context.beamToNamed('/categories/${category.id}');
+              context
+                  .read<CategoryListBloc>()
+                  .add(const CategoryListEvent.fetched(query: ''));
+            },
             leading: Icon(
               IconCodeUtils.decode(category.icon),
             ),

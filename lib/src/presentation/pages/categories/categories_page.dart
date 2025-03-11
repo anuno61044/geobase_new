@@ -183,7 +183,21 @@ class _CategoryWidget extends StatelessWidget {
     final color = category.color != null
         ? Color(category.color!).withOpacity(0.5)
         : Colors.white;
-    final titleSmall = Theme.of(context).textTheme.titleSmall;
+    final titleSmall = Theme.of(context).textTheme.titleSmall?.copyWith(
+          color: Theme.of(context)
+              .textTheme
+              .titleSmall
+              ?.color
+              ?.getContrastColor(color),
+        );
+    final bodyMedium = Theme.of(context).textTheme.bodyMedium?.copyWith(
+          color: Theme.of(context)
+              .textTheme
+              .bodyMedium
+              ?.color
+              ?.getContrastColor(color),
+        );
+    ;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10),
       child: Card(
@@ -194,13 +208,8 @@ class _CategoryWidget extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(10),
           child: ListTile(
-            title: SelectableText(
-              category.name,
-              style: titleSmall?.copyWith(
-                color: titleSmall.color?.getContrastColor(color),
-              ),
-            ),
-            subtitle: Text(category.description ?? ''),
+            title: SelectableText(category.name, style: titleSmall),
+            subtitle: Text(category.description ?? '', style: bodyMedium),
             onTap: () {
               context.beamToNamed('/categories/${category.id}');
               context
@@ -208,7 +217,8 @@ class _CategoryWidget extends StatelessWidget {
                   .add(const CategoryListEvent.fetched(query: ''));
             },
             leading: Icon(
-              IconCodeUtils.decode(category.icon),
+              IconCodeUtils.decode(category.icon) ??
+                  Icons.question_mark_rounded,
             ),
             trailing: IconButton(
               tooltip: 'Ver detalles de la Categoría',

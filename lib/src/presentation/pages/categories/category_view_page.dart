@@ -218,39 +218,36 @@ class _CategoryViewBasicInfo extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Row(
-            children: [
-              Expanded(
-                child: ListTile(
-                  // dense: true,
-                  title: Text(category.id.toString()),
-                  subtitle: const Text('Id'),
+          SizedBox(height: 12),
+          Center(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  category.name,
+                  style: Theme.of(context).textTheme.headlineMedium,
                 ),
-              ),
-              Expanded(
-                child: ListTile(
-                  // dense: true,
-                  title: Icon(
-                    IconCodeUtils.decode(category.icon),
-                    color: category.color != null
-                        ? Color(category.color!)
-                        : Theme.of(context).primaryColor,
-                  ),
-                  subtitle: Text(
-                    category.color != null
-                        ? Color(category.color!).toString()
-                        : 'Color No Especificado',
-                  ),
+                SizedBox(width: 12),
+                Icon(
+                  IconCodeUtils.decode(category.icon) ??
+                      Icons.question_mark_rounded,
+                  size: Theme.of(context).textTheme.headlineMedium!.fontSize! *
+                      1.3,
+                  color: category.color != null
+                      ? Color(category.color!)
+                      : Theme.of(context).primaryColor,
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-          ListTile(
-            title: Text(category.name),
-            subtitle: Text(
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10),
+            child: Text(
               (category.description ?? '').isNotEmpty
                   ? category.description!
                   : 'Sin descripción',
+              style: Theme.of(context).textTheme.bodyMedium,
+              textAlign: TextAlign.justify,
             ),
           ),
           const Divider(),

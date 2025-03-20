@@ -151,8 +151,19 @@ class _GeodataViewBasicInfo extends StatelessWidget {
               Flexible(
                 flex: 2,
                 child: ListTile(
-                  title: Text(geodata.category.name),
-                  subtitle: const Text('Categoría'),
+                  title: Row(
+                    children: [
+                      Icon(
+                        IconCodeUtils.decode(geodata.icon) ??
+                            Icons.question_mark_rounded,
+                        color: geodata.color != null
+                            ? Color(geodata.color!)
+                            : Theme.of(context).primaryColor,
+                      ),
+                      SizedBox(width: 4),
+                      Text(geodata.category.name),
+                    ],
+                  ),
                 ),
               ),
               Flexible(
@@ -165,40 +176,18 @@ class _GeodataViewBasicInfo extends StatelessWidget {
                   title: Wrap(
                     children: [
                       Text(
-                        'Latitud: ${geodata.latitude}\nLongitud: ${geodata.longitude}',
+                        'Latitud: ${geodata.latitude.toStringAsFixed(1)}\nLongitud: ${geodata.longitude.toStringAsFixed(1)}',
                       ),
                     ],
                   ),
-                  subtitle: const Text('Ubicación'),
+                  subtitle: const Text(
+                    'Ir A',
+                    style: TextStyle(decoration: TextDecoration.underline),
+                  ),
                   onTap: () => context.beamToNamed(
                     '/map?'
                     '$LAT_PARAM=${geodata.latitude}&'
                     '$LNG_PARAM=${geodata.longitude}',
-                  ),
-                ),
-              ),
-            ],
-          ),
-          Row(
-            children: [
-              Flexible(
-                child: ListTile(
-                  title: Text(geodata.id.toString()),
-                  subtitle: const Text('Id'),
-                ),
-              ),
-              Flexible(
-                child: ListTile(
-                  title: Icon(
-                    IconCodeUtils.decode(geodata.icon),
-                    color: geodata.color != null
-                        ? Color(geodata.color!)
-                        : Theme.of(context).primaryColor,
-                  ),
-                  subtitle: Text(
-                    geodata.color != null
-                        ? Color(geodata.color!).toString()
-                        : 'Color No Especificado',
                   ),
                 ),
               ),

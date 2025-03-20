@@ -13,7 +13,8 @@ class BaseFieldView extends FieldViewWidget {
       title: Text(fieldValue.value?.toString() ?? ''),
       subtitle: Text(
         '${fieldValue.column.name} '
-        '(${fieldValue.column.type.metaType} - ${fieldValue.column.type.name})',
+        '(${fieldValue.column.type.metaType == 'Base' ? '' : ('${fieldValue.column.type.metaType} - ')}'
+        '${fieldValue.column.type.name})',
       ),
     );
   }

@@ -34,7 +34,7 @@ const _OSM_MAP_CONFIG = MapConfigurationModel(
   sourceType: MapSource.OSM,
   properties: {
     MAP_SOURCE_URL_TEMPLATE:
-        'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     MAP_SOURCE_SUBDOMAINS: ['a', 'b', 'c'],
   },
 );

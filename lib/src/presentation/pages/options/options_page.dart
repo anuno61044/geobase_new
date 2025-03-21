@@ -8,7 +8,7 @@ class OptionsPage extends StatelessWidget {
   static BeamPage getPage(BuildContext context) {
     return const BeamPage(
       key: ValueKey('Options'),
-      title: 'Opciones',
+      title: 'Opcionessssss',
       child: OptionsPage(),
     );
   }

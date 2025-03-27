@@ -39,6 +39,12 @@ const _mediaTypesInitialRows = [
     _renderClassKey:
         '${MEDIA_METATYPE_NAME}File$DEFAULT_RENDER_CLASS_NAME_SUFFIX',
   },
+  {
+    _nameKey: 'Video',
+    _extensionKey: ['*'],
+    _renderClassKey:
+        '${MEDIA_METATYPE_NAME}Video$DEFAULT_RENDER_CLASS_NAME_SUFFIX',
+  },
 ];
 
 extension GeobaseModelDatabaseExtension on GeobaseModel {

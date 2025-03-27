@@ -66,6 +66,8 @@ class MediaAudioFieldInputWidget extends FieldInputWidget {
   }
 }
 
+
+
 Future<String?> _audioFromFiles() async {
   final FilePickerResult? result = await FilePicker.platform.pickFiles(
     type: FileType.audio,
@@ -110,7 +112,6 @@ Future<String?> _showPicker(BuildContext context) async {
   );
 }
 
-
 Future<bool> _checkPermissions() async {
   // Verificar si ya tiene permisos
   if (await Permission.microphone.isGranted) {
@@ -121,7 +122,6 @@ Future<bool> _checkPermissions() async {
   final status = await Permission.microphone.request();
   return status.isGranted;
 }
-
 
 Future<String?> _audioFromMicrofone(BuildContext context) async {
   final record = Record();

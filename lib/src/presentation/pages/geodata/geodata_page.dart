@@ -86,19 +86,18 @@ class _Body extends StatelessWidget {
               ),
               BlocBuilder<CategoriesShowerCubit, CategoriesShowerState>(
                 builder: (context, categoryState) {
-                  if (categoryState.selected != null) {
-                    return Positioned(
-                      bottom: 20,
-                      left: 20,
-                      child: ElevatedButton(
-                        onPressed: () async {
-                          await _exportToExcel(context, categoryState.selected!);
-                        },
-                        child: const Text('Exportar'),
-                      ),
-                    );
-                  }
-                  return const SizedBox.shrink();
+                  return Positioned(
+                    bottom: 15,
+                    left: 15,
+                    child: FloatingActionButton(
+                      tooltip: 'Exportar Datos',
+                      backgroundColor: Theme.of(context).primaryColor,
+                      child: const Icon(Icons.download, color: Colors.white),
+                      onPressed: () async {
+                        await _exportToExcel(context, categoryState.selected);
+                      },
+                    ),
+                  );
                 },
               ),
             ],
@@ -108,12 +107,13 @@ class _Body extends StatelessWidget {
     );
   }
 
-  Future<void> _exportToExcel(BuildContext context, int categoryId) async {
+  Future<void> _exportToExcel(BuildContext context, int? categoryId) async {
     final geodataList = context.read<GeodataListBloc>().state.maybeWhen(
-          fetchSuccess: (geodataList) =>
-              geodataList.where((g) => g.category.id == categoryId).toList(),
-          orElse: () => [],
-        );
+      fetchSuccess: (geodataList) => categoryId != null
+          ? geodataList.where((g) => g.category.id == categoryId).toList()
+          : geodataList, // Si categoryId es null, exporta todas las categorías.
+      orElse: () => [],
+    );
 
     if (geodataList.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -122,17 +122,11 @@ class _Body extends StatelessWidget {
       return;
     }
 
-    // Obtener todos los nombres de las columnas
+    // Obtener todos los nombres de columnas dinámicamente
     List<String> columnNames = ['ID', 'Categoría', 'Latitud', 'Longitud'];
-    for(var field in geodataList[0].fields) {
-      columnNames.add('${field.column.name}');
-    }
-
-    // Obtener todos los valores de campos únicos
-    Set<String> fieldNames = {};
     for (var geodata in geodataList) {
       for (var field in geodata.fields) {
-        fieldNames.add('${field.value}');
+        columnNames.add('${field.column.name}');
       }
     }
 
@@ -152,7 +146,7 @@ class _Body extends StatelessWidget {
         geodata.longitude.toString(),
       ];
 
-      for(var field in geodata.fields) {
+      for (var field in geodata.fields) {
         row.add(field.value.toString());
       }
 
@@ -170,8 +164,15 @@ class _Body extends StatelessWidget {
         return;
       }
 
-      final filePath = '$selectedDirectory/Geodata_$categoryId.xlsx';
+      final fileName = categoryId != null ? 'Geodata_$categoryId.xlsx' : 'Geodata_Todas_Categorias.xlsx';
+      final filePath = '$selectedDirectory/$fileName';
       final file = File(filePath);
+
+      // Verificar si el archivo ya existe y eliminarlo antes de escribir
+      if (file.existsSync()) {
+        await file.delete(); // Eliminar el archivo existente
+      }
+
       await file.writeAsBytes(excel.encode()!);
 
       // Mostrar mensaje de confirmación con la ruta seleccionada
@@ -179,11 +180,14 @@ class _Body extends StatelessWidget {
         SnackBar(content: Text('Archivo guardado en: $filePath')),
       );
     } catch (e) {
+      log('$e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error al guardar el archivo: $e')),
       );
     }
   }
+
+
 
 
   Widget _buildInitialState(BuildContext context) => _buildMessageState(context, 'Seleccione una categoría para ver los datos.');

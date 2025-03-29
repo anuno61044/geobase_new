@@ -37,11 +37,9 @@ class MediaVideoFieldInputWidget extends FieldInputWidget {
                 ? ClipRRect(
                     key: Key(column.name),
                     borderRadius: BorderRadius.circular(100),
-                    child: Image.file(
-                      File(state.value.value.toString()),
-                      width: 80,
-                      height: 80,
-                      fit: BoxFit.cover,
+                    child: Icon(
+                      Icons.video_camera_back,
+                      color: Colors.grey[800],
                     ),
                   )
                 : Container(
@@ -52,7 +50,7 @@ class MediaVideoFieldInputWidget extends FieldInputWidget {
                     width: 80,
                     height: 80,
                     child: Icon(
-                      Icons.camera_alt,
+                      Icons.video_camera_back,
                       color: Colors.grey[800],
                     ),
                   ),

@@ -9,4 +9,5 @@ export 'media_audio_field_render.dart';
 export 'media_field_render.dart';
 export 'media_file_field_render.dart';
 export 'media_image_field_render.dart';
+export 'media_video_field_render.dart';
 export 'staticselection_field_render.dart';

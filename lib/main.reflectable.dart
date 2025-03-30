@@ -25,8 +25,10 @@ import 'package:geobase/src/presentation/core/widgets/render_classes/field_rende
     as prefix10;
 import 'package:geobase/src/presentation/core/widgets/render_classes/field_render_classes/media_image_field_render.dart'
     as prefix11;
-import 'package:geobase/src/presentation/core/widgets/render_classes/field_render_classes/staticselection_field_render.dart'
+import 'package:geobase/src/presentation/core/widgets/render_classes/field_render_classes/media_video_field_render.dart'
     as prefix12;
+import 'package:geobase/src/presentation/core/widgets/render_classes/field_render_classes/staticselection_field_render.dart'
+    as prefix13;
 import 'package:geobase/src/presentation/core/widgets/render_classes/reflect.dart'
     as prefix0;
 
@@ -250,8 +252,8 @@ final _data = <r.Reflectable, r.ReflectorData>{
             null,
             {}),
         r.NonGenericClassMirrorImpl(
-            r'StaticSelectionFieldRender',
-            r'.StaticSelectionFieldRender',
+            r'MediaVideoFieldRender',
+            r'.MediaVideoFieldRender',
             134217735,
             11,
             const prefix0.FieldRenderReflectable(),
@@ -262,11 +264,31 @@ final _data = <r.Reflectable, r.ReflectorData>{
             {},
             {},
             {
-              r'': (bool b) =>
-                  () => b ? prefix12.StaticSelectionFieldRender() : null
+              r'': (bool b) => () => b ? prefix12.MediaVideoFieldRender() : null
             },
             -1,
             11,
+            const <int>[6],
+            null,
+            {}),
+        r.NonGenericClassMirrorImpl(
+            r'StaticSelectionFieldRender',
+            r'.StaticSelectionFieldRender',
+            134217735,
+            12,
+            const prefix0.FieldRenderReflectable(),
+            const <int>[-1],
+            null,
+            null,
+            -1,
+            {},
+            {},
+            {
+              r'': (bool b) =>
+                  () => b ? prefix13.StaticSelectionFieldRender() : null
+            },
+            -1,
+            12,
             const <int>[6],
             null,
             {})
@@ -285,9 +307,10 @@ final _data = <r.Reflectable, r.ReflectorData>{
         prefix9.MediaFieldRender,
         prefix10.MediaFileFieldRender,
         prefix11.MediaImageFieldRender,
-        prefix12.StaticSelectionFieldRender
+        prefix12.MediaVideoFieldRender,
+        prefix13.StaticSelectionFieldRender
       ],
-      12,
+      13,
       {},
       {},
       null,

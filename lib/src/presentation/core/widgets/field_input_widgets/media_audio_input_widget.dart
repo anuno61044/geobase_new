@@ -7,6 +7,10 @@ import 'package:geobase/src/presentation/core/app.dart';
 import 'package:geobase/src/presentation/core/utils/file_utilis.dart';
 import 'package:geobase/src/presentation/core/widgets/field_input_widgets/field_input_widget.dart';
 
+import 'package:record/record.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
+
 class MediaAudioFieldInputWidget extends FieldInputWidget {
   const MediaAudioFieldInputWidget({
     super.key,
@@ -62,6 +66,8 @@ class MediaAudioFieldInputWidget extends FieldInputWidget {
   }
 }
 
+
+
 Future<String?> _audioFromFiles() async {
   final FilePickerResult? result = await FilePicker.platform.pickFiles(
     type: FileType.audio,
@@ -91,17 +97,14 @@ Future<String?> _showPicker(BuildContext context) async {
                     .then((value) => Navigator.of(context).pop(value));
               },
             ),
-
-            //TODO: DO THIS WITH MICROPHONE
-            //
-            // ListTile(
-            //   leading: const Icon(Icons.mic),
-            //   title: const Text('Grabar Sonido'),
-            //   onTap: () async {
-            //     await _audioFromMicrofone(context)
-            //         .then((value) => Navigator.of(context).pop(value));
-            //   },
-            // ),
+            ListTile(
+              leading: const Icon(Icons.mic),
+              title: const Text('Grabar Sonido'),
+              onTap: () async {
+                await _audioFromMicrofone(context)
+                    .then((value) => Navigator.of(context).pop(value));
+              },
+            ),
           ],
         ),
       );
@@ -109,16 +112,77 @@ Future<String?> _showPicker(BuildContext context) async {
   );
 }
 
-// Future<String?> _audioFromMicrofone(BuildContext context) async {
-//   final audioPath = showDialog(
-//     context: context,
-//     builder: (context) => Dialog(
-//       child: Padding(
-//         padding: EdgeInsets.all(8),
-//         child: SimpleRecorder,
-//       ),
-//     ),
-//   );
+Future<bool> _checkPermissions() async {
+  // Verificar si ya tiene permisos
+  if (await Permission.microphone.isGranted) {
+    return true;
+  }
 
-//   return audioPath;
-// }
+  // Solicitar permisos
+  final status = await Permission.microphone.request();
+  return status.isGranted;
+}
+
+Future<String?> _audioFromMicrofone(BuildContext context) async {
+  final record = Record();
+
+  // Verificar permisos
+  final hasPermission = await _checkPermissions();
+  if (!hasPermission) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Permiso para acceder al micrófono denegado')),
+    );
+    return null;
+  }
+
+  // Obtener la ruta del directorio temporal para guardar la grabación
+  final directory = await getTemporaryDirectory();
+  final filePath = '${directory.path}/recording.m4a';
+
+  // Mostrar un diálogo para grabar audio
+  return showDialog<String>(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: const Text('Grabar Audio'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('Presiona el botón para comenzar a grabar.'),
+            const SizedBox(height: 20),
+            StreamBuilder<RecordState>(
+              stream: record.onStateChanged(),
+              builder: (context, snapshot) {
+                final isRecording = snapshot.data == RecordState.record;
+                return IconButton(
+                  icon: Icon(isRecording ? Icons.stop : Icons.mic),
+                  onPressed: () async {
+                    if (isRecording) {
+                      // Detener la grabación
+                      await record.stop();
+                      Navigator.of(context).pop(filePath); // Retornar la ruta del archivo
+                    } else {
+                      // Comenzar la grabación
+                      await record.start(
+                        path: filePath,
+                        encoder: AudioEncoder.aacLc, // Formato de audio
+                      );
+                    }
+                  },
+                );
+              },
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(); // Cerrar el diálogo sin grabar
+            },
+            child: const Text('Cancelar'),
+          ),
+        ],
+      );
+    },
+  );
+}

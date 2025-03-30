@@ -5,9 +5,9 @@ import 'package:geobase/src/domain/entities/entities.dart';
 import 'package:geobase/src/domain/services/services.dart';
 import 'package:rxdart/rxdart.dart';
 
+part 'geodatalist_bloc.freezed.dart';
 part 'geodatalist_event.dart';
 part 'geodatalist_state.dart';
-part 'geodatalist_bloc.freezed.dart';
 
 @injectable
 class GeodataListBloc extends Bloc<GeodataListEvent, GeodataListState> {
@@ -23,7 +23,9 @@ class GeodataListBloc extends Bloc<GeodataListEvent, GeodataListState> {
             }
             emit(const GeodataListState.fetchInProgress());
             final response = await geodataService.loadGeodataWhere(
-              FilterDataOptionsEntity(categoryId: categoryId),
+              categoryId != -1
+                  ? FilterDataOptionsEntity(categoryId: categoryId)
+                  : null,
             );
             response.fold(
               (error) => emit(

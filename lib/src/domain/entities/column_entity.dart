@@ -4,4 +4,10 @@ abstract class ColumnEntity {
   });
 
   final String name;
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name
+    };
+  }
 }

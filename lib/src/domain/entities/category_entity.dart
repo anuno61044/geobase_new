@@ -13,4 +13,13 @@ abstract class CategoryEntity {
   final int? color;
 
   final String icon;
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'description': description,
+      'color': color,
+      'icon': icon,
+    };
+  }
 }

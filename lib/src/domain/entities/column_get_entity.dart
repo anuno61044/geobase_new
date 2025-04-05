@@ -15,6 +15,15 @@ class ColumnGetEntity extends ColumnEntity {
 
   final FieldTypeGetEntity type;
 
+  @override
+  Map<String, dynamic> toJson() {
+    return {
+      ...super.toJson(), // Incluye los campos de CategoryEntity
+      'id': id,
+      'type': type.name
+    };
+  }
+
   ColumnGetEntity copyWith({
     int? id,
     int? categoryId,

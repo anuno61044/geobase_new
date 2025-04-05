@@ -165,6 +165,72 @@ class _Body extends StatelessWidget {
               ],
             );
           },
+          exportInProgress: () {
+            // Add your implementation for export in progress
+            return Column(
+              children: [
+                _QueryInput(
+                  key: queryWidgetKey,
+                  controller: queryController,
+                  focusNode: focusNode,
+                ),
+                Flexible(
+                  flex: 3,
+                  child: Center(
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Theme.of(context).primaryColor,
+                    ),
+                  ),
+                ),
+                const Flexible(flex: 2, child: SizedBox.shrink()),
+              ],
+            );
+          },
+          exportSuccess: (message) {
+            // Add your implementation for export success
+            return Column(
+              children: [
+                _QueryInput(
+                  key: queryWidgetKey,
+                  controller: queryController,
+                  focusNode: focusNode,
+                ),
+                Flexible(
+                  flex: 3,
+                  child: Center(
+                    child: SelectableText(
+                      message,
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+                const Flexible(flex: 2, child: SizedBox.shrink()),
+              ],
+            );
+          },
+          exportFailure: (error) {
+            // Add your implementation for export failure
+            return Column(
+              children: [
+                _QueryInput(
+                  key: queryWidgetKey,
+                  controller: queryController,
+                  focusNode: focusNode,
+                ),
+                Flexible(
+                  flex: 3,
+                  child: Center(
+                    child: SelectableText(
+                      error,
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+                const Flexible(flex: 2, child: SizedBox.shrink()),
+              ],
+            );
+          },
         );
       },
     );
@@ -295,16 +361,32 @@ class _FloatingActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FloatingActionButton(
-      tooltip: 'Agregar Categoría',
-      heroTag: null,
-      child: const Icon(Icons.add),
-      onPressed: () {
-        context.beamToNamed('/categories/new');
-        context
-            .read<CategoryListBloc>()
-            .add(const CategoryListEvent.fetched(query: ''));
-      },
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // Botón de Exportación
+        FloatingActionButton(
+          tooltip: 'Exportar categorías',
+          heroTag: 'export_button',
+          child: const Icon(Icons.download),
+          onPressed: () => context
+              .read<CategoryListBloc>()
+              .add(const CategoryListEvent.exportToJson()),
+        ),
+        const SizedBox(height: 16),
+        // Botón de Agregar (existente)
+        FloatingActionButton(
+          tooltip: 'Agregar Categoría',
+          heroTag: 'add_button',
+          child: const Icon(Icons.add),
+          onPressed: () {
+            context.beamToNamed('/categories/new');
+            context
+                .read<CategoryListBloc>()
+                .add(const CategoryListEvent.fetched(query: ''));
+          },
+        ),
+      ],
     );
   }
 }

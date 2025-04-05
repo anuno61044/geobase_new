@@ -12,4 +12,14 @@ class CategoryListState with _$CategoryListState {
   const factory CategoryListState.fetchFailure({
     required String error,
   }) = _FetchFailure;
+
+  // Nuevos estados para exportación (mismo formato con _)
+  const factory CategoryListState.exportInProgress() = 
+      _ExportInProgress;
+  const factory CategoryListState.exportSuccess({
+    required String filePath,  // Ruta del archivo guardado
+  }) = _ExportSuccess;
+  const factory CategoryListState.exportFailure({
+    required String error,
+  }) = _ExportFailure;
 }

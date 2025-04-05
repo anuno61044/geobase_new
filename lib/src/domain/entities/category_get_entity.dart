@@ -14,4 +14,13 @@ class CategoryGetEntity extends CategoryEntity {
   final int id;
 
   final List<ColumnGetEntity> columns;
+
+  @override
+  Map<String, dynamic> toJson() {
+    return {
+      ...super.toJson(), // Incluye los campos de CategoryEntity
+      'id': id,
+      'columns': columns.map((column) => column.toJson()).toList(),
+    };
+  }
 }

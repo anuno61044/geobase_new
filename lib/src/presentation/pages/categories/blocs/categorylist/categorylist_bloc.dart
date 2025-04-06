@@ -22,8 +22,57 @@ class CategoryListBloc extends Bloc<CategoryListEvent, CategoryListState> {
     on<CategoryListEvent>(
       (event, emit) async {
         await event.when(
-          fetched: (query) => _handleFetch(emit, query),
-          exportToJson: () => _handleExport(emit),
+          fetched: (query) async {
+            emit(const CategoryListState.fetchInProgress());
+            final response = await categoryService.loadCategoriesWhere(
+              FilterCategoriesOptionsEntity(nameSubstring: query),
+            );
+            response.fold(
+              (error) => emit(
+                CategoryListState.fetchFailure(
+                  error: error.message ?? error.toString(),
+                ),
+              ),
+              (categories) => emit(
+                categories.isEmpty
+                    ? const CategoryListState.fetchSuccessNotFound()
+                    : CategoryListState.fetchSuccess(categories: categories),
+              ),
+            );
+          },
+          exportToJson: () async {
+            try {
+              if (isClosed) return;
+              emit(const CategoryListState.exportInProgress());
+
+              // Si no hay categorías o el estado no es el correcto, intentamos cargarlas
+              final currentState = state;
+              if (currentState is! _FetchSuccess || currentState.categories.isEmpty) {
+                await _handleFetch(emit, ''); // Cargamos todas las categorías
+                
+                // Verificamos nuevamente después de cargar
+                final newState = state;
+                if (newState is! _FetchSuccess || newState.categories.isEmpty) {
+                  if (isClosed) return;
+                  emit(const CategoryListState.exportFailure(
+                      error: 'No hay categorías disponibles para exportar'));
+                  return;
+                }
+              }
+
+              // Procedemos con la exportación
+              final categories = (state as _FetchSuccess).categories;
+              final filePath = await _saveCategoriesToJsonWithPicker(categories);
+              
+              if (isClosed) return;
+              emit(CategoryListState.exportSuccess(
+                  filePath: filePath ?? 'Ruta no disponible'));
+            } catch (e) {
+              if (!isClosed) {
+                emit(CategoryListState.exportFailure(error: e.toString()));
+              }
+            }
+          }
         );
       },
       transformer: (events, mapper) {

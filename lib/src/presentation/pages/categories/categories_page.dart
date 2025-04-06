@@ -45,17 +45,7 @@ class _CategoriesPageInternal extends StatelessWidget {
           title: const Text('Lista de Categorías'),
         ),
         body: _Body(),
-        floatingActionButton: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: const [
-            Padding(
-              padding: EdgeInsets.only(bottom: 10.0),
-              child: _HelloButton(),
-            ),
-            _FloatingActionButton(),
-          ],
-        ),
+        floatingActionButton: const _FloatingActionButton(),
       ),
     );
   }
@@ -371,34 +361,32 @@ class _FloatingActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FloatingActionButton(
-      tooltip: 'Agregar Categoría',
-      heroTag: null,
-      child: const Icon(Icons.add),
-      onPressed: () {
-        context.beamToNamed('/categories/new');
-        context
-            .read<CategoryListBloc>()
-            .add(const CategoryListEvent.fetched(query: ''));
-      },
-    );
-  }
-}
-
-class _HelloButton extends StatelessWidget {
-  const _HelloButton();
-
-  @override
-  Widget build(BuildContext context) {
-    return FloatingActionButton(
-      heroTag: 'helloButton',
-      tooltip: 'Saludar',
-      onPressed: () {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Hola')),
-        );
-      },
-      child: const Icon(Icons.waving_hand),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // Botón de Exportación
+        FloatingActionButton(
+          tooltip: 'Exportar categorías',
+          heroTag: 'export_button',
+          child: const Icon(Icons.download),
+          onPressed: () => context
+              .read<CategoryListBloc>()
+              .add(const CategoryListEvent.exportToJson()),
+        ),
+        const SizedBox(height: 16),
+        // Botón de Agregar (existente)
+        FloatingActionButton(
+          tooltip: 'Agregar Categoría',
+          heroTag: 'add_button',
+          child: const Icon(Icons.add),
+          onPressed: () {
+            context.beamToNamed('/categories/new');
+            context
+                .read<CategoryListBloc>()
+                .add(const CategoryListEvent.fetched(query: ''));
+          },
+        ),
+      ],
     );
   }
 }

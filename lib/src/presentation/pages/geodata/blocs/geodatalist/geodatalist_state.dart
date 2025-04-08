@@ -11,4 +11,13 @@ class GeodataListState with _$GeodataListState {
   const factory GeodataListState.fetchFailure({
     required String error,
   }) = _FetchFailure;
+
+  // Nuevos estados para exportación
+  const factory GeodataListState.exportInProgress() = _ExportInProgress;
+  const factory GeodataListState.exportSuccess({
+    required String filePath,
+  }) = _ExportSuccess;
+  const factory GeodataListState.exportFailure({
+    required String error,
+  }) = _ExportFailure;
 }

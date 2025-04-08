@@ -16,42 +16,43 @@ final _privateConstructorUsedError = UnsupportedError(
 
 /// @nodoc
 mixin _$GeodataListEvent {
-  int? get categoryId => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(int? categoryId) fetched,
+    required TResult Function() exportData,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(int? categoryId)? fetched,
+    TResult? Function()? exportData,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(int? categoryId)? fetched,
+    TResult Function()? exportData,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(_Fetched value) fetched,
+    required TResult Function(_ExportData value) exportData,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(_Fetched value)? fetched,
+    TResult? Function(_ExportData value)? exportData,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(_Fetched value)? fetched,
+    TResult Function(_ExportData value)? exportData,
     required TResult orElse(),
   }) =>
-      throw _privateConstructorUsedError;
-
-  @JsonKey(ignore: true)
-  $GeodataListEventCopyWith<GeodataListEvent> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -60,8 +61,6 @@ abstract class $GeodataListEventCopyWith<$Res> {
   factory $GeodataListEventCopyWith(
           GeodataListEvent value, $Res Function(GeodataListEvent) then) =
       _$GeodataListEventCopyWithImpl<$Res, GeodataListEvent>;
-  @useResult
-  $Res call({int? categoryId});
 }
 
 /// @nodoc
@@ -73,28 +72,13 @@ class _$GeodataListEventCopyWithImpl<$Res, $Val extends GeodataListEvent>
   final $Val _value;
   // ignore: unused_field
   final $Res Function($Val) _then;
-
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? categoryId = freezed,
-  }) {
-    return _then(_value.copyWith(
-      categoryId: freezed == categoryId
-          ? _value.categoryId
-          : categoryId // ignore: cast_nullable_to_non_nullable
-              as int?,
-    ) as $Val);
-  }
 }
 
 /// @nodoc
-abstract class _$$_FetchedCopyWith<$Res>
-    implements $GeodataListEventCopyWith<$Res> {
+abstract class _$$_FetchedCopyWith<$Res> {
   factory _$$_FetchedCopyWith(
           _$_Fetched value, $Res Function(_$_Fetched) then) =
       __$$_FetchedCopyWithImpl<$Res>;
-  @override
   @useResult
   $Res call({int? categoryId});
 }
@@ -155,6 +139,7 @@ class _$_Fetched implements _Fetched {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(int? categoryId) fetched,
+    required TResult Function() exportData,
   }) {
     return fetched(categoryId);
   }
@@ -163,6 +148,7 @@ class _$_Fetched implements _Fetched {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(int? categoryId)? fetched,
+    TResult? Function()? exportData,
   }) {
     return fetched?.call(categoryId);
   }
@@ -171,6 +157,7 @@ class _$_Fetched implements _Fetched {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(int? categoryId)? fetched,
+    TResult Function()? exportData,
     required TResult orElse(),
   }) {
     if (fetched != null) {
@@ -183,6 +170,7 @@ class _$_Fetched implements _Fetched {
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(_Fetched value) fetched,
+    required TResult Function(_ExportData value) exportData,
   }) {
     return fetched(this);
   }
@@ -191,6 +179,7 @@ class _$_Fetched implements _Fetched {
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(_Fetched value)? fetched,
+    TResult? Function(_ExportData value)? exportData,
   }) {
     return fetched?.call(this);
   }
@@ -199,6 +188,7 @@ class _$_Fetched implements _Fetched {
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(_Fetched value)? fetched,
+    TResult Function(_ExportData value)? exportData,
     required TResult orElse(),
   }) {
     if (fetched != null) {
@@ -211,12 +201,112 @@ class _$_Fetched implements _Fetched {
 abstract class _Fetched implements GeodataListEvent {
   const factory _Fetched({final int? categoryId}) = _$_Fetched;
 
-  @override
   int? get categoryId;
-  @override
   @JsonKey(ignore: true)
   _$$_FetchedCopyWith<_$_Fetched> get copyWith =>
       throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$_ExportDataCopyWith<$Res> {
+  factory _$$_ExportDataCopyWith(
+          _$_ExportData value, $Res Function(_$_ExportData) then) =
+      __$$_ExportDataCopyWithImpl<$Res>;
+}
+
+/// @nodoc
+class __$$_ExportDataCopyWithImpl<$Res>
+    extends _$GeodataListEventCopyWithImpl<$Res, _$_ExportData>
+    implements _$$_ExportDataCopyWith<$Res> {
+  __$$_ExportDataCopyWithImpl(
+      _$_ExportData _value, $Res Function(_$_ExportData) _then)
+      : super(_value, _then);
+}
+
+/// @nodoc
+
+class _$_ExportData implements _ExportData {
+  const _$_ExportData();
+
+  @override
+  String toString() {
+    return 'GeodataListEvent.exportData()';
+  }
+
+  @override
+  bool operator ==(dynamic other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is _$_ExportData);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(int? categoryId) fetched,
+    required TResult Function() exportData,
+  }) {
+    return exportData();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(int? categoryId)? fetched,
+    TResult? Function()? exportData,
+  }) {
+    return exportData?.call();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(int? categoryId)? fetched,
+    TResult Function()? exportData,
+    required TResult orElse(),
+  }) {
+    if (exportData != null) {
+      return exportData();
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(_Fetched value) fetched,
+    required TResult Function(_ExportData value) exportData,
+  }) {
+    return exportData(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_Fetched value)? fetched,
+    TResult? Function(_ExportData value)? exportData,
+  }) {
+    return exportData?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(_Fetched value)? fetched,
+    TResult Function(_ExportData value)? exportData,
+    required TResult orElse(),
+  }) {
+    if (exportData != null) {
+      return exportData(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class _ExportData implements GeodataListEvent {
+  const factory _ExportData() = _$_ExportData;
 }
 
 /// @nodoc
@@ -228,6 +318,9 @@ mixin _$GeodataListState {
     required TResult Function(List<GeodataGetEntity> geodataList) fetchSuccess,
     required TResult Function() fetchSuccessNotFound,
     required TResult Function(String error) fetchFailure,
+    required TResult Function() exportInProgress,
+    required TResult Function(String filePath) exportSuccess,
+    required TResult Function(String error) exportFailure,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -237,6 +330,9 @@ mixin _$GeodataListState {
     TResult? Function(List<GeodataGetEntity> geodataList)? fetchSuccess,
     TResult? Function()? fetchSuccessNotFound,
     TResult? Function(String error)? fetchFailure,
+    TResult? Function()? exportInProgress,
+    TResult? Function(String filePath)? exportSuccess,
+    TResult? Function(String error)? exportFailure,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -246,6 +342,9 @@ mixin _$GeodataListState {
     TResult Function(List<GeodataGetEntity> geodataList)? fetchSuccess,
     TResult Function()? fetchSuccessNotFound,
     TResult Function(String error)? fetchFailure,
+    TResult Function()? exportInProgress,
+    TResult Function(String filePath)? exportSuccess,
+    TResult Function(String error)? exportFailure,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -256,6 +355,9 @@ mixin _$GeodataListState {
     required TResult Function(_FetchSuccess value) fetchSuccess,
     required TResult Function(_FetchSuccessNotFound value) fetchSuccessNotFound,
     required TResult Function(_FetchFailure value) fetchFailure,
+    required TResult Function(_ExportInProgress value) exportInProgress,
+    required TResult Function(_ExportSuccess value) exportSuccess,
+    required TResult Function(_ExportFailure value) exportFailure,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -265,6 +367,9 @@ mixin _$GeodataListState {
     TResult? Function(_FetchSuccess value)? fetchSuccess,
     TResult? Function(_FetchSuccessNotFound value)? fetchSuccessNotFound,
     TResult? Function(_FetchFailure value)? fetchFailure,
+    TResult? Function(_ExportInProgress value)? exportInProgress,
+    TResult? Function(_ExportSuccess value)? exportSuccess,
+    TResult? Function(_ExportFailure value)? exportFailure,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -274,6 +379,9 @@ mixin _$GeodataListState {
     TResult Function(_FetchSuccess value)? fetchSuccess,
     TResult Function(_FetchSuccessNotFound value)? fetchSuccessNotFound,
     TResult Function(_FetchFailure value)? fetchFailure,
+    TResult Function(_ExportInProgress value)? exportInProgress,
+    TResult Function(_ExportSuccess value)? exportSuccess,
+    TResult Function(_ExportFailure value)? exportFailure,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -339,6 +447,9 @@ class _$_Initial implements _Initial {
     required TResult Function(List<GeodataGetEntity> geodataList) fetchSuccess,
     required TResult Function() fetchSuccessNotFound,
     required TResult Function(String error) fetchFailure,
+    required TResult Function() exportInProgress,
+    required TResult Function(String filePath) exportSuccess,
+    required TResult Function(String error) exportFailure,
   }) {
     return initial();
   }
@@ -351,6 +462,9 @@ class _$_Initial implements _Initial {
     TResult? Function(List<GeodataGetEntity> geodataList)? fetchSuccess,
     TResult? Function()? fetchSuccessNotFound,
     TResult? Function(String error)? fetchFailure,
+    TResult? Function()? exportInProgress,
+    TResult? Function(String filePath)? exportSuccess,
+    TResult? Function(String error)? exportFailure,
   }) {
     return initial?.call();
   }
@@ -363,6 +477,9 @@ class _$_Initial implements _Initial {
     TResult Function(List<GeodataGetEntity> geodataList)? fetchSuccess,
     TResult Function()? fetchSuccessNotFound,
     TResult Function(String error)? fetchFailure,
+    TResult Function()? exportInProgress,
+    TResult Function(String filePath)? exportSuccess,
+    TResult Function(String error)? exportFailure,
     required TResult orElse(),
   }) {
     if (initial != null) {
@@ -379,6 +496,9 @@ class _$_Initial implements _Initial {
     required TResult Function(_FetchSuccess value) fetchSuccess,
     required TResult Function(_FetchSuccessNotFound value) fetchSuccessNotFound,
     required TResult Function(_FetchFailure value) fetchFailure,
+    required TResult Function(_ExportInProgress value) exportInProgress,
+    required TResult Function(_ExportSuccess value) exportSuccess,
+    required TResult Function(_ExportFailure value) exportFailure,
   }) {
     return initial(this);
   }
@@ -391,6 +511,9 @@ class _$_Initial implements _Initial {
     TResult? Function(_FetchSuccess value)? fetchSuccess,
     TResult? Function(_FetchSuccessNotFound value)? fetchSuccessNotFound,
     TResult? Function(_FetchFailure value)? fetchFailure,
+    TResult? Function(_ExportInProgress value)? exportInProgress,
+    TResult? Function(_ExportSuccess value)? exportSuccess,
+    TResult? Function(_ExportFailure value)? exportFailure,
   }) {
     return initial?.call(this);
   }
@@ -403,6 +526,9 @@ class _$_Initial implements _Initial {
     TResult Function(_FetchSuccess value)? fetchSuccess,
     TResult Function(_FetchSuccessNotFound value)? fetchSuccessNotFound,
     TResult Function(_FetchFailure value)? fetchFailure,
+    TResult Function(_ExportInProgress value)? exportInProgress,
+    TResult Function(_ExportSuccess value)? exportSuccess,
+    TResult Function(_ExportFailure value)? exportFailure,
     required TResult orElse(),
   }) {
     if (initial != null) {
@@ -459,6 +585,9 @@ class _$_FetchInProgress implements _FetchInProgress {
     required TResult Function(List<GeodataGetEntity> geodataList) fetchSuccess,
     required TResult Function() fetchSuccessNotFound,
     required TResult Function(String error) fetchFailure,
+    required TResult Function() exportInProgress,
+    required TResult Function(String filePath) exportSuccess,
+    required TResult Function(String error) exportFailure,
   }) {
     return fetchInProgress();
   }
@@ -471,6 +600,9 @@ class _$_FetchInProgress implements _FetchInProgress {
     TResult? Function(List<GeodataGetEntity> geodataList)? fetchSuccess,
     TResult? Function()? fetchSuccessNotFound,
     TResult? Function(String error)? fetchFailure,
+    TResult? Function()? exportInProgress,
+    TResult? Function(String filePath)? exportSuccess,
+    TResult? Function(String error)? exportFailure,
   }) {
     return fetchInProgress?.call();
   }
@@ -483,6 +615,9 @@ class _$_FetchInProgress implements _FetchInProgress {
     TResult Function(List<GeodataGetEntity> geodataList)? fetchSuccess,
     TResult Function()? fetchSuccessNotFound,
     TResult Function(String error)? fetchFailure,
+    TResult Function()? exportInProgress,
+    TResult Function(String filePath)? exportSuccess,
+    TResult Function(String error)? exportFailure,
     required TResult orElse(),
   }) {
     if (fetchInProgress != null) {
@@ -499,6 +634,9 @@ class _$_FetchInProgress implements _FetchInProgress {
     required TResult Function(_FetchSuccess value) fetchSuccess,
     required TResult Function(_FetchSuccessNotFound value) fetchSuccessNotFound,
     required TResult Function(_FetchFailure value) fetchFailure,
+    required TResult Function(_ExportInProgress value) exportInProgress,
+    required TResult Function(_ExportSuccess value) exportSuccess,
+    required TResult Function(_ExportFailure value) exportFailure,
   }) {
     return fetchInProgress(this);
   }
@@ -511,6 +649,9 @@ class _$_FetchInProgress implements _FetchInProgress {
     TResult? Function(_FetchSuccess value)? fetchSuccess,
     TResult? Function(_FetchSuccessNotFound value)? fetchSuccessNotFound,
     TResult? Function(_FetchFailure value)? fetchFailure,
+    TResult? Function(_ExportInProgress value)? exportInProgress,
+    TResult? Function(_ExportSuccess value)? exportSuccess,
+    TResult? Function(_ExportFailure value)? exportFailure,
   }) {
     return fetchInProgress?.call(this);
   }
@@ -523,6 +664,9 @@ class _$_FetchInProgress implements _FetchInProgress {
     TResult Function(_FetchSuccess value)? fetchSuccess,
     TResult Function(_FetchSuccessNotFound value)? fetchSuccessNotFound,
     TResult Function(_FetchFailure value)? fetchFailure,
+    TResult Function(_ExportInProgress value)? exportInProgress,
+    TResult Function(_ExportSuccess value)? exportSuccess,
+    TResult Function(_ExportFailure value)? exportFailure,
     required TResult orElse(),
   }) {
     if (fetchInProgress != null) {
@@ -612,6 +756,9 @@ class _$_FetchSuccess implements _FetchSuccess {
     required TResult Function(List<GeodataGetEntity> geodataList) fetchSuccess,
     required TResult Function() fetchSuccessNotFound,
     required TResult Function(String error) fetchFailure,
+    required TResult Function() exportInProgress,
+    required TResult Function(String filePath) exportSuccess,
+    required TResult Function(String error) exportFailure,
   }) {
     return fetchSuccess(geodataList);
   }
@@ -624,6 +771,9 @@ class _$_FetchSuccess implements _FetchSuccess {
     TResult? Function(List<GeodataGetEntity> geodataList)? fetchSuccess,
     TResult? Function()? fetchSuccessNotFound,
     TResult? Function(String error)? fetchFailure,
+    TResult? Function()? exportInProgress,
+    TResult? Function(String filePath)? exportSuccess,
+    TResult? Function(String error)? exportFailure,
   }) {
     return fetchSuccess?.call(geodataList);
   }
@@ -636,6 +786,9 @@ class _$_FetchSuccess implements _FetchSuccess {
     TResult Function(List<GeodataGetEntity> geodataList)? fetchSuccess,
     TResult Function()? fetchSuccessNotFound,
     TResult Function(String error)? fetchFailure,
+    TResult Function()? exportInProgress,
+    TResult Function(String filePath)? exportSuccess,
+    TResult Function(String error)? exportFailure,
     required TResult orElse(),
   }) {
     if (fetchSuccess != null) {
@@ -652,6 +805,9 @@ class _$_FetchSuccess implements _FetchSuccess {
     required TResult Function(_FetchSuccess value) fetchSuccess,
     required TResult Function(_FetchSuccessNotFound value) fetchSuccessNotFound,
     required TResult Function(_FetchFailure value) fetchFailure,
+    required TResult Function(_ExportInProgress value) exportInProgress,
+    required TResult Function(_ExportSuccess value) exportSuccess,
+    required TResult Function(_ExportFailure value) exportFailure,
   }) {
     return fetchSuccess(this);
   }
@@ -664,6 +820,9 @@ class _$_FetchSuccess implements _FetchSuccess {
     TResult? Function(_FetchSuccess value)? fetchSuccess,
     TResult? Function(_FetchSuccessNotFound value)? fetchSuccessNotFound,
     TResult? Function(_FetchFailure value)? fetchFailure,
+    TResult? Function(_ExportInProgress value)? exportInProgress,
+    TResult? Function(_ExportSuccess value)? exportSuccess,
+    TResult? Function(_ExportFailure value)? exportFailure,
   }) {
     return fetchSuccess?.call(this);
   }
@@ -676,6 +835,9 @@ class _$_FetchSuccess implements _FetchSuccess {
     TResult Function(_FetchSuccess value)? fetchSuccess,
     TResult Function(_FetchSuccessNotFound value)? fetchSuccessNotFound,
     TResult Function(_FetchFailure value)? fetchFailure,
+    TResult Function(_ExportInProgress value)? exportInProgress,
+    TResult Function(_ExportSuccess value)? exportSuccess,
+    TResult Function(_ExportFailure value)? exportFailure,
     required TResult orElse(),
   }) {
     if (fetchSuccess != null) {
@@ -738,6 +900,9 @@ class _$_FetchSuccessNotFound implements _FetchSuccessNotFound {
     required TResult Function(List<GeodataGetEntity> geodataList) fetchSuccess,
     required TResult Function() fetchSuccessNotFound,
     required TResult Function(String error) fetchFailure,
+    required TResult Function() exportInProgress,
+    required TResult Function(String filePath) exportSuccess,
+    required TResult Function(String error) exportFailure,
   }) {
     return fetchSuccessNotFound();
   }
@@ -750,6 +915,9 @@ class _$_FetchSuccessNotFound implements _FetchSuccessNotFound {
     TResult? Function(List<GeodataGetEntity> geodataList)? fetchSuccess,
     TResult? Function()? fetchSuccessNotFound,
     TResult? Function(String error)? fetchFailure,
+    TResult? Function()? exportInProgress,
+    TResult? Function(String filePath)? exportSuccess,
+    TResult? Function(String error)? exportFailure,
   }) {
     return fetchSuccessNotFound?.call();
   }
@@ -762,6 +930,9 @@ class _$_FetchSuccessNotFound implements _FetchSuccessNotFound {
     TResult Function(List<GeodataGetEntity> geodataList)? fetchSuccess,
     TResult Function()? fetchSuccessNotFound,
     TResult Function(String error)? fetchFailure,
+    TResult Function()? exportInProgress,
+    TResult Function(String filePath)? exportSuccess,
+    TResult Function(String error)? exportFailure,
     required TResult orElse(),
   }) {
     if (fetchSuccessNotFound != null) {
@@ -778,6 +949,9 @@ class _$_FetchSuccessNotFound implements _FetchSuccessNotFound {
     required TResult Function(_FetchSuccess value) fetchSuccess,
     required TResult Function(_FetchSuccessNotFound value) fetchSuccessNotFound,
     required TResult Function(_FetchFailure value) fetchFailure,
+    required TResult Function(_ExportInProgress value) exportInProgress,
+    required TResult Function(_ExportSuccess value) exportSuccess,
+    required TResult Function(_ExportFailure value) exportFailure,
   }) {
     return fetchSuccessNotFound(this);
   }
@@ -790,6 +964,9 @@ class _$_FetchSuccessNotFound implements _FetchSuccessNotFound {
     TResult? Function(_FetchSuccess value)? fetchSuccess,
     TResult? Function(_FetchSuccessNotFound value)? fetchSuccessNotFound,
     TResult? Function(_FetchFailure value)? fetchFailure,
+    TResult? Function(_ExportInProgress value)? exportInProgress,
+    TResult? Function(_ExportSuccess value)? exportSuccess,
+    TResult? Function(_ExportFailure value)? exportFailure,
   }) {
     return fetchSuccessNotFound?.call(this);
   }
@@ -802,6 +979,9 @@ class _$_FetchSuccessNotFound implements _FetchSuccessNotFound {
     TResult Function(_FetchSuccess value)? fetchSuccess,
     TResult Function(_FetchSuccessNotFound value)? fetchSuccessNotFound,
     TResult Function(_FetchFailure value)? fetchFailure,
+    TResult Function(_ExportInProgress value)? exportInProgress,
+    TResult Function(_ExportSuccess value)? exportSuccess,
+    TResult Function(_ExportFailure value)? exportFailure,
     required TResult orElse(),
   }) {
     if (fetchSuccessNotFound != null) {
@@ -884,6 +1064,9 @@ class _$_FetchFailure implements _FetchFailure {
     required TResult Function(List<GeodataGetEntity> geodataList) fetchSuccess,
     required TResult Function() fetchSuccessNotFound,
     required TResult Function(String error) fetchFailure,
+    required TResult Function() exportInProgress,
+    required TResult Function(String filePath) exportSuccess,
+    required TResult Function(String error) exportFailure,
   }) {
     return fetchFailure(error);
   }
@@ -896,6 +1079,9 @@ class _$_FetchFailure implements _FetchFailure {
     TResult? Function(List<GeodataGetEntity> geodataList)? fetchSuccess,
     TResult? Function()? fetchSuccessNotFound,
     TResult? Function(String error)? fetchFailure,
+    TResult? Function()? exportInProgress,
+    TResult? Function(String filePath)? exportSuccess,
+    TResult? Function(String error)? exportFailure,
   }) {
     return fetchFailure?.call(error);
   }
@@ -908,6 +1094,9 @@ class _$_FetchFailure implements _FetchFailure {
     TResult Function(List<GeodataGetEntity> geodataList)? fetchSuccess,
     TResult Function()? fetchSuccessNotFound,
     TResult Function(String error)? fetchFailure,
+    TResult Function()? exportInProgress,
+    TResult Function(String filePath)? exportSuccess,
+    TResult Function(String error)? exportFailure,
     required TResult orElse(),
   }) {
     if (fetchFailure != null) {
@@ -924,6 +1113,9 @@ class _$_FetchFailure implements _FetchFailure {
     required TResult Function(_FetchSuccess value) fetchSuccess,
     required TResult Function(_FetchSuccessNotFound value) fetchSuccessNotFound,
     required TResult Function(_FetchFailure value) fetchFailure,
+    required TResult Function(_ExportInProgress value) exportInProgress,
+    required TResult Function(_ExportSuccess value) exportSuccess,
+    required TResult Function(_ExportFailure value) exportFailure,
   }) {
     return fetchFailure(this);
   }
@@ -936,6 +1128,9 @@ class _$_FetchFailure implements _FetchFailure {
     TResult? Function(_FetchSuccess value)? fetchSuccess,
     TResult? Function(_FetchSuccessNotFound value)? fetchSuccessNotFound,
     TResult? Function(_FetchFailure value)? fetchFailure,
+    TResult? Function(_ExportInProgress value)? exportInProgress,
+    TResult? Function(_ExportSuccess value)? exportSuccess,
+    TResult? Function(_ExportFailure value)? exportFailure,
   }) {
     return fetchFailure?.call(this);
   }
@@ -948,6 +1143,9 @@ class _$_FetchFailure implements _FetchFailure {
     TResult Function(_FetchSuccess value)? fetchSuccess,
     TResult Function(_FetchSuccessNotFound value)? fetchSuccessNotFound,
     TResult Function(_FetchFailure value)? fetchFailure,
+    TResult Function(_ExportInProgress value)? exportInProgress,
+    TResult Function(_ExportSuccess value)? exportSuccess,
+    TResult Function(_ExportFailure value)? exportFailure,
     required TResult orElse(),
   }) {
     if (fetchFailure != null) {
@@ -963,5 +1161,484 @@ abstract class _FetchFailure implements GeodataListState {
   String get error;
   @JsonKey(ignore: true)
   _$$_FetchFailureCopyWith<_$_FetchFailure> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$_ExportInProgressCopyWith<$Res> {
+  factory _$$_ExportInProgressCopyWith(
+          _$_ExportInProgress value, $Res Function(_$_ExportInProgress) then) =
+      __$$_ExportInProgressCopyWithImpl<$Res>;
+}
+
+/// @nodoc
+class __$$_ExportInProgressCopyWithImpl<$Res>
+    extends _$GeodataListStateCopyWithImpl<$Res, _$_ExportInProgress>
+    implements _$$_ExportInProgressCopyWith<$Res> {
+  __$$_ExportInProgressCopyWithImpl(
+      _$_ExportInProgress _value, $Res Function(_$_ExportInProgress) _then)
+      : super(_value, _then);
+}
+
+/// @nodoc
+
+class _$_ExportInProgress implements _ExportInProgress {
+  const _$_ExportInProgress();
+
+  @override
+  String toString() {
+    return 'GeodataListState.exportInProgress()';
+  }
+
+  @override
+  bool operator ==(dynamic other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is _$_ExportInProgress);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() initial,
+    required TResult Function() fetchInProgress,
+    required TResult Function(List<GeodataGetEntity> geodataList) fetchSuccess,
+    required TResult Function() fetchSuccessNotFound,
+    required TResult Function(String error) fetchFailure,
+    required TResult Function() exportInProgress,
+    required TResult Function(String filePath) exportSuccess,
+    required TResult Function(String error) exportFailure,
+  }) {
+    return exportInProgress();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? initial,
+    TResult? Function()? fetchInProgress,
+    TResult? Function(List<GeodataGetEntity> geodataList)? fetchSuccess,
+    TResult? Function()? fetchSuccessNotFound,
+    TResult? Function(String error)? fetchFailure,
+    TResult? Function()? exportInProgress,
+    TResult? Function(String filePath)? exportSuccess,
+    TResult? Function(String error)? exportFailure,
+  }) {
+    return exportInProgress?.call();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? initial,
+    TResult Function()? fetchInProgress,
+    TResult Function(List<GeodataGetEntity> geodataList)? fetchSuccess,
+    TResult Function()? fetchSuccessNotFound,
+    TResult Function(String error)? fetchFailure,
+    TResult Function()? exportInProgress,
+    TResult Function(String filePath)? exportSuccess,
+    TResult Function(String error)? exportFailure,
+    required TResult orElse(),
+  }) {
+    if (exportInProgress != null) {
+      return exportInProgress();
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(_Initial value) initial,
+    required TResult Function(_FetchInProgress value) fetchInProgress,
+    required TResult Function(_FetchSuccess value) fetchSuccess,
+    required TResult Function(_FetchSuccessNotFound value) fetchSuccessNotFound,
+    required TResult Function(_FetchFailure value) fetchFailure,
+    required TResult Function(_ExportInProgress value) exportInProgress,
+    required TResult Function(_ExportSuccess value) exportSuccess,
+    required TResult Function(_ExportFailure value) exportFailure,
+  }) {
+    return exportInProgress(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_Initial value)? initial,
+    TResult? Function(_FetchInProgress value)? fetchInProgress,
+    TResult? Function(_FetchSuccess value)? fetchSuccess,
+    TResult? Function(_FetchSuccessNotFound value)? fetchSuccessNotFound,
+    TResult? Function(_FetchFailure value)? fetchFailure,
+    TResult? Function(_ExportInProgress value)? exportInProgress,
+    TResult? Function(_ExportSuccess value)? exportSuccess,
+    TResult? Function(_ExportFailure value)? exportFailure,
+  }) {
+    return exportInProgress?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(_Initial value)? initial,
+    TResult Function(_FetchInProgress value)? fetchInProgress,
+    TResult Function(_FetchSuccess value)? fetchSuccess,
+    TResult Function(_FetchSuccessNotFound value)? fetchSuccessNotFound,
+    TResult Function(_FetchFailure value)? fetchFailure,
+    TResult Function(_ExportInProgress value)? exportInProgress,
+    TResult Function(_ExportSuccess value)? exportSuccess,
+    TResult Function(_ExportFailure value)? exportFailure,
+    required TResult orElse(),
+  }) {
+    if (exportInProgress != null) {
+      return exportInProgress(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class _ExportInProgress implements GeodataListState {
+  const factory _ExportInProgress() = _$_ExportInProgress;
+}
+
+/// @nodoc
+abstract class _$$_ExportSuccessCopyWith<$Res> {
+  factory _$$_ExportSuccessCopyWith(
+          _$_ExportSuccess value, $Res Function(_$_ExportSuccess) then) =
+      __$$_ExportSuccessCopyWithImpl<$Res>;
+  @useResult
+  $Res call({String filePath});
+}
+
+/// @nodoc
+class __$$_ExportSuccessCopyWithImpl<$Res>
+    extends _$GeodataListStateCopyWithImpl<$Res, _$_ExportSuccess>
+    implements _$$_ExportSuccessCopyWith<$Res> {
+  __$$_ExportSuccessCopyWithImpl(
+      _$_ExportSuccess _value, $Res Function(_$_ExportSuccess) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? filePath = null,
+  }) {
+    return _then(_$_ExportSuccess(
+      filePath: null == filePath
+          ? _value.filePath
+          : filePath // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$_ExportSuccess implements _ExportSuccess {
+  const _$_ExportSuccess({required this.filePath});
+
+  @override
+  final String filePath;
+
+  @override
+  String toString() {
+    return 'GeodataListState.exportSuccess(filePath: $filePath)';
+  }
+
+  @override
+  bool operator ==(dynamic other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$_ExportSuccess &&
+            (identical(other.filePath, filePath) ||
+                other.filePath == filePath));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, filePath);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$_ExportSuccessCopyWith<_$_ExportSuccess> get copyWith =>
+      __$$_ExportSuccessCopyWithImpl<_$_ExportSuccess>(this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() initial,
+    required TResult Function() fetchInProgress,
+    required TResult Function(List<GeodataGetEntity> geodataList) fetchSuccess,
+    required TResult Function() fetchSuccessNotFound,
+    required TResult Function(String error) fetchFailure,
+    required TResult Function() exportInProgress,
+    required TResult Function(String filePath) exportSuccess,
+    required TResult Function(String error) exportFailure,
+  }) {
+    return exportSuccess(filePath);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? initial,
+    TResult? Function()? fetchInProgress,
+    TResult? Function(List<GeodataGetEntity> geodataList)? fetchSuccess,
+    TResult? Function()? fetchSuccessNotFound,
+    TResult? Function(String error)? fetchFailure,
+    TResult? Function()? exportInProgress,
+    TResult? Function(String filePath)? exportSuccess,
+    TResult? Function(String error)? exportFailure,
+  }) {
+    return exportSuccess?.call(filePath);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? initial,
+    TResult Function()? fetchInProgress,
+    TResult Function(List<GeodataGetEntity> geodataList)? fetchSuccess,
+    TResult Function()? fetchSuccessNotFound,
+    TResult Function(String error)? fetchFailure,
+    TResult Function()? exportInProgress,
+    TResult Function(String filePath)? exportSuccess,
+    TResult Function(String error)? exportFailure,
+    required TResult orElse(),
+  }) {
+    if (exportSuccess != null) {
+      return exportSuccess(filePath);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(_Initial value) initial,
+    required TResult Function(_FetchInProgress value) fetchInProgress,
+    required TResult Function(_FetchSuccess value) fetchSuccess,
+    required TResult Function(_FetchSuccessNotFound value) fetchSuccessNotFound,
+    required TResult Function(_FetchFailure value) fetchFailure,
+    required TResult Function(_ExportInProgress value) exportInProgress,
+    required TResult Function(_ExportSuccess value) exportSuccess,
+    required TResult Function(_ExportFailure value) exportFailure,
+  }) {
+    return exportSuccess(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_Initial value)? initial,
+    TResult? Function(_FetchInProgress value)? fetchInProgress,
+    TResult? Function(_FetchSuccess value)? fetchSuccess,
+    TResult? Function(_FetchSuccessNotFound value)? fetchSuccessNotFound,
+    TResult? Function(_FetchFailure value)? fetchFailure,
+    TResult? Function(_ExportInProgress value)? exportInProgress,
+    TResult? Function(_ExportSuccess value)? exportSuccess,
+    TResult? Function(_ExportFailure value)? exportFailure,
+  }) {
+    return exportSuccess?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(_Initial value)? initial,
+    TResult Function(_FetchInProgress value)? fetchInProgress,
+    TResult Function(_FetchSuccess value)? fetchSuccess,
+    TResult Function(_FetchSuccessNotFound value)? fetchSuccessNotFound,
+    TResult Function(_FetchFailure value)? fetchFailure,
+    TResult Function(_ExportInProgress value)? exportInProgress,
+    TResult Function(_ExportSuccess value)? exportSuccess,
+    TResult Function(_ExportFailure value)? exportFailure,
+    required TResult orElse(),
+  }) {
+    if (exportSuccess != null) {
+      return exportSuccess(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class _ExportSuccess implements GeodataListState {
+  const factory _ExportSuccess({required final String filePath}) =
+      _$_ExportSuccess;
+
+  String get filePath;
+  @JsonKey(ignore: true)
+  _$$_ExportSuccessCopyWith<_$_ExportSuccess> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$_ExportFailureCopyWith<$Res> {
+  factory _$$_ExportFailureCopyWith(
+          _$_ExportFailure value, $Res Function(_$_ExportFailure) then) =
+      __$$_ExportFailureCopyWithImpl<$Res>;
+  @useResult
+  $Res call({String error});
+}
+
+/// @nodoc
+class __$$_ExportFailureCopyWithImpl<$Res>
+    extends _$GeodataListStateCopyWithImpl<$Res, _$_ExportFailure>
+    implements _$$_ExportFailureCopyWith<$Res> {
+  __$$_ExportFailureCopyWithImpl(
+      _$_ExportFailure _value, $Res Function(_$_ExportFailure) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? error = null,
+  }) {
+    return _then(_$_ExportFailure(
+      error: null == error
+          ? _value.error
+          : error // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$_ExportFailure implements _ExportFailure {
+  const _$_ExportFailure({required this.error});
+
+  @override
+  final String error;
+
+  @override
+  String toString() {
+    return 'GeodataListState.exportFailure(error: $error)';
+  }
+
+  @override
+  bool operator ==(dynamic other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$_ExportFailure &&
+            (identical(other.error, error) || other.error == error));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, error);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$_ExportFailureCopyWith<_$_ExportFailure> get copyWith =>
+      __$$_ExportFailureCopyWithImpl<_$_ExportFailure>(this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() initial,
+    required TResult Function() fetchInProgress,
+    required TResult Function(List<GeodataGetEntity> geodataList) fetchSuccess,
+    required TResult Function() fetchSuccessNotFound,
+    required TResult Function(String error) fetchFailure,
+    required TResult Function() exportInProgress,
+    required TResult Function(String filePath) exportSuccess,
+    required TResult Function(String error) exportFailure,
+  }) {
+    return exportFailure(error);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? initial,
+    TResult? Function()? fetchInProgress,
+    TResult? Function(List<GeodataGetEntity> geodataList)? fetchSuccess,
+    TResult? Function()? fetchSuccessNotFound,
+    TResult? Function(String error)? fetchFailure,
+    TResult? Function()? exportInProgress,
+    TResult? Function(String filePath)? exportSuccess,
+    TResult? Function(String error)? exportFailure,
+  }) {
+    return exportFailure?.call(error);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? initial,
+    TResult Function()? fetchInProgress,
+    TResult Function(List<GeodataGetEntity> geodataList)? fetchSuccess,
+    TResult Function()? fetchSuccessNotFound,
+    TResult Function(String error)? fetchFailure,
+    TResult Function()? exportInProgress,
+    TResult Function(String filePath)? exportSuccess,
+    TResult Function(String error)? exportFailure,
+    required TResult orElse(),
+  }) {
+    if (exportFailure != null) {
+      return exportFailure(error);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(_Initial value) initial,
+    required TResult Function(_FetchInProgress value) fetchInProgress,
+    required TResult Function(_FetchSuccess value) fetchSuccess,
+    required TResult Function(_FetchSuccessNotFound value) fetchSuccessNotFound,
+    required TResult Function(_FetchFailure value) fetchFailure,
+    required TResult Function(_ExportInProgress value) exportInProgress,
+    required TResult Function(_ExportSuccess value) exportSuccess,
+    required TResult Function(_ExportFailure value) exportFailure,
+  }) {
+    return exportFailure(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_Initial value)? initial,
+    TResult? Function(_FetchInProgress value)? fetchInProgress,
+    TResult? Function(_FetchSuccess value)? fetchSuccess,
+    TResult? Function(_FetchSuccessNotFound value)? fetchSuccessNotFound,
+    TResult? Function(_FetchFailure value)? fetchFailure,
+    TResult? Function(_ExportInProgress value)? exportInProgress,
+    TResult? Function(_ExportSuccess value)? exportSuccess,
+    TResult? Function(_ExportFailure value)? exportFailure,
+  }) {
+    return exportFailure?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(_Initial value)? initial,
+    TResult Function(_FetchInProgress value)? fetchInProgress,
+    TResult Function(_FetchSuccess value)? fetchSuccess,
+    TResult Function(_FetchSuccessNotFound value)? fetchSuccessNotFound,
+    TResult Function(_FetchFailure value)? fetchFailure,
+    TResult Function(_ExportInProgress value)? exportInProgress,
+    TResult Function(_ExportSuccess value)? exportSuccess,
+    TResult Function(_ExportFailure value)? exportFailure,
+    required TResult orElse(),
+  }) {
+    if (exportFailure != null) {
+      return exportFailure(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class _ExportFailure implements GeodataListState {
+  const factory _ExportFailure({required final String error}) =
+      _$_ExportFailure;
+
+  String get error;
+  @JsonKey(ignore: true)
+  _$$_ExportFailureCopyWith<_$_ExportFailure> get copyWith =>
       throw _privateConstructorUsedError;
 }

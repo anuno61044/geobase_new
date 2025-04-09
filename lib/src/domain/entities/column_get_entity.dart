@@ -18,9 +18,8 @@ class ColumnGetEntity extends ColumnEntity {
   @override
   Map<String, dynamic> toJson() {
     return {
-      ...super.toJson(), // Incluye los campos de CategoryEntity
-      'id': id,
-      'type': type.name
+      ...super.toJson(),
+      'type': type.toJson(),
     };
   }
 

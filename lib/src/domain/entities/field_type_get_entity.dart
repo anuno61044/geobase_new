@@ -8,6 +8,13 @@ abstract class FieldTypeEntity {
   final String name;
 
   final String metaType;
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name':name,
+      'metatype': metaType,
+    };
+  }
 }
 
 class FieldTypeGetEntity extends FieldTypeEntity {
@@ -24,4 +31,14 @@ class FieldTypeGetEntity extends FieldTypeEntity {
   final String renderClass;
 
   final Map<String, dynamic>? extradata;
+
+  @override
+  Map<String, dynamic> toJson() {
+
+    return {
+      ...super.toJson(),
+      'renderClass':renderClass,
+      'extradata': extradata,
+    };
+  }
 }

@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:geobase/injection.dart';
 import 'package:geobase/src/domain/entities/category_get_entity.dart';
 import 'package:geobase/src/domain/entities/entities.dart';
 import 'package:geobase/src/domain/services/interfaces/interfaces.dart';
@@ -13,6 +14,7 @@ import 'package:path/path.dart' as path;
 part 'categories_exporter_cubit.freezed.dart';
 part 'categories_exporter_state.dart';
 
+@injectable
 class CategoriesExporterCubit extends Cubit<CategoriesExporterState> {
   CategoriesExporterCubit(this.categoryService)
       : super(CategoriesExporterState.state());

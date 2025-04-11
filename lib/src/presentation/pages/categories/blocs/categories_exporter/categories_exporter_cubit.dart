@@ -33,6 +33,10 @@ class CategoriesExporterCubit extends Cubit<CategoriesExporterState> {
   Future<void> exportToJson() async {
     // nothing to do while loading
     if (state.status.isLoading) return;
+    // clear status
+    emit(state.copyWith(message: null, filePath: null));
+
+    //TODO: HANDLE REQUEST STORAGE PERMISSIONS HERE
 
     if (state.categories.isEmpty) {
       return _exportAll();

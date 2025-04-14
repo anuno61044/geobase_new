@@ -168,11 +168,16 @@ class _GeodataCreateFormBody extends StatelessWidget {
   Widget build(BuildContext context) {
     return LyFormListener<IGeodataCreateFormBloc, void, Failure>(
       bloc: context.read<IGeodataCreateFormBloc>(),
-      onSuccess: (_) => NotificationHelper.showSuccessSnackbar(
-        context,
-        message: 'El punto fue correctamente añadido.',
-        onShow: () => context.beamBack(),
-      ),
+      onSuccess: (_) async {
+        context.beamBack();
+        // Throw error when showing snackbar and pop at the same time
+        // FIXME: use an external package to make pop after the snackbar show
+        // await NotificationHelper.showSuccessSnackbar(
+        //   context,
+        //   message: 'El punto fue correctamente añadido.',
+        //   onShow: () => context.beamBack(),
+        // );
+      },
       onError: (error) => NotificationHelper.showErrorSnackbar(
         context,
         message: error.message ?? 'Ha ocurrido un error, vuelve a intentarlo.',

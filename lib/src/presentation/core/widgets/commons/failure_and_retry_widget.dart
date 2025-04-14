@@ -26,7 +26,10 @@ class FailureAndRetryWidget extends StatelessWidget {
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Text(errorText),
+            child: Text(
+              errorText,
+              maxLines: 8,
+            ),
           ),
           const SizedBox(height: 16),
           MainButton(

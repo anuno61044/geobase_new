@@ -15,9 +15,21 @@ class CategoriesShowerCubit extends Cubit<CategoriesShowerState> {
 
   final ICategoryService service;
 
-  Future<void> loadCategories() async {
+  Future<void> loadCategories({bool includeAllOption = true}) async {
     final either = await service.loadCategoriesWhere();
-    final categories = either.fold((l) => <CategoryGetEntity>[], (r) => r);
+    final categories = either.fold(
+        (l) => <CategoryGetEntity>[],
+        (r) => [
+              ...r,
+              if (includeAllOption)
+                CategoryGetEntity(
+                    id: -1,
+                    name: 'Todas',
+                    description: null,
+                    color: null,
+                    icon: '',
+                    columns: [])
+            ]);
     emit(state.copyWith(categories: categories));
   }
 

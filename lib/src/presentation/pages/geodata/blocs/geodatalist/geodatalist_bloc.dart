@@ -10,9 +10,9 @@ import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:file_picker/file_picker.dart';
 
+part 'geodatalist_bloc.freezed.dart';
 part 'geodatalist_event.dart';
 part 'geodatalist_state.dart';
-part 'geodatalist_bloc.freezed.dart';
 
 @injectable
 class GeodataListBloc extends Bloc<GeodataListEvent, GeodataListState> {
@@ -28,7 +28,9 @@ class GeodataListBloc extends Bloc<GeodataListEvent, GeodataListState> {
             }
             emit(const GeodataListState.fetchInProgress());
             final response = await geodataService.loadGeodataWhere(
-              FilterDataOptionsEntity(categoryId: categoryId),
+              categoryId != -1
+                  ? FilterDataOptionsEntity(categoryId: categoryId)
+                  : null,
             );
             response.fold(
               (error) => emit(

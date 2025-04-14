@@ -177,6 +177,7 @@ class _FailureGetTilesAndRetry extends StatelessWidget {
           ),
           Text(
             message,
+            maxLines: 8,
             textAlign: TextAlign.center,
           ),
           const Spacer(),

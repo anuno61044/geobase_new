@@ -13,7 +13,7 @@ dependencies:
     sdk: flutter
   dartz: ^0.10.1
   record: ^4.0.0             # Para grabar audio
-  permission_handler: ^10.0.0
+  permission_handler: ^10.4.0
   excel: ^2.0.0  # Para generar archivos Excel
   video_player: ^2.7.0
   file_picker: ^7.0.2

@@ -10,6 +10,7 @@ import 'package:geobase/src/domain/entities/category_get_entity.dart';
 import 'package:geobase/src/domain/entities/entities.dart';
 import 'package:geobase/src/domain/services/interfaces/interfaces.dart';
 import 'package:path/path.dart' as path;
+import 'package:permission_handler/permission_handler.dart';
 
 part 'categories_exporter_cubit.freezed.dart';
 part 'categories_exporter_state.dart';
@@ -31,17 +32,44 @@ class CategoriesExporterCubit extends Cubit<CategoriesExporterState> {
   }
 
   Future<void> exportToJson() async {
-    // nothing to do while loading
     if (state.status.isLoading) return;
-    // clear status
+    
     emit(state.copyWith(message: null, filePath: null));
 
-    //TODO: HANDLE REQUEST STORAGE PERMISSIONS HERE
+    try {
+      // Verifica si ya tienes el permiso
+      var status = await Permission.storage.status;
+      
+      // Si no está concedido, solicítalo
+      if (!status.isGranted) {
+        status = await Permission.storage.request();
+        
+        // Si el usuario lo deniega permanentemente, puedes guiarlo a ajustes
+        if (status.isPermanentlyDenied) {
+          emit(state.copyWith(
+            message: 'Por favor, active los permisos manualmente en Ajustes'
+          ));
+          await openAppSettings(); // Necesitas importar 'package:permission_handler/permission_handler.dart'
+          return;
+        }
+        
+        if (!status.isGranted) {
+          emit(state.copyWith(
+            message: 'Se requieren permisos de almacenamiento para exportar'
+          ));
+          return;
+        }
+      }
 
-    if (state.categories.isEmpty) {
-      return _exportAll();
-    } else {
-      return _exportLoaded();
+      if (state.categories.isEmpty) {
+        return _exportAll();
+      } else {
+        return _exportLoaded();
+      }
+    } catch (e) {
+      emit(state.copyWith(
+        message: 'Error al solicitar permisos: ${e.toString()}'
+      ));
     }
   }
 

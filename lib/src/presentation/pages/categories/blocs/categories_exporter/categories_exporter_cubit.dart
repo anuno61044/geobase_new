@@ -37,30 +37,6 @@ class CategoriesExporterCubit extends Cubit<CategoriesExporterState> {
     emit(state.copyWith(message: null, filePath: null));
 
     try {
-      // Verifica si ya tienes el permiso
-      var status = await Permission.storage.status;
-      
-      // Si no está concedido, solicítalo
-      if (!status.isGranted) {
-        status = await Permission.storage.request();
-        
-        // Si el usuario lo deniega permanentemente, puedes guiarlo a ajustes
-        if (status.isPermanentlyDenied) {
-          emit(state.copyWith(
-            message: 'Por favor, active los permisos manualmente en Ajustes'
-          ));
-          await openAppSettings(); // Necesitas importar 'package:permission_handler/permission_handler.dart'
-          return;
-        }
-        
-        if (!status.isGranted) {
-          emit(state.copyWith(
-            message: 'Se requieren permisos de almacenamiento para exportar'
-          ));
-          return;
-        }
-      }
-
       if (state.categories.isEmpty) {
         return _exportAll();
       } else {

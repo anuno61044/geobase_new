@@ -5,4 +5,4 @@ class CategoryListEvent with _$CategoryListEvent {
   const factory CategoryListEvent.fetched({
     required String query,
   }) = _Fetched;
-}
+  }

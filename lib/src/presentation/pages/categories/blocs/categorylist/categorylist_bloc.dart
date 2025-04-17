@@ -13,31 +13,35 @@ part 'categorylist_state.dart';
 class CategoryListBloc extends Bloc<CategoryListEvent, CategoryListState> {
   CategoryListBloc(this.categoryService)
       : super(const CategoryListState.initial()) {
-    on<CategoryListEvent>(
+    on<_Fetched>(
       (event, emit) async {
-        await event.when(
-          fetched: (query) async {
-            emit(const CategoryListState.fetchInProgress());
-            final response = await categoryService.loadCategoriesWhere(
-              FilterCategoriesOptionsEntity(nameSubstring: query),
-            );
-            response.fold(
-              (error) => emit(
-                CategoryListState.fetchFailure(
-                  error: error.message ?? error.toString(),
-                ),
-              ),
-              (categories) => emit(
-                categories.isEmpty
-                    ? const CategoryListState.fetchSuccessNotFound()
-                    : CategoryListState.fetchSuccess(categories: categories),
-              ),
-            );
-          },
+        if (isClosed) return;
+        emit(const CategoryListState.fetchInProgress());
+
+        final response = await categoryService.loadCategoriesWhere(
+          FilterCategoriesOptionsEntity(nameSubstring: event.query),
+        );
+
+        if (isClosed) return;
+
+        await response.fold(
+          (error) async => emit(
+            CategoryListState.fetchFailure(
+              error: error.message ?? error.toString(),
+            ),
+          ),
+          (categories) async => emit(
+            categories.isEmpty
+                ? const CategoryListState.fetchSuccessNotFound()
+                : CategoryListState.fetchSuccess(categories: categories),
+          ),
         );
       },
       transformer: (events, mapper) {
-        return events.debounceTime(const Duration(seconds: 1)).flatMap(mapper);
+        return events
+            .debounceTime(const Duration(milliseconds: 300))
+            .where((_) => !isClosed)
+            .asyncExpand(mapper);
       },
     );
   }

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:dartz/dartz.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -27,6 +28,7 @@ class LocationCubit extends Cubit<LocationState> {
   @override
   Future<void> close() async {
     await locationChangesSubscription?.cancel();
+    log('🔴 BLoC cerrado', name: 'CategoryListBloc');
     await super.close();
   }
 

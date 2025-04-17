@@ -41,7 +41,7 @@ import 'package:geobase/src/domain/services/user_preferences_reader_service.dart
 import 'package:geobase/src/domain/services/user_preferences_writter_service.dart'
     as _i64;
 import 'package:geobase/src/infrastructure/core/registers/external_registers.dart'
-    as _i78;
+    as _i79;
 import 'package:geobase/src/infrastructure/providers/categories_provider.dart'
     as _i7;
 import 'package:geobase/src/infrastructure/providers/columns_provider.dart'
@@ -97,20 +97,22 @@ import 'package:geobase/src/presentation/core/utils/simple_bloc_observer.dart'
     as _i4;
 import 'package:geobase/src/presentation/core/widgets/render_classes/reflect.dart'
     as _i5;
+import 'package:geobase/src/presentation/pages/categories/blocs/categories_exporter/categories_exporter_cubit.dart'
+    as _i70;
 import 'package:geobase/src/presentation/pages/categories/blocs/category_form/category_create_form_bloc.dart'
-    as _i72;
-import 'package:geobase/src/presentation/pages/categories/blocs/category_form/category_edit_form_bloc.dart'
     as _i73;
-import 'package:geobase/src/presentation/pages/categories/blocs/category_view/categoryview_cubit.dart'
-    as _i75;
-import 'package:geobase/src/presentation/pages/categories/blocs/categorylist/categorylist_bloc.dart'
+import 'package:geobase/src/presentation/pages/categories/blocs/category_form/category_edit_form_bloc.dart'
     as _i74;
+import 'package:geobase/src/presentation/pages/categories/blocs/category_view/categoryview_cubit.dart'
+    as _i76;
+import 'package:geobase/src/presentation/pages/categories/blocs/categorylist/categorylist_bloc.dart'
+    as _i75;
 import 'package:geobase/src/presentation/pages/geodata/blocs/blocs.dart'
     as _i57;
 import 'package:geobase/src/presentation/pages/geodata/blocs/categories_shower/categoriesshower_cubit.dart'
-    as _i71;
+    as _i72;
 import 'package:geobase/src/presentation/pages/geodata/blocs/geodata_create/geodata_create_cubit.dart'
-    as _i76;
+    as _i77;
 import 'package:geobase/src/presentation/pages/geodata/blocs/geodata_edit/geodata_edit_cubit.dart'
     as _i47;
 import 'package:geobase/src/presentation/pages/geodata/blocs/geodata_form/create_form_bloc.dart'
@@ -122,7 +124,7 @@ import 'package:geobase/src/presentation/pages/geodata/blocs/geodatalist/geodata
 import 'package:geobase/src/presentation/pages/geodata/blocs/geodataview/geodataview_cubit.dart'
     as _i51;
 import 'package:geobase/src/presentation/pages/home/blocs/categories_map_selector/categoriesmapselector_cubit.dart'
-    as _i70;
+    as _i71;
 import 'package:geobase/src/presentation/pages/home/blocs/location/location_cubit.dart'
     as _i65;
 import 'package:geobase/src/presentation/pages/home/blocs/map/map_cubit.dart'
@@ -130,7 +132,7 @@ import 'package:geobase/src/presentation/pages/home/blocs/map/map_cubit.dart'
 import 'package:geobase/src/presentation/pages/home/blocs/markers/marker_cubit.dart'
     as _i69;
 import 'package:geobase/src/presentation/pages/home/blocs/panel_geodata_new/geodata_new_cubit.dart'
-    as _i77;
+    as _i78;
 import 'package:geobase/src/presentation/pages/home/blocs/panel_geodata_preview/geodata_preview_cubit.dart'
     as _i50;
 import 'package:geobase/src/presentation/pages/home/blocs/sliding_up_panel/sliding_up_panel_cubit.dart'
@@ -289,38 +291,40 @@ extension GetItInjectableX on _i1.GetIt {
           markerGetterService: gh<_i17.IMarkerGetterService>(),
           uPrefsReader: gh<_i17.IUserPreferencesReaderService>(),
         ));
-    gh.factory<_i70.CategoriesMapSelectorCubit>(
-        () => _i70.CategoriesMapSelectorCubit(
+    gh.factory<_i70.CategoriesExporterCubit>(
+        () => _i70.CategoriesExporterCubit(gh<_i17.ICategoryService>()));
+    gh.factory<_i71.CategoriesMapSelectorCubit>(
+        () => _i71.CategoriesMapSelectorCubit(
               gh<_i17.ICategoryService>(),
               gh<_i17.IUserPreferencesReaderService>(),
             ));
-    gh.factory<_i71.CategoriesShowerCubit>(
-        () => _i71.CategoriesShowerCubit(gh<_i17.ICategoryService>()));
-    gh.factory<_i72.CategoryCreateFormBloc>(() => _i72.CategoryCreateFormBloc(
+    gh.factory<_i72.CategoriesShowerCubit>(
+        () => _i72.CategoriesShowerCubit(gh<_i17.ICategoryService>()));
+    gh.factory<_i73.CategoryCreateFormBloc>(() => _i73.CategoryCreateFormBloc(
           categoryService: gh<_i48.ICategoryService>(),
           fieldTypeService: gh<_i48.IFieldTypeService>(),
         ));
-    gh.factoryParam<_i73.CategoryEditFormBloc, int?, dynamic>((
+    gh.factoryParam<_i74.CategoryEditFormBloc, int?, dynamic>((
       categoryId,
       _,
     ) =>
-        _i73.CategoryEditFormBloc(
+        _i74.CategoryEditFormBloc(
           categoryId: categoryId,
           categoryService: gh<_i48.ICategoryService>(),
           fieldTypeService: gh<_i48.IFieldTypeService>(),
         ));
-    gh.factory<_i74.CategoryListBloc>(
-        () => _i74.CategoryListBloc(gh<_i48.ICategoryService>()));
-    gh.factory<_i75.CategoryViewCubit>(
-        () => _i75.CategoryViewCubit(gh<_i48.ICategoryService>()));
-    gh.factory<_i76.GeodataCreateCubit>(() => _i76.GeodataCreateCubit(
+    gh.factory<_i75.CategoryListBloc>(
+        () => _i75.CategoryListBloc(gh<_i48.ICategoryService>()));
+    gh.factory<_i76.CategoryViewCubit>(
+        () => _i76.CategoryViewCubit(gh<_i48.ICategoryService>()));
+    gh.factory<_i77.GeodataCreateCubit>(() => _i77.GeodataCreateCubit(
           gh<_i48.ICategoryService>(),
           gh<_i48.ILocationReaderService>(),
         ));
-    gh.factory<_i77.GeodataNewCubit>(
-        () => _i77.GeodataNewCubit(gh<_i17.ICategoryService>()));
+    gh.factory<_i78.GeodataNewCubit>(
+        () => _i78.GeodataNewCubit(gh<_i17.ICategoryService>()));
     return this;
   }
 }
 
-class _$RegisterModule extends _i78.RegisterModule {}
+class _$RegisterModule extends _i79.RegisterModule {}

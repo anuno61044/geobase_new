@@ -55,8 +55,15 @@ class _GeodataPageInternal extends StatelessWidget {
           title: const Text('Datos Almacenados'),
         ),
         body: const _Body(),
-        floatingActionButton: BlocProvider<CategoriesShowerCubit>(
-          create: (context) => getIt<CategoriesShowerCubit>(),
+        floatingActionButton: MultiBlocProvider(
+          providers: [
+            BlocProvider<CategoriesShowerCubit>(
+              create: (context) => getIt<CategoriesShowerCubit>(),
+            ),
+            BlocProvider<GeodataExporterCubit>(
+              create: (context) => getIt<GeodataExporterCubit>(),
+            ),
+          ],
           child: const _FloatingActionButton(),
         ),
       ),
@@ -81,11 +88,6 @@ class _Body extends StatelessWidget {
       child: BlocBuilder<GeodataListBloc, GeodataListState>(
         bloc: context.read<GeodataListBloc>(),
         builder: (context, state) {
-          final isExporting = state.maybeWhen(
-            exportInProgress: () => true,
-            orElse: () => false,
-          );
-
           return Stack(
             children: [
               // Contenido principal según estado
@@ -172,28 +174,8 @@ class _Body extends StatelessWidget {
                     ],
                   );
                 },
-                exportInProgress: () => _buildLoadingState(context),
-                exportSuccess: (filePath) =>
-                    _buildExportSuccessState(context, filePath),
-                exportFailure: (error) =>
-                    _buildExportErrorState(context, error),
               ),
 
-              // Botón de exportación flotante
-              Positioned(
-                bottom: 20,
-                left: 20, // Espacio para el botón de agregar
-                child: FloatingActionButton(
-                  heroTag: 'export_button', // Importante para evitar conflictos
-                  tooltip: 'Exportar a Excel',
-                  child: const Icon(Icons.download),
-                  onPressed: isExporting
-                      ? null
-                      : () => context.read<GeodataListBloc>().add(
-                            const GeodataListEvent.exportData(),
-                          ),
-                ),
-              )
             ],
           );
         },
@@ -346,20 +328,31 @@ class _FloatingActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<CategoriesShowerCubit, CategoriesShowerState>(
-      bloc: context.read<CategoriesShowerCubit>()..loadCategories(),
-      builder: (context, state) {
-        if (state.categories.isEmpty) {
-          return const SizedBox();
-        }
-        return FloatingActionButton(
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // Botón de Exportación
+        FloatingActionButton(
+          tooltip: 'Exportar geodatas',
+          heroTag: 'export_button',
+          child: context.read<GeodataExporterCubit>().state.status.isLoading
+              ? const CircularProgressIndicator(
+                  color: Colors.white,
+                  strokeWidth: 2,
+                )
+              : const Icon(Icons.download),
+          onPressed: () => context.read<GeodataExporterCubit>().exportGeodata(),
+        ),
+        const SizedBox(height: 16),
+        // Botón de Agregar (existente)
+        FloatingActionButton(
           tooltip: 'Agregar Punto de Interés',
           child: const Icon(Icons.add),
           onPressed: () {
             context.beamToNamed('/geodata/new');
           },
-        );
-      },
+        )
+      ],
     );
   }
 }

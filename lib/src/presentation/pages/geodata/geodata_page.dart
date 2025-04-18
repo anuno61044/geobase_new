@@ -65,9 +65,14 @@ class _GeodataPageInternal extends StatelessWidget {
 }
 
 class _Body extends StatelessWidget {
-  const _Body({this.queryWidgetKey = const Key('queryWidgetKey')});
+  const _Body({
+    // ignore: unused_element
+    this.queryWidgetKey = const Key('queryWidgetKey'),
+  });
 
   final Key queryWidgetKey;
+  // final queryController = TextEditingController();
+  // final focusNode = FocusNode();
 
   @override
   Widget build(BuildContext context) {
@@ -85,12 +90,88 @@ class _Body extends StatelessWidget {
             children: [
               // Contenido principal según estado
               state.when(
-                initial: () => _buildInitialState(context),
-                fetchInProgress: () => _buildLoadingState(context),
-                fetchSuccess: (geodataList) =>
-                    _buildSuccessState(context, geodataList),
-                fetchSuccessNotFound: () => _buildNotFoundState(context),
-                fetchFailure: (error) => _buildErrorState(context, error),
+                initial: () {
+                  return Column(
+                    children: [
+                      _QueryInput(key: queryWidgetKey),
+                      const Flexible(
+                        flex: 3,
+                        child: Center(
+                          child: SelectableText(
+                            'Datos geográficos guardados\nEn la caja de texto de arriba puede acceder a estas seleccionando una categoría.',
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                      const Flexible(flex: 2, child: SizedBox.shrink()),
+                    ],
+                  );
+                },
+                fetchInProgress: () {
+                  return Column(
+                    children: [
+                      _QueryInput(key: queryWidgetKey),
+                      Flexible(
+                        flex: 3,
+                        child: Center(
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Theme.of(context).primaryColor,
+                          ),
+                        ),
+                      ),
+                      const Flexible(flex: 2, child: SizedBox.shrink()),
+                    ],
+                  );
+                },
+                fetchSuccess: (geodataList) {
+                  return ListView(
+                    physics: const AlwaysScrollableScrollPhysics(
+                      parent: BouncingScrollPhysics(),
+                    ),
+                    children: [
+                      _QueryInput(key: queryWidgetKey),
+                      for (final geodata in geodataList)
+                        _GeodataWidget(geodata: geodata),
+                      const SizedBox(height: 80),
+                    ],
+                  );
+                },
+                fetchSuccessNotFound: () {
+                  return Column(
+                    children: [
+                      _QueryInput(key: queryWidgetKey),
+                      const Flexible(
+                        flex: 3,
+                        child: Center(
+                          child: SelectableText(
+                            'No se encontraron datos de acuerdo '
+                            'a los parámetros de búsqueda.',
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                      const Flexible(flex: 2, child: SizedBox.shrink()),
+                    ],
+                  );
+                },
+                fetchFailure: (error) {
+                  return Column(
+                    children: [
+                      _QueryInput(key: queryWidgetKey),
+                      Flexible(
+                        flex: 3,
+                        child: Center(
+                          child: SelectableText(
+                            error,
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                      const Flexible(flex: 2, child: SizedBox.shrink()),
+                    ],
+                  );
+                },
                 exportInProgress: () => _buildLoadingState(context),
                 exportSuccess: (filePath) =>
                     _buildExportSuccessState(context, filePath),
@@ -120,20 +201,8 @@ class _Body extends StatelessWidget {
     );
   }
 
-  Widget _buildInitialState(BuildContext context) => _buildMessageState(
-      context, 'Seleccione una categoría para ver los datos.');
   Widget _buildLoadingState(BuildContext context) =>
       const Center(child: CircularProgressIndicator());
-  Widget _buildSuccessState(
-          BuildContext context, List<GeodataGetEntity> geodataList) =>
-      ListView(children: [
-        _QueryInput(key: queryWidgetKey),
-        for (final geodata in geodataList) _GeodataWidget(geodata: geodata)
-      ]);
-  Widget _buildNotFoundState(BuildContext context) =>
-      _buildMessageState(context, 'No se encontraron datos.');
-  Widget _buildErrorState(BuildContext context, String error) =>
-      _buildMessageState(context, error);
 
   Widget _buildExportSuccessState(BuildContext context, String filePath) =>
       _buildMessageState(

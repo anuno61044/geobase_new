@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:beamer/beamer.dart';
@@ -54,8 +55,15 @@ class _GeodataPageInternal extends StatelessWidget {
           title: const Text('Datos Almacenados'),
         ),
         body: const _Body(),
-        floatingActionButton: BlocProvider<CategoriesShowerCubit>(
-          create: (context) => getIt<CategoriesShowerCubit>(),
+        floatingActionButton: MultiBlocProvider(
+          providers: [
+            BlocProvider<CategoriesShowerCubit>(
+              create: (context) => getIt<CategoriesShowerCubit>(),
+            ),
+            BlocProvider<GeodataExporterCubit>(
+              create: (context) => getIt<GeodataExporterCubit>(),
+            ),
+          ],
           child: const _FloatingActionButton(),
         ),
       ),
@@ -64,9 +72,14 @@ class _GeodataPageInternal extends StatelessWidget {
 }
 
 class _Body extends StatelessWidget {
-  const _Body({this.queryWidgetKey = const Key('queryWidgetKey')});
+  const _Body({
+    // ignore: unused_element
+    this.queryWidgetKey = const Key('queryWidgetKey'),
+  });
 
   final Key queryWidgetKey;
+  // final queryController = TextEditingController();
+  // final focusNode = FocusNode();
 
   @override
   Widget build(BuildContext context) {
@@ -77,30 +90,92 @@ class _Body extends StatelessWidget {
         builder: (context, state) {
           return Stack(
             children: [
+              // Contenido principal según estado
               state.when(
-                initial: () => _buildInitialState(context),
-                fetchInProgress: () => _buildLoadingState(context),
-                fetchSuccess: (geodataList) => _buildSuccessState(context, geodataList),
-                fetchSuccessNotFound: () => _buildNotFoundState(context),
-                fetchFailure: (error) => _buildErrorState(context, error),
-              ),
-              BlocBuilder<CategoriesShowerCubit, CategoriesShowerState>(
-                builder: (context, categoryState) {
-                  if (categoryState.selected != null) {
-                    return Positioned(
-                      bottom: 20,
-                      left: 20,
-                      child: ElevatedButton(
-                        onPressed: () async {
-                          await _exportToExcel(context, categoryState.selected!);
-                        },
-                        child: const Text('Exportar'),
+                initial: () {
+                  return Column(
+                    children: [
+                      _QueryInput(key: queryWidgetKey),
+                      const Flexible(
+                        flex: 3,
+                        child: Center(
+                          child: SelectableText(
+                            'Datos geográficos guardados\nEn la caja de texto de arriba puede acceder a estas seleccionando una categoría.',
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
                       ),
-                    );
-                  }
-                  return const SizedBox.shrink();
+                      const Flexible(flex: 2, child: SizedBox.shrink()),
+                    ],
+                  );
+                },
+                fetchInProgress: () {
+                  return Column(
+                    children: [
+                      _QueryInput(key: queryWidgetKey),
+                      Flexible(
+                        flex: 3,
+                        child: Center(
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Theme.of(context).primaryColor,
+                          ),
+                        ),
+                      ),
+                      const Flexible(flex: 2, child: SizedBox.shrink()),
+                    ],
+                  );
+                },
+                fetchSuccess: (geodataList) {
+                  return ListView(
+                    physics: const AlwaysScrollableScrollPhysics(
+                      parent: BouncingScrollPhysics(),
+                    ),
+                    children: [
+                      _QueryInput(key: queryWidgetKey),
+                      for (final geodata in geodataList)
+                        _GeodataWidget(geodata: geodata),
+                      const SizedBox(height: 80),
+                    ],
+                  );
+                },
+                fetchSuccessNotFound: () {
+                  return Column(
+                    children: [
+                      _QueryInput(key: queryWidgetKey),
+                      const Flexible(
+                        flex: 3,
+                        child: Center(
+                          child: SelectableText(
+                            'No se encontraron datos de acuerdo '
+                            'a los parámetros de búsqueda.',
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                      const Flexible(flex: 2, child: SizedBox.shrink()),
+                    ],
+                  );
+                },
+                fetchFailure: (error) {
+                  return Column(
+                    children: [
+                      _QueryInput(key: queryWidgetKey),
+                      Flexible(
+                        flex: 3,
+                        child: Center(
+                          child: SelectableText(
+                            error,
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                      const Flexible(flex: 2, child: SizedBox.shrink()),
+                    ],
+                  );
                 },
               ),
+
             ],
           );
         },
@@ -108,100 +183,25 @@ class _Body extends StatelessWidget {
     );
   }
 
-  Future<void> _exportToExcel(BuildContext context, int categoryId) async {
-    final geodataList = context.read<GeodataListBloc>().state.maybeWhen(
-          fetchSuccess: (geodataList) =>
-              geodataList.where((g) => g.category.id == categoryId).toList(),
-          orElse: () => [],
-        );
+  Widget _buildLoadingState(BuildContext context) =>
+      const Center(child: CircularProgressIndicator());
 
-    if (geodataList.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No hay datos para exportar.')),
-      );
-      return;
-    }
+  Widget _buildExportSuccessState(BuildContext context, String filePath) =>
+      _buildMessageState(
+          context, 'Datos exportados correctamente en: $filePath');
 
-    // Obtener todos los nombres de las columnas
-    List<String> columnNames = ['ID', 'Categoría', 'Latitud', 'Longitud'];
-    for(var field in geodataList[0].fields) {
-      columnNames.add('${field.column.name}');
-    }
+  Widget _buildExportErrorState(BuildContext context, String error) =>
+      _buildMessageState(context, error);
 
-    // Obtener todos los valores de campos únicos
-    Set<String> fieldNames = {};
-    for (var geodata in geodataList) {
-      for (var field in geodata.fields) {
-        fieldNames.add('${field.value}');
-      }
-    }
-
-    // Crear archivo Excel
-    var excel = Excel.createExcel();
-    var sheet = excel[excel.getDefaultSheet()!];
-
-    // Agregar encabezados
-    sheet.appendRow(columnNames);
-
-    // Agregar datos de los puntos
-    for (var geodata in geodataList) {
-      List<String> row = [
-        geodata.id.toString(),
-        geodata.category.name.toString(),
-        geodata.latitude.toString(),
-        geodata.longitude.toString(),
-      ];
-
-      for(var field in geodata.fields) {
-        row.add(field.value.toString());
-      }
-
-      sheet.appendRow(row);
-    }
-
-    try {
-      // Permitir al usuario seleccionar la ubicación del archivo
-      String? selectedDirectory = await FilePicker.platform.getDirectoryPath();
-
-      if (selectedDirectory == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Selección de carpeta cancelada.')),
-        );
-        return;
-      }
-
-      final filePath = '$selectedDirectory/Geodata_$categoryId.xlsx';
-      final file = File(filePath);
-      await file.writeAsBytes(excel.encode()!);
-
-      // Mostrar mensaje de confirmación con la ruta seleccionada
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Archivo guardado en: $filePath')),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error al guardar el archivo: $e')),
-      );
-    }
-  }
-
-
-  Widget _buildInitialState(BuildContext context) => _buildMessageState(context, 'Seleccione una categoría para ver los datos.');
-  Widget _buildLoadingState(BuildContext context) => const Center(child: CircularProgressIndicator());
-  Widget _buildSuccessState(BuildContext context, List<GeodataGetEntity> geodataList) => ListView(children: [_QueryInput(key: queryWidgetKey), for (final geodata in geodataList) _GeodataWidget(geodata: geodata)]);
-  Widget _buildNotFoundState(BuildContext context) => _buildMessageState(context, 'No se encontraron datos.');
-  Widget _buildErrorState(BuildContext context, String error) => _buildMessageState(context, error);
-  
   Widget _buildMessageState(BuildContext context, String message) {
     return Column(
       children: [
-        _QueryInput(key: queryWidgetKey),
-        Expanded(child: Center(child: Text(message, textAlign: TextAlign.center))),
+        Expanded(
+            child: Center(child: Text(message, textAlign: TextAlign.center))),
       ],
     );
   }
 }
-
 
 class _GeodataWidget extends StatelessWidget {
   const _GeodataWidget({
@@ -328,20 +328,31 @@ class _FloatingActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<CategoriesShowerCubit, CategoriesShowerState>(
-      bloc: context.read<CategoriesShowerCubit>()..loadCategories(),
-      builder: (context, state) {
-        if (state.categories.isEmpty) {
-          return const SizedBox();
-        }
-        return FloatingActionButton(
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // Botón de Exportación
+        FloatingActionButton(
+          tooltip: 'Exportar geodatas',
+          heroTag: 'export_button',
+          child: context.read<GeodataExporterCubit>().state.status.isLoading
+              ? const CircularProgressIndicator(
+                  color: Colors.white,
+                  strokeWidth: 2,
+                )
+              : const Icon(Icons.download),
+          onPressed: () => context.read<GeodataExporterCubit>().exportGeodata(),
+        ),
+        const SizedBox(height: 16),
+        // Botón de Agregar (existente)
+        FloatingActionButton(
           tooltip: 'Agregar Punto de Interés',
           child: const Icon(Icons.add),
           onPressed: () {
             context.beamToNamed('/geodata/new');
           },
-        );
-      },
+        )
+      ],
     );
   }
 }

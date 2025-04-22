@@ -117,7 +117,6 @@ const tableColumn = SqfEntityTable(
     SqfEntityFieldRelationship(
       parentTable: tableCategory,
       fieldName: 'category_id',
-      isNotNull: true,
       deleteRule: DeleteRule.CASCADE,
     ),
     SqfEntityFieldRelationship(

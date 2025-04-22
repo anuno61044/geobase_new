@@ -12,6 +12,7 @@ class ColumnsSQLiteProvider implements IColumnsProvider {
           model.name,
           model.categoryId,
           model.typeId,
+          model.formId,
         ).save() ??
         -1;
   }
@@ -23,6 +24,7 @@ class ColumnsSQLiteProvider implements IColumnsProvider {
           model.name,
           model.categoryId,
           model.typeId,
+          model.formId,
         ).save() ??
         -1;
   }

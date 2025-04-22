@@ -4,16 +4,19 @@ import 'package:geobase/src/domain/entities/field_type_get_entity.dart';
 class ColumnGetEntity extends ColumnEntity {
   ColumnGetEntity({
     required this.id,
-    required this.categoryId,
+    this.categoryId,
     required super.name,
     required this.type,
+    this.formId,
   });
 
   final int id;
 
-  final int categoryId;
+  final int? categoryId;
 
   final FieldTypeGetEntity type;
+
+  final int? formId;
 
   @override
   Map<String, dynamic> toJson() {

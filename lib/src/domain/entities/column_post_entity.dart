@@ -5,9 +5,12 @@ class ColumnPostEntity extends ColumnEntity {
     required super.name,
     this.categoryId,
     required this.typeId,
+    this.formId,
   });
 
   final int? categoryId;
 
   final int typeId;
+
+  final int? formId;
 }

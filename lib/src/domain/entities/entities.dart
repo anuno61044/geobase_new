@@ -14,6 +14,8 @@ export 'field_value_post_entity.dart';
 export 'field_value_put_entity.dart';
 export 'filter_categories_options_entity.dart';
 export 'filter_data_options_entity.dart';
+export 'form_get_entity.dart';
+export 'form_post_entity.dart';
 export 'geodata_entity.dart';
 export 'geodata_get_entity.dart';
 export 'geodata_post_entity.dart';

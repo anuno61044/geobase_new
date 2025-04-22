@@ -165,7 +165,7 @@ const tableForm = SqfEntityTable(
   primaryKeyName: 'form_id',
   primaryKeyType: PrimaryKeyType.integer_auto_incremental,
   fields: [
-    SqfEntityField('nombre', DbType.text, isNotNull: true),
+    SqfEntityField('name', DbType.text, isNotNull: true),
     SqfEntityFieldRelationship(
       parentTable: tableFieldType,
       fieldName: 'field_type_id',

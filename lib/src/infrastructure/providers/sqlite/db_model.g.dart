@@ -229,7 +229,7 @@ class TableFormDBModel extends SqfEntityTableBase {
 
     // declare fields
     fields = [
-      SqfEntityFieldBase('nombre', DbType.text, isNotNull: true),
+      SqfEntityFieldBase('name', DbType.text, isNotNull: true),
       SqfEntityFieldRelationshipBase(
           TableFieldTypeDBModel.getInstance, DeleteRule.NO_ACTION,
           relationType: RelationType.ONE_TO_MANY,
@@ -2428,7 +2428,7 @@ class ColumnDBModel extends TableBase {
       map['form_id'] = forView
           ? plFormDBModel == null
               ? form_id
-              : plFormDBModel!.nombre
+              : plFormDBModel!.name
           : form_id;
     } else if (form_id != null || !forView) {
       map['form_id'] = null;
@@ -2469,7 +2469,7 @@ class ColumnDBModel extends TableBase {
       map['form_id'] = forView
           ? plFormDBModel == null
               ? form_id
-              : plFormDBModel!.nombre
+              : plFormDBModel!.name
           : form_id;
     } else if (form_id != null || !forView) {
       map['form_id'] = null;
@@ -7214,14 +7214,14 @@ class FieldValueDBModelManager extends SqfEntityProvider {
 //endregion FieldValueDBModelManager
 // region FormDBModel
 class FormDBModel extends TableBase {
-  FormDBModel({this.form_id, this.nombre, this.field_type_id}) {
+  FormDBModel({this.form_id, this.name, this.field_type_id}) {
     _setDefaultValues();
     softDeleteActivated = false;
   }
-  FormDBModel.withFields(this.nombre, this.field_type_id) {
+  FormDBModel.withFields(this.name, this.field_type_id) {
     _setDefaultValues();
   }
-  FormDBModel.withId(this.form_id, this.nombre, this.field_type_id) {
+  FormDBModel.withId(this.form_id, this.name, this.field_type_id) {
     _setDefaultValues();
   }
   // fromMap v2.0
@@ -7230,8 +7230,8 @@ class FormDBModel extends TableBase {
       _setDefaultValues();
     }
     form_id = int.tryParse(o['form_id'].toString());
-    if (o['nombre'] != null) {
-      nombre = o['nombre'].toString();
+    if (o['name'] != null) {
+      name = o['name'].toString();
     }
     field_type_id = int.tryParse(o['field_type_id'].toString());
 
@@ -7244,7 +7244,7 @@ class FormDBModel extends TableBase {
   }
   // FIELDS (FormDBModel)
   int? form_id;
-  String? nombre;
+  String? name;
   int? field_type_id;
 
   // end FIELDS (FormDBModel)
@@ -7296,8 +7296,8 @@ class FormDBModel extends TableBase {
       {bool forQuery = false, bool forJson = false, bool forView = false}) {
     final map = <String, dynamic>{};
     map['form_id'] = form_id;
-    if (nombre != null || !forView) {
-      map['nombre'] = nombre;
+    if (name != null || !forView) {
+      map['name'] = name;
     }
     if (field_type_id != null) {
       map['field_type_id'] = forView
@@ -7319,8 +7319,8 @@ class FormDBModel extends TableBase {
       bool forView = false]) async {
     final map = <String, dynamic>{};
     map['form_id'] = form_id;
-    if (nombre != null || !forView) {
-      map['nombre'] = nombre;
+    if (name != null || !forView) {
+      map['name'] = name;
     }
     if (field_type_id != null) {
       map['field_type_id'] = forView
@@ -7355,12 +7355,12 @@ class FormDBModel extends TableBase {
 
   @override
   List<dynamic> toArgs() {
-    return [nombre, field_type_id];
+    return [name, field_type_id];
   }
 
   @override
   List<dynamic> toArgsWithIds() {
-    return [form_id, nombre, field_type_id];
+    return [form_id, name, field_type_id];
   }
 
   static Future<List<FormDBModel>?> fromWebUrl(Uri uri,
@@ -7564,8 +7564,8 @@ class FormDBModel extends TableBase {
   Future<int?> upsert({bool ignoreBatch = true}) async {
     try {
       final result = await _mnFormDBModel.rawInsert(
-          'INSERT OR REPLACE INTO Form (form_id, nombre, field_type_id)  VALUES (?,?,?)',
-          [form_id, nombre, field_type_id],
+          'INSERT OR REPLACE INTO Form (form_id, name, field_type_id)  VALUES (?,?,?)',
+          [form_id, name, field_type_id],
           ignoreBatch);
       if (result! > 0) {
         saveResult = BoolResult(
@@ -7593,7 +7593,7 @@ class FormDBModel extends TableBase {
   Future<BoolCommitResult> upsertAll(List<FormDBModel> formdbmodels,
       {bool? exclusive, bool? noResult, bool? continueOnError}) async {
     final results = await _mnFormDBModel.rawInsertAll(
-        'INSERT OR REPLACE INTO Form (form_id, nombre, field_type_id)  VALUES (?,?,?)',
+        'INSERT OR REPLACE INTO Form (form_id, name, field_type_id)  VALUES (?,?,?)',
         formdbmodels,
         exclusive: exclusive,
         noResult: noResult,
@@ -7866,9 +7866,9 @@ class FormDBModelFilterBuilder extends ConjunctionBase {
     return _form_id = _setField(_form_id, 'form_id', DbType.integer);
   }
 
-  FormDBModelField? _nombre;
-  FormDBModelField get nombre {
-    return _nombre = _setField(_nombre, 'nombre', DbType.text);
+  FormDBModelField? _name;
+  FormDBModelField get name {
+    return _name = _setField(_name, 'name', DbType.text);
   }
 
   FormDBModelField? _field_type_id;
@@ -8140,10 +8140,9 @@ class FormDBModelFields {
         _fForm_id ?? SqlSyntax.setField(_fForm_id, 'form_id', DbType.integer);
   }
 
-  static TableField? _fNombre;
-  static TableField get nombre {
-    return _fNombre =
-        _fNombre ?? SqlSyntax.setField(_fNombre, 'nombre', DbType.text);
+  static TableField? _fName;
+  static TableField get name {
+    return _fName = _fName ?? SqlSyntax.setField(_fName, 'name', DbType.text);
   }
 
   static TableField? _fField_type_id;

@@ -17,6 +17,7 @@ const String STATICSELECTION_TABLE_NAME = 'StaticSelection';
 const String MEDIA_TABLE_NAME = 'Media';
 const String COLUMN_TABLE_NAME = 'Column';
 const String FIELDVALUE_TABLE_NAME = 'FieldValue';
+const String FORM_TABLE_NAME = 'Form'; // Nueva tabla
 
 // meta type names for FieldType
 const STATICSELECTION_METATYPE_NAME = STATICSELECTION_TABLE_NAME;
@@ -125,6 +126,11 @@ const tableColumn = SqfEntityTable(
       isNotNull: true,
       deleteRule: DeleteRule.CASCADE,
     ),
+    SqfEntityFieldRelationship(
+      parentTable: tableForm,
+      fieldName: 'form_id',
+      deleteRule: DeleteRule.CASCADE,
+    ),
   ],
 );
 
@@ -151,6 +157,22 @@ const tableFieldValue = SqfEntityTable(
   ],
 );
 
+const tableForm = SqfEntityTable(
+  tableName: FORM_TABLE_NAME,
+  modelName: 'FormDBModel',
+  primaryKeyName: 'form_id',
+  primaryKeyType: PrimaryKeyType.integer_auto_incremental,
+  fields: [
+    SqfEntityField('nombre', DbType.text, isNotNull: true),
+    SqfEntityFieldRelationship(
+      parentTable: tableFieldType,
+      fieldName: 'field_type_id',
+      isNotNull: true,
+      deleteRule: DeleteRule.NO_ACTION,
+    ),
+  ],
+);
+
 @SqfEntityBuilder(geobaseDBModel)
 const geobaseDBModel = SqfEntityModel(
   modelName: 'GeobaseModel',
@@ -163,6 +185,7 @@ const geobaseDBModel = SqfEntityModel(
     tableStaticSelection,
     tableMedia,
     tableFieldValue,
+    tableForm,
   ],
-  dbVersion: 1,
+  dbVersion: 2,
 );

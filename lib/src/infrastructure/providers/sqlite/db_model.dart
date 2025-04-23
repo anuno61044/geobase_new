@@ -17,9 +17,11 @@ const String STATICSELECTION_TABLE_NAME = 'StaticSelection';
 const String MEDIA_TABLE_NAME = 'Media';
 const String COLUMN_TABLE_NAME = 'Column';
 const String FIELDVALUE_TABLE_NAME = 'FieldValue';
+const String FORM_TABLE_NAME = 'Form'; // Nueva tabla
 
 // meta type names for FieldType
 const STATICSELECTION_METATYPE_NAME = STATICSELECTION_TABLE_NAME;
+const FORM_METATYPE_NAME = FORM_TABLE_NAME;
 const MEDIA_METATYPE_NAME = MEDIA_TABLE_NAME;
 const BASE_METATYPE_NAME = 'Base';
 
@@ -27,6 +29,8 @@ const BASE_METATYPE_NAME = 'Base';
 const DEFAULT_RENDER_CLASS_NAME_SUFFIX = 'FieldRender';
 const STATICSELECTION_RENDER_CLASS =
     '$STATICSELECTION_METATYPE_NAME$DEFAULT_RENDER_CLASS_NAME_SUFFIX';
+const FORM_RENDER_CLASS =
+    '$FORM_METATYPE_NAME$DEFAULT_RENDER_CLASS_NAME_SUFFIX';
 const MEDIA_RENDER_CLASS =
     '$MEDIA_METATYPE_NAME$DEFAULT_RENDER_CLASS_NAME_SUFFIX';
 
@@ -116,13 +120,17 @@ const tableColumn = SqfEntityTable(
     SqfEntityFieldRelationship(
       parentTable: tableCategory,
       fieldName: 'category_id',
-      isNotNull: true,
       deleteRule: DeleteRule.CASCADE,
     ),
     SqfEntityFieldRelationship(
       parentTable: tableFieldType,
       fieldName: 'field_type_id',
       isNotNull: true,
+      deleteRule: DeleteRule.CASCADE,
+    ),
+    SqfEntityFieldRelationship(
+      parentTable: tableForm,
+      fieldName: 'form_id',
       deleteRule: DeleteRule.CASCADE,
     ),
   ],
@@ -151,6 +159,22 @@ const tableFieldValue = SqfEntityTable(
   ],
 );
 
+const tableForm = SqfEntityTable(
+  tableName: FORM_TABLE_NAME,
+  modelName: 'FormDBModel',
+  primaryKeyName: 'form_id',
+  primaryKeyType: PrimaryKeyType.integer_auto_incremental,
+  fields: [
+    SqfEntityField('name', DbType.text, isNotNull: true),
+    SqfEntityFieldRelationship(
+      parentTable: tableFieldType,
+      fieldName: 'field_type_id',
+      isNotNull: true,
+      deleteRule: DeleteRule.NO_ACTION,
+    ),
+  ],
+);
+
 @SqfEntityBuilder(geobaseDBModel)
 const geobaseDBModel = SqfEntityModel(
   modelName: 'GeobaseModel',
@@ -163,6 +187,7 @@ const geobaseDBModel = SqfEntityModel(
     tableStaticSelection,
     tableMedia,
     tableFieldValue,
+    tableForm,
   ],
-  dbVersion: 1,
+  dbVersion: 2,
 );

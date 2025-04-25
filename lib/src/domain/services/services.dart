@@ -1,5 +1,6 @@
 export 'categories_service.dart';
 export 'field_type_service.dart';
+export 'form_service.dart';
 export 'goedata_service.dart';
 export 'interfaces/interfaces.dart';
 export 'location_reader_service.dart';

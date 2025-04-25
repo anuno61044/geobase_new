@@ -16,6 +16,7 @@ class Routes {
         GeodataLocation(),
         OptionsLocation(),
         StaticSelectionLocation(),
+        FormLocation(),
         NotFoundLocation(),
       ],
     ).call,

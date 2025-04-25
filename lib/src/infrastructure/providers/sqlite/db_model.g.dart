@@ -231,7 +231,7 @@ class TableFormDBModel extends SqfEntityTableBase {
     fields = [
       SqfEntityFieldBase('name', DbType.text, isNotNull: true),
       SqfEntityFieldRelationshipBase(
-          TableFieldTypeDBModel.getInstance, DeleteRule.NO_ACTION,
+          TableFieldTypeDBModel.getInstance, DeleteRule.CASCADE,
           relationType: RelationType.ONE_TO_MANY,
           fieldName: 'field_type_id',
           isNotNull: true),
@@ -3891,17 +3891,16 @@ class FieldTypeDBModel extends TableBase {
     if (!result.success) {
       return result;
     }
-    if (await FormDBModel()
-            .select()
-            .field_type_id
-            .equals(field_type_id)
-            .and
-            .toCount() >
-        0) {
-      return BoolResult(
-          success: false,
-          errorMessage:
-              'SQFENTITY ERROR: The DELETE statement conflicted with the REFERENCE RELATIONSHIP (FormDBModel.field_type_id)');
+    {
+      result = await FormDBModel()
+          .select()
+          .field_type_id
+          .equals(field_type_id)
+          .and
+          .delete(hardDelete);
+    }
+    if (!result.success) {
+      return result;
     }
     if (!_softDeleteActivated || hardDelete) {
       return _mnFieldTypeDBModel.delete(QueryParams(
@@ -4208,19 +4207,15 @@ class FieldTypeDBModelFilterBuilder extends ConjunctionBase {
     if (!resMediaDBModelBYfield_type_id.success) {
       return resMediaDBModelBYfield_type_id;
     }
-// Check sub records where in (FormDBModel) according to DeleteRule.NO_ACTION
-
+// Delete sub records where in (FormDBModel) according to DeleteRule.CASCADE
     final idListFormDBModelBYfield_type_id = toListPrimaryKeySQL(false);
     final resFormDBModelBYfield_type_id = await FormDBModel()
         .select()
         .where('field_type_id IN (${idListFormDBModelBYfield_type_id['sql']})',
             parameterValue: idListFormDBModelBYfield_type_id['args'])
-        .toCount();
-    if (resFormDBModelBYfield_type_id > 0) {
-      return BoolResult(
-          success: false,
-          errorMessage:
-              'SQFENTITY ERROR: The DELETE statement conflicted with the REFERENCE RELATIONSHIP (FormDBModel.field_type_id)');
+        .delete(hardDelete);
+    if (!resFormDBModelBYfield_type_id.success) {
+      return resFormDBModelBYfield_type_id;
     }
 
     if (_softDeleteActivated && !hardDelete) {

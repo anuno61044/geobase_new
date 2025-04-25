@@ -170,7 +170,7 @@ const tableForm = SqfEntityTable(
       parentTable: tableFieldType,
       fieldName: 'field_type_id',
       isNotNull: true,
-      deleteRule: DeleteRule.NO_ACTION,
+      deleteRule: DeleteRule.CASCADE,
     ),
   ],
 );

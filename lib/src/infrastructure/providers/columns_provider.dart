@@ -51,6 +51,27 @@ class ColumnsSQLiteProvider implements IColumnsProvider {
   }
 
   @override
+  Future<List<ColumnGetModel>> getAllFromForm(int formId) async {
+    final columns = await ColumnDBModel()
+        .select()
+        .category_id
+        .equals(formId)
+        .toList(preload: true);
+    final result = <ColumnGetModel>[];
+    for (final e in columns) {
+      result.add(
+        ColumnGetModel(
+          id: e.column_id!,
+          formId: e.form_id!,
+          name: e.name!,
+          type: await getIt<IFieldTypeProvider>().getById(e.field_type_id!),
+        ),
+      );
+    }
+    return result;
+  }
+
+  @override
   Future<ColumnGetModel> getById(int id) async {
     final column = await ColumnDBModel()
         .select()

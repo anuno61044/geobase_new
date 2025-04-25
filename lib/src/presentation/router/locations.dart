@@ -101,6 +101,26 @@ class StaticSelectionLocation extends BeamLocation<BeamState> {
   }
 }
 
+class FormLocation extends BeamLocation<BeamState> {
+  @override
+  List<String> get pathPatterns => [
+        '/form',
+        '/form/new',
+        '/form/:$FIELD_TYPE_ID',
+      ];
+
+  @override
+  List<BeamPage> buildPages(BuildContext context, BeamState state) {
+    return [
+      FormListPage.getPage(context),
+      if (state.fieldTypeId != null)
+        FormViewPage.getPage(context, state.fieldTypeId!)
+      else if (state.uri.pathSegments.contains('new'))
+        FormNewPage.getPage(context),
+    ];
+  }
+}
+
 class CategoriesLocation extends BeamLocation<BeamState> {
   @override
   List<String> get pathPatterns => [

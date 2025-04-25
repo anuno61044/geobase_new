@@ -2,6 +2,7 @@ export 'category_extensions.dart';
 export 'column_extensions.dart';
 export 'field_type_extension.dart';
 export 'field_value_extension.dart';
+export 'form_extensions.dart';
 export 'geodata_extension.dart';
 export 'map_configuration_extension.dart';
 export 'map_mode_extensions.dart';

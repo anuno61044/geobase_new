@@ -11,6 +11,8 @@ export 'field_value_get_model.dart';
 export 'field_value_model.dart';
 export 'field_value_post_model.dart';
 export 'field_value_put_model.dart';
+export 'form_get_model.dart';
+export 'form_post_model.dart';
 export 'geodata_get_model.dart';
 export 'geodata_model.dart';
 export 'geodata_post_model.dart';

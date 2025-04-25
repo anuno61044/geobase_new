@@ -7,5 +7,6 @@ export 'i_map_conf_reader.dart';
 export 'i_map_conf_writter.dart';
 export 'i_media.dart';
 export 'i_static_selection.dart';
+export 'i_form.dart';
 export 'i_user_preferences_reader.dart';
 export 'i_user_preferences_writter.dart';

@@ -74,6 +74,16 @@ class _Body extends StatelessWidget {
                 trailing: const Icon(Icons.account_tree_rounded),
                 onTap: () => context.beamToNamed('/staticselection'),
               ),
+              ListTile(
+                title: Text(
+                  'Formularios (Form)',
+                  style: titleLarge?.copyWith(
+                    color: titleLarge.color?.withOpacity(0.7),
+                  ),
+                ),
+                trailing: const Icon(Icons.assignment),
+                onTap: () => context.beamToNamed('/form'),
+              ),
             ],
           ),
           ListTile(

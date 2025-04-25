@@ -16,7 +16,6 @@ class FieldTypeFormGetEntity extends FieldTypeGetEntity {
   Map<String, dynamic> toJson() {
     return {
       ...super.toJson(),
-      'id': id,
       'columns': columns.map((column) => column.toJson()).toList(),
     };
   }

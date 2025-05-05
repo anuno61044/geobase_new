@@ -7,7 +7,6 @@ class ColumnGetEntity extends ColumnEntity {
     this.categoryId,
     required super.name,
     required this.type,
-    this.formId,
   });
 
   final int id;
@@ -15,8 +14,6 @@ class ColumnGetEntity extends ColumnEntity {
   final int? categoryId;
 
   final FieldTypeGetEntity type;
-
-  final int? formId;
 
   @override
   Map<String, dynamic> toJson() {

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:geobase/src/infrastructure/models/column_post_model.dart';
 import 'package:geobase/src/infrastructure/models/field_type_get_model.dart';
 
@@ -13,4 +15,14 @@ class FieldTypeFormPostModel extends FieldTypeModel {
   final String? renderClass;
 
   final List<ColumnPostModel> columns;
+
+  // Serializar todas las columnas a List<Map>
+  List<Map<String, dynamic>> columnsToMapList() {
+    return columns.map((column) => column.toMap()).toList();
+  }
+
+  // Serializar todas las columnas a JSON String
+  String columnsToJson() {
+    return json.encode(columnsToMapList());
+  }
 }

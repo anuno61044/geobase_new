@@ -6,7 +6,6 @@ class ColumnPutEntity extends ColumnEntity {
     this.categoryId,
     required this.typeId,
     required super.name,
-    this.formId,
   });
 
   final int id;
@@ -15,5 +14,4 @@ class ColumnPutEntity extends ColumnEntity {
 
   final int typeId;
 
-  final int? formId;
 }

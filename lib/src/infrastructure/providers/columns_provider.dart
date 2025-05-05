@@ -12,7 +12,6 @@ class ColumnsSQLiteProvider implements IColumnsProvider {
           model.name,
           model.categoryId,
           model.typeId,
-          model.formId,
         ).save() ??
         -1;
   }
@@ -23,8 +22,7 @@ class ColumnsSQLiteProvider implements IColumnsProvider {
           model.id,
           model.name,
           model.categoryId,
-          model.typeId,
-          model.formId,
+          model.typeId
         ).save() ??
         -1;
   }
@@ -42,27 +40,6 @@ class ColumnsSQLiteProvider implements IColumnsProvider {
         ColumnGetModel(
           id: e.column_id!,
           categoryId: e.category_id!,
-          name: e.name!,
-          type: await getIt<IFieldTypeProvider>().getById(e.field_type_id!),
-        ),
-      );
-    }
-    return result;
-  }
-
-  @override
-  Future<List<ColumnGetModel>> getAllFromForm(int formId) async {
-    final columns = await ColumnDBModel()
-        .select()
-        .category_id
-        .equals(formId)
-        .toList(preload: true);
-    final result = <ColumnGetModel>[];
-    for (final e in columns) {
-      result.add(
-        ColumnGetModel(
-          id: e.column_id!,
-          formId: e.form_id!,
           name: e.name!,
           type: await getIt<IFieldTypeProvider>().getById(e.field_type_id!),
         ),

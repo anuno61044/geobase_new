@@ -95,9 +95,6 @@ class TableColumnDBModel extends SqfEntityTableBase {
           relationType: RelationType.ONE_TO_MANY,
           fieldName: 'field_type_id',
           isNotNull: true),
-      SqfEntityFieldRelationshipBase(
-          TableFormDBModel.getInstance, DeleteRule.CASCADE,
-          relationType: RelationType.ONE_TO_MANY, fieldName: 'form_id'),
     ];
     super.init();
   }
@@ -235,6 +232,8 @@ class TableFormDBModel extends SqfEntityTableBase {
           relationType: RelationType.ONE_TO_MANY,
           fieldName: 'field_type_id',
           isNotNull: true),
+      SqfEntityFieldBase('columns', DbType.text,
+          defaultValue: '[]', isNotNull: true),
     ];
     super.init();
   }
@@ -2278,20 +2277,15 @@ class GeodataDBModelManager extends SqfEntityProvider {
 // region ColumnDBModel
 class ColumnDBModel extends TableBase {
   ColumnDBModel(
-      {this.column_id,
-      this.name,
-      this.category_id,
-      this.field_type_id,
-      this.form_id}) {
+      {this.column_id, this.name, this.category_id, this.field_type_id}) {
     _setDefaultValues();
     softDeleteActivated = false;
   }
-  ColumnDBModel.withFields(
-      this.name, this.category_id, this.field_type_id, this.form_id) {
+  ColumnDBModel.withFields(this.name, this.category_id, this.field_type_id) {
     _setDefaultValues();
   }
-  ColumnDBModel.withId(this.column_id, this.name, this.category_id,
-      this.field_type_id, this.form_id) {
+  ColumnDBModel.withId(
+      this.column_id, this.name, this.category_id, this.field_type_id) {
     _setDefaultValues();
   }
   // fromMap v2.0
@@ -2308,8 +2302,6 @@ class ColumnDBModel extends TableBase {
 
     field_type_id = int.tryParse(o['field_type_id'].toString());
 
-    form_id = int.tryParse(o['form_id'].toString());
-
     // RELATIONSHIPS FromMAP
     plCategoryDBModel = o['categoryDBModel'] != null
         ? CategoryDBModel.fromMap(o['categoryDBModel'] as Map<String, dynamic>)
@@ -2318,9 +2310,6 @@ class ColumnDBModel extends TableBase {
         ? FieldTypeDBModel.fromMap(
             o['fieldTypeDBModel'] as Map<String, dynamic>)
         : null;
-    plFormDBModel = o['formDBModel'] != null
-        ? FormDBModel.fromMap(o['formDBModel'] as Map<String, dynamic>)
-        : null;
     // END RELATIONSHIPS FromMAP
   }
   // FIELDS (ColumnDBModel)
@@ -2328,7 +2317,6 @@ class ColumnDBModel extends TableBase {
   String? name;
   int? category_id;
   int? field_type_id;
-  int? form_id;
 
   // end FIELDS (ColumnDBModel)
 
@@ -2354,18 +2342,6 @@ class ColumnDBModel extends TableBase {
       {bool loadParents = false, List<String>? loadedFields}) async {
     final _obj = await FieldTypeDBModel().getById(field_type_id,
         loadParents: loadParents, loadedFields: loadedFields);
-    return _obj;
-  }
-
-  /// to load parent of items to this field, use preload parameter ex: toList(preload:true) or toSingle(preload:true) or getById(preload:true)
-  /// You can also specify this object into certain preload fields!. Ex: toList(preload:true, preloadFields:['plFormDBModel', 'plField2'..]) or so on..
-  FormDBModel? plFormDBModel;
-
-  /// get FormDBModel By Form_id
-  Future<FormDBModel?> getFormDBModel(
-      {bool loadParents = false, List<String>? loadedFields}) async {
-    final _obj = await FormDBModel()
-        .getById(form_id, loadParents: loadParents, loadedFields: loadedFields);
     return _obj;
   }
   // END RELATIONSHIPS (ColumnDBModel)
@@ -2424,15 +2400,6 @@ class ColumnDBModel extends TableBase {
     } else if (field_type_id != null || !forView) {
       map['field_type_id'] = null;
     }
-    if (form_id != null) {
-      map['form_id'] = forView
-          ? plFormDBModel == null
-              ? form_id
-              : plFormDBModel!.name
-          : form_id;
-    } else if (form_id != null || !forView) {
-      map['form_id'] = null;
-    }
 
     return map;
   }
@@ -2465,15 +2432,6 @@ class ColumnDBModel extends TableBase {
     } else if (field_type_id != null || !forView) {
       map['field_type_id'] = null;
     }
-    if (form_id != null) {
-      map['form_id'] = forView
-          ? plFormDBModel == null
-              ? form_id
-              : plFormDBModel!.name
-          : form_id;
-    } else if (form_id != null || !forView) {
-      map['form_id'] = null;
-    }
 
 // COLLECTIONS (ColumnDBModel)
     if (!forQuery) {
@@ -2498,12 +2456,12 @@ class ColumnDBModel extends TableBase {
 
   @override
   List<dynamic> toArgs() {
-    return [name, category_id, field_type_id, form_id];
+    return [name, category_id, field_type_id];
   }
 
   @override
   List<dynamic> toArgsWithIds() {
-    return [column_id, name, category_id, field_type_id, form_id];
+    return [column_id, name, category_id, field_type_id];
   }
 
   static Future<List<ColumnDBModel>?> fromWebUrl(Uri uri,
@@ -2581,12 +2539,6 @@ class ColumnDBModel extends TableBase {
           obj.plFieldTypeDBModel = obj.plFieldTypeDBModel ??
               await obj.getFieldTypeDBModel(loadParents: loadParents);
         }
-        if ((preloadFields == null ||
-            loadParents ||
-            preloadFields.contains('plFormDBModel'))) {
-          obj.plFormDBModel = obj.plFormDBModel ??
-              await obj.getFormDBModel(loadParents: loadParents);
-        }
       } // END RELATIONSHIPS PRELOAD
 
       objList.add(obj);
@@ -2646,12 +2598,6 @@ class ColumnDBModel extends TableBase {
             preloadFields.contains('plFieldTypeDBModel'))) {
           obj.plFieldTypeDBModel = obj.plFieldTypeDBModel ??
               await obj.getFieldTypeDBModel(loadParents: loadParents);
-        }
-        if ((preloadFields == null ||
-            loadParents ||
-            preloadFields.contains('plFormDBModel'))) {
-          obj.plFormDBModel = obj.plFormDBModel ??
-              await obj.getFormDBModel(loadParents: loadParents);
         }
       } // END RELATIONSHIPS PRELOAD
     } else {
@@ -2731,8 +2677,8 @@ class ColumnDBModel extends TableBase {
   Future<int?> upsert({bool ignoreBatch = true}) async {
     try {
       final result = await _mnColumnDBModel.rawInsert(
-          'INSERT OR REPLACE INTO Column (column_id, name, category_id, field_type_id, form_id)  VALUES (?,?,?,?,?)',
-          [column_id, name, category_id, field_type_id, form_id],
+          'INSERT OR REPLACE INTO Column (column_id, name, category_id, field_type_id)  VALUES (?,?,?,?)',
+          [column_id, name, category_id, field_type_id],
           ignoreBatch);
       if (result! > 0) {
         saveResult = BoolResult(
@@ -2760,7 +2706,7 @@ class ColumnDBModel extends TableBase {
   Future<BoolCommitResult> upsertAll(List<ColumnDBModel> columndbmodels,
       {bool? exclusive, bool? noResult, bool? continueOnError}) async {
     final results = await _mnColumnDBModel.rawInsertAll(
-        'INSERT OR REPLACE INTO Column (column_id, name, category_id, field_type_id, form_id)  VALUES (?,?,?,?,?)',
+        'INSERT OR REPLACE INTO Column (column_id, name, category_id, field_type_id)  VALUES (?,?,?,?)',
         columndbmodels,
         exclusive: exclusive,
         noResult: noResult,
@@ -3051,11 +2997,6 @@ class ColumnDBModelFilterBuilder extends ConjunctionBase {
         _setField(_field_type_id, 'field_type_id', DbType.integer);
   }
 
-  ColumnDBModelField? _form_id;
-  ColumnDBModelField get form_id {
-    return _form_id = _setField(_form_id, 'form_id', DbType.integer);
-  }
-
   /// Deletes List<ColumnDBModel> bulk by query
   ///
   /// <returns>BoolResult res.success= true (Deleted), false (Could not be deleted)
@@ -3146,12 +3087,6 @@ class ColumnDBModelFilterBuilder extends ConjunctionBase {
             preloadFields.contains('plFieldTypeDBModel'))) {
           obj.plFieldTypeDBModel = obj.plFieldTypeDBModel ??
               await obj.getFieldTypeDBModel(loadParents: loadParents);
-        }
-        if ((preloadFields == null ||
-            loadParents ||
-            preloadFields.contains('plFormDBModel'))) {
-          obj.plFormDBModel = obj.plFormDBModel ??
-              await obj.getFormDBModel(loadParents: loadParents);
         }
       } // END RELATIONSHIPS PRELOAD
     } else {
@@ -3348,12 +3283,6 @@ class ColumnDBModelFields {
   static TableField get field_type_id {
     return _fField_type_id = _fField_type_id ??
         SqlSyntax.setField(_fField_type_id, 'field_type_id', DbType.integer);
-  }
-
-  static TableField? _fForm_id;
-  static TableField get form_id {
-    return _fForm_id =
-        _fForm_id ?? SqlSyntax.setField(_fForm_id, 'form_id', DbType.integer);
   }
 }
 // endregion ColumnDBModelFields
@@ -7209,14 +7138,15 @@ class FieldValueDBModelManager extends SqfEntityProvider {
 //endregion FieldValueDBModelManager
 // region FormDBModel
 class FormDBModel extends TableBase {
-  FormDBModel({this.form_id, this.name, this.field_type_id}) {
+  FormDBModel({this.form_id, this.name, this.field_type_id, this.columns}) {
     _setDefaultValues();
     softDeleteActivated = false;
   }
-  FormDBModel.withFields(this.name, this.field_type_id) {
+  FormDBModel.withFields(this.name, this.field_type_id, this.columns) {
     _setDefaultValues();
   }
-  FormDBModel.withId(this.form_id, this.name, this.field_type_id) {
+  FormDBModel.withId(
+      this.form_id, this.name, this.field_type_id, this.columns) {
     _setDefaultValues();
   }
   // fromMap v2.0
@@ -7230,6 +7160,10 @@ class FormDBModel extends TableBase {
     }
     field_type_id = int.tryParse(o['field_type_id'].toString());
 
+    if (o['columns'] != null) {
+      columns = o['columns'].toString();
+    }
+
     // RELATIONSHIPS FromMAP
     plFieldTypeDBModel = o['fieldTypeDBModel'] != null
         ? FieldTypeDBModel.fromMap(
@@ -7241,6 +7175,7 @@ class FormDBModel extends TableBase {
   int? form_id;
   String? name;
   int? field_type_id;
+  String? columns;
 
   // end FIELDS (FormDBModel)
 
@@ -7257,26 +7192,6 @@ class FormDBModel extends TableBase {
     return _obj;
   }
   // END RELATIONSHIPS (FormDBModel)
-
-// COLLECTIONS & VIRTUALS (FormDBModel)
-  /// to load children of items to this field, use preload parameter. Ex: toList(preload:true) or toSingle(preload:true) or getById(preload:true)
-  /// You can also specify this object into certain preload fields!. Ex: toList(preload:true, preloadFields:['plColumnDBModels', 'plField2'..]) or so on..
-  List<ColumnDBModel>? plColumnDBModels;
-
-  /// get ColumnDBModel(s) filtered by form_id=form_id
-  ColumnDBModelFilterBuilder? getColumnDBModels(
-      {List<String>? columnsToSelect, bool? getIsDeleted}) {
-    if (form_id == null) {
-      return null;
-    }
-    return ColumnDBModel()
-        .select(columnsToSelect: columnsToSelect, getIsDeleted: getIsDeleted)
-        .form_id
-        .equals(form_id)
-        .and;
-  }
-
-// END COLLECTIONS & VIRTUALS (FormDBModel)
 
   static const bool _softDeleteActivated = false;
   FormDBModelManager? __mnFormDBModel;
@@ -7303,6 +7218,9 @@ class FormDBModel extends TableBase {
     } else if (field_type_id != null || !forView) {
       map['field_type_id'] = null;
     }
+    if (columns != null || !forView) {
+      map['columns'] = columns;
+    }
 
     return map;
   }
@@ -7326,12 +7244,9 @@ class FormDBModel extends TableBase {
     } else if (field_type_id != null || !forView) {
       map['field_type_id'] = null;
     }
-
-// COLLECTIONS (FormDBModel)
-    if (!forQuery) {
-      map['ColumnDBModels'] = await getColumnDBModels()!.toMapList();
+    if (columns != null || !forView) {
+      map['columns'] = columns;
     }
-// END COLLECTIONS (FormDBModel)
 
     return map;
   }
@@ -7350,12 +7265,12 @@ class FormDBModel extends TableBase {
 
   @override
   List<dynamic> toArgs() {
-    return [name, field_type_id];
+    return [name, field_type_id, columns];
   }
 
   @override
   List<dynamic> toArgsWithIds() {
-    return [form_id, name, field_type_id];
+    return [form_id, name, field_type_id, columns];
   }
 
   static Future<List<FormDBModel>?> fromWebUrl(Uri uri,
@@ -7402,22 +7317,6 @@ class FormDBModel extends TableBase {
           setDefaultValues: setDefaultValues);
       // final List<String> _loadedFields = List<String>.from(loadedFields);
 
-      // RELATIONSHIPS PRELOAD CHILD
-      if (preload) {
-        loadedFields = loadedFields ?? [];
-        if (/*!_loadedfields!.contains('Form.plColumnDBModels') && */ (preloadFields ==
-                null ||
-            preloadFields.contains('plColumnDBModels'))) {
-          /*_loadedfields!.add('Form.plColumnDBModels'); */ obj
-                  .plColumnDBModels =
-              obj.plColumnDBModels ??
-                  await obj.getColumnDBModels()!.toList(
-                      preload: preload,
-                      preloadFields: preloadFields,
-                      loadParents: false /*, loadedFields:_loadedFields*/);
-        }
-      } // END RELATIONSHIPS PRELOAD CHILD
-
       // RELATIONSHIPS PRELOAD
       if (preload || loadParents) {
         loadedFields = loadedFields ?? [];
@@ -7455,22 +7354,6 @@ class FormDBModel extends TableBase {
     final data = await _mnFormDBModel.getById([form_id]);
     if (data.length != 0) {
       obj = FormDBModel.fromMap(data[0] as Map<String, dynamic>);
-
-      // RELATIONSHIPS PRELOAD CHILD
-      if (preload) {
-        loadedFields = loadedFields ?? [];
-        if (/*!_loadedfields!.contains('Form.plColumnDBModels') && */ (preloadFields ==
-                null ||
-            preloadFields.contains('plColumnDBModels'))) {
-          /*_loadedfields!.add('Form.plColumnDBModels'); */ obj
-                  .plColumnDBModels =
-              obj.plColumnDBModels ??
-                  await obj.getColumnDBModels()!.toList(
-                      preload: preload,
-                      preloadFields: preloadFields,
-                      loadParents: false /*, loadedFields:_loadedFields*/);
-        }
-      } // END RELATIONSHIPS PRELOAD CHILD
 
       // RELATIONSHIPS PRELOAD
       if (preload || loadParents) {
@@ -7559,8 +7442,8 @@ class FormDBModel extends TableBase {
   Future<int?> upsert({bool ignoreBatch = true}) async {
     try {
       final result = await _mnFormDBModel.rawInsert(
-          'INSERT OR REPLACE INTO Form (form_id, name, field_type_id)  VALUES (?,?,?)',
-          [form_id, name, field_type_id],
+          'INSERT OR REPLACE INTO Form (form_id, name, field_type_id, columns)  VALUES (?,?,?,?)',
+          [form_id, name, field_type_id, columns],
           ignoreBatch);
       if (result! > 0) {
         saveResult = BoolResult(
@@ -7588,7 +7471,7 @@ class FormDBModel extends TableBase {
   Future<BoolCommitResult> upsertAll(List<FormDBModel> formdbmodels,
       {bool? exclusive, bool? noResult, bool? continueOnError}) async {
     final results = await _mnFormDBModel.rawInsertAll(
-        'INSERT OR REPLACE INTO Form (form_id, name, field_type_id)  VALUES (?,?,?)',
+        'INSERT OR REPLACE INTO Form (form_id, name, field_type_id, columns)  VALUES (?,?,?,?)',
         formdbmodels,
         exclusive: exclusive,
         noResult: noResult,
@@ -7602,18 +7485,6 @@ class FormDBModel extends TableBase {
   @override
   Future<BoolResult> delete([bool hardDelete = false]) async {
     debugPrint('SQFENTITIY: delete FormDBModel invoked (form_id=$form_id)');
-    var result = BoolResult(success: false);
-    {
-      result = await ColumnDBModel()
-          .select()
-          .form_id
-          .equals(form_id)
-          .and
-          .delete(hardDelete);
-    }
-    if (!result.success) {
-      return result;
-    }
     if (!_softDeleteActivated || hardDelete) {
       return _mnFormDBModel.delete(
           QueryParams(whereString: 'form_id=?', whereArguments: [form_id]));
@@ -7647,7 +7518,9 @@ class FormDBModel extends TableBase {
       ..qparams.distinct = true;
   }
 
-  void _setDefaultValues() {}
+  void _setDefaultValues() {
+    columns = columns ?? '[]';
+  }
 
   @override
   void rollbackPk() {
@@ -7872,6 +7745,11 @@ class FormDBModelFilterBuilder extends ConjunctionBase {
         _setField(_field_type_id, 'field_type_id', DbType.integer);
   }
 
+  FormDBModelField? _columns;
+  FormDBModelField get columns {
+    return _columns = _setField(_columns, 'columns', DbType.text);
+  }
+
   /// Deletes List<FormDBModel> bulk by query
   ///
   /// <returns>BoolResult res.success= true (Deleted), false (Could not be deleted)
@@ -7879,16 +7757,6 @@ class FormDBModelFilterBuilder extends ConjunctionBase {
   Future<BoolResult> delete([bool hardDelete = false]) async {
     buildParameters();
     var r = BoolResult(success: false);
-    // Delete sub records where in (ColumnDBModel) according to DeleteRule.CASCADE
-    final idListColumnDBModelBYform_id = toListPrimaryKeySQL(false);
-    final resColumnDBModelBYform_id = await ColumnDBModel()
-        .select()
-        .where('form_id IN (${idListColumnDBModelBYform_id['sql']})',
-            parameterValue: idListColumnDBModelBYform_id['args'])
-        .delete(hardDelete);
-    if (!resColumnDBModelBYform_id.success) {
-      return resColumnDBModelBYform_id;
-    }
 
     if (_softDeleteActivated && !hardDelete) {
       r = await _mnFormDBModel!.updateBatch(qparams, {'isDeleted': 1});
@@ -7931,22 +7799,6 @@ class FormDBModelFilterBuilder extends ConjunctionBase {
     FormDBModel? obj;
     if (data.isNotEmpty) {
       obj = FormDBModel.fromMap(data[0] as Map<String, dynamic>);
-
-      // RELATIONSHIPS PRELOAD CHILD
-      if (preload) {
-        loadedFields = loadedFields ?? [];
-        if (/*!_loadedfields!.contains('Form.plColumnDBModels') && */ (preloadFields ==
-                null ||
-            preloadFields.contains('plColumnDBModels'))) {
-          /*_loadedfields!.add('Form.plColumnDBModels'); */ obj
-                  .plColumnDBModels =
-              obj.plColumnDBModels ??
-                  await obj.getColumnDBModels()!.toList(
-                      preload: preload,
-                      preloadFields: preloadFields,
-                      loadParents: false /*, loadedFields:_loadedFields*/);
-        }
-      } // END RELATIONSHIPS PRELOAD CHILD
 
       // RELATIONSHIPS PRELOAD
       if (preload || loadParents) {
@@ -8144,6 +7996,12 @@ class FormDBModelFields {
   static TableField get field_type_id {
     return _fField_type_id = _fField_type_id ??
         SqlSyntax.setField(_fField_type_id, 'field_type_id', DbType.integer);
+  }
+
+  static TableField? _fColumns;
+  static TableField get columns {
+    return _fColumns =
+        _fColumns ?? SqlSyntax.setField(_fColumns, 'columns', DbType.text);
   }
 }
 // endregion FormDBModelFields

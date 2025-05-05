@@ -128,11 +128,6 @@ const tableColumn = SqfEntityTable(
       isNotNull: true,
       deleteRule: DeleteRule.CASCADE,
     ),
-    SqfEntityFieldRelationship(
-      parentTable: tableForm,
-      fieldName: 'form_id',
-      deleteRule: DeleteRule.CASCADE,
-    ),
   ],
 );
 
@@ -171,6 +166,10 @@ const tableForm = SqfEntityTable(
       fieldName: 'field_type_id',
       isNotNull: true,
       deleteRule: DeleteRule.CASCADE,
+    ),
+    SqfEntityField('columns', DbType.text,
+      defaultValue: '[]', // Valor por defecto: array vacío
+      isNotNull: true,
     ),
   ],
 );

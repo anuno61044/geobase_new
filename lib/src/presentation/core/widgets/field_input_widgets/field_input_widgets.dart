@@ -3,6 +3,7 @@ export 'date_input_widget.dart';
 export 'datetime_input_widget.dart';
 export 'double_input_widget.dart';
 export 'field_input_widget.dart';
+export 'form_input_widget.dart';
 export 'int_input_widget.dart';
 export 'media_audio_input_widget.dart';
 export 'media_file_input_widget.dart';

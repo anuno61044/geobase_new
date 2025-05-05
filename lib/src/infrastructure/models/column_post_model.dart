@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:geobase/src/infrastructure/models/column_model.dart';
 
 class ColumnPostModel extends ColumnModel {
@@ -5,12 +7,22 @@ class ColumnPostModel extends ColumnModel {
     required super.name,
     this.categoryId,
     required this.typeId,
-    this.formId,
   });
 
   final int? categoryId;
 
   final int typeId;
 
-  final int? formId;
+  // Convertir a Map (serialización básica)
+  Map<String, dynamic> toMap() {
+    return {
+      'name': name,
+      'categoryId': categoryId,
+      'typeId': typeId,
+    };
+  }
+
+  // Convertir a JSON String
+  String toJson() => json.encode(toMap());
+
 }

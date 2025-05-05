@@ -1,4 +1,7 @@
 ///Base Class for TypeModel.
+
+import 'package:geobase/src/infrastructure/utils/parsing_helpers.dart';
+
 abstract class FieldTypeModel {
   FieldTypeModel({
     required this.name,
@@ -24,4 +27,16 @@ class FieldTypeGetModel extends FieldTypeModel {
   final String renderClass;
 
   final Map<String, dynamic>? extradata;
+
+  factory FieldTypeGetModel.fromMap(Map<String, dynamic> map) {
+    return FieldTypeGetModel(
+      id: parseDynamicToInt((map['id'])),
+      name: parseDynamicToString(map['name']),
+      metaType: parseDynamicToString(map['metaType']),
+      renderClass: parseDynamicToString(map['renderClass']),
+      extradata: map['extradata'] != null 
+          ? parseDynamicToMap(map['extradata'])
+          : null,
+    );
+  }
 }

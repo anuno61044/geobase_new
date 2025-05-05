@@ -6,7 +6,6 @@ class ColumnPutModel extends ColumnModel {
     this.categoryId,
     required this.typeId,
     required super.name,
-    this.formId,
   });
 
   final int id;
@@ -15,5 +14,4 @@ class ColumnPutModel extends ColumnModel {
 
   final int typeId;
 
-  final int? formId;
 }

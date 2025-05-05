@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:geobase/injection.dart';
 import 'package:geobase/src/infrastructure/models/models.dart';
 import 'package:geobase/src/infrastructure/providers/providers.dart';
+import 'package:geobase/src/infrastructure/utils/parsing_helpers.dart';
 
 @LazySingleton(as: IFieldTypeFormProvider)
 class FormSQLiteProvider implements IFieldTypeFormProvider {
@@ -19,17 +20,9 @@ class FormSQLiteProvider implements IFieldTypeFormProvider {
       final id = await FormDBModel.withFields(
         model.name,
         fieldTypeId,
+        model.columnsToJson()
       ).save();
       if (id == null) throw Exception('Create Form Denied');
-      for (final col in model.columns) {
-        await getIt<IColumnsProvider>().create(
-          ColumnPostModel(
-            name: col.name,
-            typeId: col.typeId,
-            formId: id,
-          ),
-        );
-      }
       return id;
     } catch (e) {
       rethrow;
@@ -48,8 +41,7 @@ class FormSQLiteProvider implements IFieldTypeFormProvider {
           metaType: fieldType.meta_type!,
           id: form.field_type_id!,
           renderClass: fieldType.render_class!,
-          columns: await getIt<IColumnsProvider>()
-              .getAllFromForm(form.form_id!),
+          columns: parseColumnsList(form.columns!),
         ),
       );
     }
@@ -65,14 +57,17 @@ class FormSQLiteProvider implements IFieldTypeFormProvider {
         .equals(id)
         .toSingle(preload: true);
     if (form == null) throw Exception('Form Not Found');
-    return FieldTypeFormGetModel(
-      id: form.field_type_id!,
-      name: form.name!,
-      metaType: form.plFieldTypeDBModel!.meta_type!,
-      renderClass: form.plFieldTypeDBModel!.render_class!,
-      columns: await getIt<IColumnsProvider>()
-          .getAllFromForm(form.form_id!),
-    );
+    try {
+      return FieldTypeFormGetModel(
+        id: form.field_type_id!,
+        name: form.name!,
+        metaType: form.plFieldTypeDBModel!.meta_type!,
+        renderClass: form.plFieldTypeDBModel!.render_class!,
+        columns: parseColumnsList(form.columns!),
+      );
+    } catch (e) {
+      throw Exception('Error al procesar el formulario: $e');
+    }
   }
 
   @override

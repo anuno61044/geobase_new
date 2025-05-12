@@ -54,7 +54,7 @@ class ColumnsSQLiteProvider implements IColumnsProvider {
   Future<List<ColumnGetModel>> getAllFromForm(int formId) async {
     final columns = await ColumnDBModel()
         .select()
-        .category_id
+        .form_id
         .equals(formId)
         .toList(preload: true);
     final result = <ColumnGetModel>[];

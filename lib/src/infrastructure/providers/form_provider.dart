@@ -26,11 +26,12 @@ class FormSQLiteProvider implements IFieldTypeFormProvider {
           ColumnPostModel(
             name: col.name,
             typeId: col.typeId,
-            formId: id,
+            formId: fieldTypeId,
           ),
         );
       }
-      return id;
+
+      return fieldTypeId;
     } catch (e) {
       rethrow;
     }
@@ -49,7 +50,7 @@ class FormSQLiteProvider implements IFieldTypeFormProvider {
           id: form.field_type_id!,
           renderClass: fieldType.render_class!,
           columns: await getIt<IColumnsProvider>()
-              .getAllFromForm(form.form_id!),
+              .getAllFromForm(form.field_type_id!),
         ),
       );
     }
@@ -71,7 +72,7 @@ class FormSQLiteProvider implements IFieldTypeFormProvider {
       metaType: form.plFieldTypeDBModel!.meta_type!,
       renderClass: form.plFieldTypeDBModel!.render_class!,
       columns: await getIt<IColumnsProvider>()
-          .getAllFromForm(form.form_id!),
+          .getAllFromForm(form.field_type_id!),
     );
   }
 

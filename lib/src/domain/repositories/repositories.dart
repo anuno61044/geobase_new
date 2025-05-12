@@ -3,6 +3,7 @@ export 'i_column_repository.dart';
 export 'i_configuration_repository.dart';
 export 'i_field_type_repository.dart';
 export 'i_field_value_repository.dart';
+export 'i_form_repository.dart';
 export 'i_geodata_repostitory.dart';
 export 'i_location_repository.dart';
 export 'i_media_repository.dart';

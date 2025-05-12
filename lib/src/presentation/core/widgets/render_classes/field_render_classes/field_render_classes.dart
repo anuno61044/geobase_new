@@ -5,6 +5,7 @@ export 'base_double_field_render.dart';
 export 'base_int_field_render.dart';
 export 'base_string_field_render.dart';
 export 'field_render_class.dart';
+export 'form_field_render.dart';
 export 'media_audio_field_render.dart';
 export 'media_field_render.dart';
 export 'media_file_field_render.dart';

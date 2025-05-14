@@ -44,7 +44,7 @@ class FormFieldRender implements IFieldRenderClass {
 
   @override
   Widget getViewWidget(FieldValueGetEntity fieldValue) {
-    return BaseFieldView(
+    return FormFieldView(
       fieldValue: fieldValue,
     );
   }

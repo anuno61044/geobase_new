@@ -1,4 +1,5 @@
 export 'i_category.dart';
+export 'i_column.dart';
 export 'i_field_type.dart';
 export 'i_geodata.dart';
 export 'i_get_markers.dart';

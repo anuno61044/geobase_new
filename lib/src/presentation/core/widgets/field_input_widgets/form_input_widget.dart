@@ -9,7 +9,6 @@ import 'package:geobase/src/domain/entities/entities.dart';
 import 'package:geobase/src/presentation/core/app.dart';
 import 'package:geobase/src/presentation/core/widgets/commons/dropdown_field.dart';
 import 'package:geobase/src/presentation/core/widgets/field_input_widgets/field_input_widget.dart';
-import 'package:geobase/src/presentation/core/widgets/blocs/form_input_bloc/form_selector_bloc/form_selector_cubit.dart';
 import 'package:geobase/src/presentation/core/widgets/render_classes/reflect.dart';
 
 class FormFieldInputWidget extends FieldInputWidget {
@@ -21,27 +20,24 @@ class FormFieldInputWidget extends FieldInputWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) =>
-          getIt<FormSelectorCubit>()..loadFormForColumn(column),
-      child: BlocBuilder<FormSelectorCubit, FormSelectorState>(
-        builder: (context, state) {
-          return state.when(
-            initial: () => const CircularProgressIndicator(),
-            loading: () => const CircularProgressIndicator(),
-            loaded: (form) {
-              return _FormFieldsExpansion(
-                form: form,
-                inputBloc: inputBloc,
-                column: column,
-              );
-            },
-            empty: () => _buildDropdown([], context),
-            error: (message) => Text('Error: $message'),
-          );
-        },
-      ),
-    );
+    // Check if the column has form columns directly
+    if (column.type.extradata?['columns'] != null) {
+      
+      List<ColumnGetEntity> columns = [];
+
+      for (Map<String, dynamic> col in column.type.extradata?['columns']) {
+        columns.add(ColumnGetEntity.fromMap(col));
+      }
+
+      return _FormFieldsExpansion(
+        columns: columns,
+        inputBloc: inputBloc,
+        column: column,
+      );
+    } else {
+      // Fallback to dropdown if no form columns are available
+      return _buildDropdown([], context);
+    }
   }
 
   Widget _buildDropdown(List<String> items, BuildContext context) {
@@ -71,12 +67,12 @@ class FormFieldInputWidget extends FieldInputWidget {
 
 class _FormFieldsExpansion extends StatelessWidget {
   const _FormFieldsExpansion({
-    required this.form,
+    required this.columns,
     required this.inputBloc,
     required this.column,
   });
 
-  final FieldTypeFormGetEntity form;
+  final List<ColumnGetEntity> columns;
   final LyInput<FieldValueEntity> inputBloc;
   final ColumnGetEntity column;
 
@@ -89,9 +85,9 @@ class _FormFieldsExpansion extends StatelessWidget {
           height: 200, // Ajusta según necesidad
           child: ListView.separated(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            itemCount: form.columns.length,
+            itemCount: columns.length,
             itemBuilder: (context, index) {
-              final column = form.columns[index];
+              final column = columns[index];
               return FieldRenderResolver.getInputWidget(
                 column,
                 LyInput<FieldValueEntity>(

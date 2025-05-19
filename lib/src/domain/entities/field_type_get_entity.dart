@@ -26,6 +26,17 @@ class FieldTypeGetEntity extends FieldTypeEntity {
     this.extradata,
   });
 
+  // Nuevo método fromMap (inverso de toMap)
+  factory FieldTypeGetEntity.fromMap(Map<String, dynamic> map) {
+    return FieldTypeGetEntity(
+      id: map['id'] as int,
+      name: map['name'] as String,
+      metaType: map['metaType'] as String,
+      renderClass: map['renderClass'] as String,
+      extradata: map['extradata'] as Map<String, dynamic>?,
+    );
+  }
+
   final int id;
 
   final String renderClass;
@@ -39,6 +50,16 @@ class FieldTypeGetEntity extends FieldTypeEntity {
       ...super.toJson(),
       'renderClass':renderClass,
       'extradata': extradata,
+    };
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'name': name,
+      'metaType': metaType,
+      'renderClass': renderClass,
+      if (extradata != null) 'extradata': extradata,
     };
   }
 }

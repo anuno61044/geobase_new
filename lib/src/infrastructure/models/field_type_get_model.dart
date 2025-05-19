@@ -23,5 +23,15 @@ class FieldTypeGetModel extends FieldTypeModel {
 
   final String renderClass;
 
-  final Map<String, dynamic>? extradata;
+  Map<String, dynamic>? extradata;
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'name': name,
+      'metaType': metaType,
+      'renderClass': renderClass,
+      if (extradata != null) 'extradata': extradata,
+    };
+  }
 }

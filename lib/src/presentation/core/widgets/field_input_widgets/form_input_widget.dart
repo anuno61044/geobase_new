@@ -65,7 +65,7 @@ class FormFieldInputWidget extends FieldInputWidget {
   }
 }
 
-class _FormFieldsExpansion extends StatelessWidget {
+class _FormFieldsExpansion extends StatefulWidget {
   const _FormFieldsExpansion({
     required this.columns,
     required this.inputBloc,
@@ -77,30 +77,40 @@ class _FormFieldsExpansion extends StatelessWidget {
   final ColumnGetEntity column;
 
   @override
+  State<_FormFieldsExpansion> createState() => _FormFieldsExpansionState();
+}
+
+class _FormFieldsExpansionState extends State<_FormFieldsExpansion> {
+  final Map<int, FieldValueGetEntity> formValues = {};
+
+  @override
   Widget build(BuildContext context) {
     return ExpansionTile(
-      title: Text(column.name),
+      title: Text(widget.column.name),
       children: [
-        SizedBox(
-          height: 200, // Ajusta según necesidad
-          child: ListView.separated(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            itemCount: columns.length,
-            itemBuilder: (context, index) {
-              final column = columns[index];
-              return FieldRenderResolver.getInputWidget(
-                column,
-                LyInput<FieldValueEntity>(
-                  pureValue: FieldValuePostEntity(
-                    columnId: column.id,
-                    value: null,
-                  ),
+        ListView.builder(
+          shrinkWrap: true, // ¡Solución clave!
+          physics: NeverScrollableScrollPhysics(), // Opcional pero recomendado
+          padding: EdgeInsets.all(16), // Espaciado interno
+          itemCount: widget.columns.length,
+          itemBuilder: (context, index) {
+            final column = widget.columns[index];
+            return Padding(
+              padding: EdgeInsets.only(bottom: 12), // Espacio entre campos
+              child: TextFormField(
+                decoration: InputDecoration(
+                  labelText: column.name,
+                  border: OutlineInputBorder(), // Borde más claro
                 ),
-              );
-            },
-            separatorBuilder: (context, index) =>
-                const SizedBox(height: 16), // Espacio entre items
-          ),
+                onChanged: (value) {
+                  setState(() {
+                    formValues[column.id] = FieldValueGetEntity(value: value, column: column, geodataId: 1, id: 1);
+                    widget.inputBloc.dirty(FieldValuePostEntity(value: formValues, columnId: widget.column.id));
+                  });
+                },
+              ),
+            );
+          },
         ),
       ],
     );

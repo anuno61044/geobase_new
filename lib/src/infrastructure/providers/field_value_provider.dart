@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:geobase/injection.dart';
 import 'package:geobase/src/infrastructure/models/models.dart';
@@ -39,16 +40,27 @@ class FieldValueSQLiteProvider implements IFieldValueProvider {
         .equals(geodataId)
         .toList();
     final result = <FieldValueGetModel>[];
-    for (final field in fields) {
-      ColumnGetModel column = await getIt<IColumnsProvider>().getById(field.column_id!);
-      result.add(
-        FieldValueGetModel(
-          value: decodeValue(field.value),
-          id: field.field_value_id!,
-          geodataId: geodataId,
-          column: await _processColumnWithExtraData(column),
-        ),
-      );
+    for (FieldValueDBModel field in fields) {
+      try {
+        ColumnGetModel column = await getIt<IColumnsProvider>().getById(field.column_id!);
+        if (column.formId != null) {
+          continue;
+        }
+
+        result.add(
+          FieldValueGetModel(
+            value: decodeValue(field.value),
+            id: field.field_value_id!,
+            geodataId: geodataId,
+            column: await _processColumnWithExtraData(column),
+          ),
+        );
+      }
+      catch (e) {
+        log('Erroooor: $e');
+      }
+
+      
     }
     return result;
   }

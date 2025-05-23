@@ -4,6 +4,7 @@ abstract class FieldTypeEntity {
     required this.name,
     required this.metaType,
   });
+  
 
   final String name;
 
@@ -25,6 +26,15 @@ class FieldTypeGetEntity extends FieldTypeEntity {
     required this.renderClass,
     this.extradata,
   });
+  
+  FieldTypeGetEntity.empty()
+      : id = 0,
+        renderClass = '',
+        extradata = null,
+        super(
+          name: '',
+          metaType: '',
+        );
 
   // Nuevo método fromMap (inverso de toMap)
   factory FieldTypeGetEntity.fromMap(Map<String, dynamic> map) {

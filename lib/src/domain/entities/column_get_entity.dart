@@ -13,6 +13,13 @@ class ColumnGetEntity extends ColumnEntity {
       formId: map['formId'] as int?,
     );
   }
+  ColumnGetEntity.empty()
+      : id = 0,
+        categoryId = null,
+        type = FieldTypeGetEntity.empty(),
+        formId = null,
+        super(name: '');
+        
   ColumnGetEntity({
     required this.id,
     this.categoryId,

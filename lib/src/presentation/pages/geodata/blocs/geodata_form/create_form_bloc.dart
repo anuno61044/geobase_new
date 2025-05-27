@@ -69,15 +69,15 @@ class GeodataCreateFormBloc extends IGeodataCreateFormBloc {
       (e) => MapEntry(
         e,
         FieldRenderResolver.getInputBloc(
-              e,
-              FieldValuePostEntity(value: null, columnId: e.id),
-            ) ??
-            LyInput<FieldValueEntity>(
-              pureValue: FieldValuePostEntity(
-                columnId: e.id,
-                value: null,
-              ),
-            ),
+          e,
+          FieldValuePostEntity(value: null, columnId: e.id),
+        ) ??
+        LyInput<FieldValueEntity>(
+          pureValue: FieldValuePostEntity(
+            columnId: e.id,
+            value: null,
+          ),
+        ),
       ),
     ),
   );

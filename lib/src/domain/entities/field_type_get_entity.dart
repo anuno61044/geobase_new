@@ -4,6 +4,7 @@ abstract class FieldTypeEntity {
     required this.name,
     required this.metaType,
   });
+  
 
   final String name;
 
@@ -25,6 +26,26 @@ class FieldTypeGetEntity extends FieldTypeEntity {
     required this.renderClass,
     this.extradata,
   });
+  
+  FieldTypeGetEntity.empty()
+      : id = 0,
+        renderClass = '',
+        extradata = null,
+        super(
+          name: '',
+          metaType: '',
+        );
+
+  // Nuevo método fromMap (inverso de toMap)
+  factory FieldTypeGetEntity.fromMap(Map<String, dynamic> map) {
+    return FieldTypeGetEntity(
+      id: map['id'] as int,
+      name: map['name'] as String,
+      metaType: map['metaType'] as String,
+      renderClass: map['renderClass'] as String,
+      extradata: map['extradata'] as Map<String, dynamic>?,
+    );
+  }
 
   final int id;
 
@@ -39,6 +60,16 @@ class FieldTypeGetEntity extends FieldTypeEntity {
       ...super.toJson(),
       'renderClass':renderClass,
       'extradata': extradata,
+    };
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'name': name,
+      'metaType': metaType,
+      'renderClass': renderClass,
+      if (extradata != null) 'extradata': extradata,
     };
   }
 }

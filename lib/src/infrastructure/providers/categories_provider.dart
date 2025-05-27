@@ -61,7 +61,18 @@ class CategoriesSQLiteProvider implements ICategoriesProvider {
   Future<List<CategoryGetModel>> getAll() async {
     final categories = await CategoryDBModel().select().toList();
     final result = <CategoryGetModel>[];
-    for (final cat in categories) {
+
+    for (var cat in categories) {
+      // Obtenemos todas las columnas para todas las categorías en un solo mapa
+      final columns =
+          await getIt<IColumnsProvider>().getAllFromCategory(cat.category_id!);
+
+      List<ColumnGetModel> columnsList = [];
+
+      for (var col in columns) {
+        columnsList.add(await _processColumnWithExtraData(col));
+      }
+
       result.add(
         CategoryGetModel(
           id: cat.category_id!,
@@ -69,8 +80,7 @@ class CategoriesSQLiteProvider implements ICategoriesProvider {
           description: cat.description,
           color: cat.color,
           icon: cat.icon!,
-          columns: await getIt<IColumnsProvider>()
-              .getAllFromCategory(cat.category_id!),
+          columns: columnsList,
         ),
       );
     }
@@ -82,14 +92,21 @@ class CategoriesSQLiteProvider implements ICategoriesProvider {
     final category =
         await CategoryDBModel().select().category_id.equals(id).toSingle();
     if (category == null) throw Exception('Category Not Found');
+
+    List<ColumnGetModel> columns =
+        await getIt<IColumnsProvider>().getAllFromCategory(id);
+    List<ColumnGetModel> columnsList = [];
+
+    for (var col in columns) {
+      columnsList.add(await _processColumnWithExtraData(col));
+    }
     return CategoryGetModel(
       id: category.category_id!,
       name: category.name!,
       description: category.description,
       icon: category.icon!,
       color: category.color,
-      columns: await getIt<IColumnsProvider>()
-          .getAllFromCategory(category.category_id!),
+      columns: columnsList,
     );
   }
 
@@ -116,6 +133,9 @@ class CategoriesSQLiteProvider implements ICategoriesProvider {
     log(r.toString());
     final result = <CategoryGetModel>[];
     for (final cat in categories) {
+      final columns =
+          await getIt<IColumnsProvider>().getAllFromCategory(cat.category_id!);
+
       result.add(
         CategoryGetModel(
           id: cat.category_id!,
@@ -123,11 +143,35 @@ class CategoriesSQLiteProvider implements ICategoriesProvider {
           description: cat.description,
           color: cat.color,
           icon: cat.icon!,
-          columns: await getIt<IColumnsProvider>()
-              .getAllFromCategory(cat.category_id!),
+          columns: columns,
         ),
       );
     }
     return result;
+  }
+
+  // Método interno para procesar una columna y agregar datos de formulario si es necesario
+  Future<ColumnGetModel> _processColumnWithExtraData(
+      ColumnGetModel column) async {
+    if (column.type.metaType == 'Form') {
+      final associatedColumns =
+          await getIt<IColumnsProvider>().getAllFromForm(column.type.id);
+
+      List<Map<String, dynamic>> columns =
+          associatedColumns.map((col) => col.toMap()).toList();
+
+      final modifiedColumn = ColumnGetModel(
+          id: column.id,
+          name: column.name,
+          type: FieldTypeGetModel(
+            name: column.type.name,
+            renderClass: column.type.renderClass,
+            id: column.type.id,
+            metaType: column.type.metaType,
+            extradata: {...?column.type.extradata, 'columns': columns},
+          ));
+      return modifiedColumn;
+    }
+    return column;
   }
 }

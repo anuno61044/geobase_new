@@ -1,8 +1,11 @@
+import 'dart:developer';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:geobase/injection.dart';
 import 'package:geobase/src/domain/entities/entities.dart';
 import 'package:geobase/src/domain/services/services.dart';
+import 'package:geobase/src/infrastructure/providers/providers.dart';
 import 'package:latlong2/latlong.dart';
 
 part 'geodata_create_cubit.freezed.dart';
@@ -47,18 +50,18 @@ class GeodataCreateCubit extends Cubit<GeodataCreateState> {
       dfltLocation = eitherLocation.fold((l) => location, (r) => r);
     }
     final eitherCategory = await categoryService.getCategory(categoryId);
-    eitherCategory.fold(
-      (failure) => emit(
-        GeodataCreateState.failure(failure: failure),
-      ),
-      (category) => emit(
-        GeodataCreateState.inputData(
+    await eitherCategory.fold(
+      (failure) async => emit(GeodataCreateState.failure(failure: failure)),
+      (category) async {
+
+        // Emitir el estado con los datos
+        emit(GeodataCreateState.inputData(
           fetchData: GeodataCreateInitialData(
             location: dfltLocation,
             category: category,
           ),
-        ),
-      ),
+        ));
+      },
     );
   }
 }

@@ -1,4 +1,8 @@
+import 'dart:convert';
+import 'dart:developer';
+
 import 'package:geobase/injection.dart';
+import 'package:geobase/src/domain/entities/entities.dart';
 import 'package:geobase/src/infrastructure/models/models.dart';
 
 import 'package:geobase/src/infrastructure/providers/interfaces/interfaces.dart';
@@ -16,13 +20,26 @@ class GeodataSQLiteProvider implements IGeodataProvider {
       ).save();
       if (geodataId == null) throw Exception('Create Geodata Denied');
       for (final fv in model.fieldValues) {
-        await getIt<IFieldValueProvider>().create(
-          FieldValuePostModel(
-            columnId: fv.columnId,
-            geodataId: geodataId,
-            value: fv.value,
-          ),
-        );
+        // Verificar si corresponde a un formulario
+        if (fv.value is Map<int, FieldValueGetEntity>) {
+          final value = jsonEncode(fv.value.map((key, value) => MapEntry(key.toString(), value.toMap())));
+          await getIt<IFieldValueProvider>().create(
+            FieldValuePostModel(
+              columnId: fv.columnId,
+              geodataId: geodataId,
+              value: value,
+            ),
+          );
+        } else {
+          // Si no es array, procesar normalmente
+          await getIt<IFieldValueProvider>().create(
+            FieldValuePostModel(
+              columnId: fv.columnId,
+              geodataId: geodataId,
+              value: fv.value,
+            ),
+          );
+        }
       }
       return geodataId;
     } catch (e) {

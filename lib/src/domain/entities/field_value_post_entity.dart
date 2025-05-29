@@ -1,6 +1,7 @@
 import 'package:geobase/src/domain/entities/field_value_entity.dart';
 
 class FieldValuePostEntity extends FieldValueEntity {
+
   FieldValuePostEntity({
     required super.value,
     this.geodataId,
@@ -8,8 +9,16 @@ class FieldValuePostEntity extends FieldValueEntity {
   });
 
   final int? geodataId;
-
   final int columnId;
+
+  // Método para convertir a Map
+  Map<String, dynamic> toMap() {
+    return {
+      'value': value,
+      'geodataId': geodataId,
+      'columnId': columnId,
+    };
+  }
 
   @override
   FieldValueEntity copyWithValue(dynamic value) {

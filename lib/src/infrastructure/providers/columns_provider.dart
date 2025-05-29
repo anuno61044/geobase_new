@@ -84,8 +84,9 @@ class ColumnsSQLiteProvider implements IColumnsProvider {
 
     return ColumnGetModel(
       id: id,
-      categoryId: column.category_id!,
+      categoryId: column.category_id,
       name: column.name!,
+      formId: column.form_id,
       type: await getIt<IFieldTypeProvider>().getById(column.field_type_id!),
     );
   }

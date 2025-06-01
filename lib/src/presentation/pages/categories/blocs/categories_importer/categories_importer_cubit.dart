@@ -64,7 +64,7 @@ class CategoriesImporterCubit extends Cubit<CategoriesImporterState> {
       for (Map<String,dynamic> category in rawCategories) {
         List<ColumnPostEntity> columns = [];
         for (Map<String, dynamic> column in category['columns']) {
-          if (column['type']['metatype'] == 'Form') {
+          if (column['type']['metaType'] == 'Form') {
             FieldTypeFormPostEntity form = FieldTypeFormPostEntity.fromMap(column['type']['extradata'] as Map<String, dynamic>);
             final result = await formService.createForm(form);
             result.fold(
@@ -80,7 +80,7 @@ class CategoriesImporterCubit extends Cubit<CategoriesImporterState> {
               },
             );
           }
-          else if (column['metatype'] == 'StaticSelection') {
+          else if (column['metaType'] == 'StaticSelection') {
             // TODO
             // Implementar deserializar e importar una seleccion estatica
             log('aun no implementado');

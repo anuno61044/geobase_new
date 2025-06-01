@@ -157,8 +157,15 @@ class CategoriesSQLiteProvider implements ICategoriesProvider {
       final associatedColumns =
           await getIt<IColumnsProvider>().getAllFromForm(column.type.id);
 
+      List<ColumnGetModel> processedColumns = [];
+
+      for (final subcolumn in associatedColumns) {
+        final processedColumn = await _processColumnWithExtraData(subcolumn);
+        processedColumns.add(processedColumn);
+      }
+
       List<Map<String, dynamic>> columns =
-          associatedColumns.map((col) => col.toMap()).toList();
+          processedColumns.map((col) => col.toMap()).toList();
 
       final modifiedColumn = ColumnGetModel(
           id: column.id,

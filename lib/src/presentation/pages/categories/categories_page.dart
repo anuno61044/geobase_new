@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geobase/injection.dart';
 import 'package:geobase/src/domain/entities/entities.dart';
-import 'package:geobase/src/domain/services/services.dart';
 import 'package:geobase/src/presentation/core/extensions/color_extension.dart';
 import 'package:geobase/src/presentation/core/utils/notification_helper.dart';
 import 'package:geobase/src/presentation/core/utils/utils.dart';
@@ -11,6 +10,7 @@ import 'package:geobase/src/presentation/core/widgets/widgets.dart';
 import 'package:geobase/src/presentation/pages/categories/blocs/categories_exporter/categories_exporter_cubit.dart';
 import 'package:geobase/src/presentation/pages/categories/blocs/categories_importer/categories_importer_cubit.dart';
 import 'package:geobase/src/presentation/pages/categories/blocs/categorylist/categorylist_bloc.dart';
+import 'package:geobase/src/presentation/pages/categories/category_new_page.dart';
 
 class CategoriesPage extends StatelessWidget {
   const CategoriesPage({super.key});
@@ -25,7 +25,6 @@ class CategoriesPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return MultiBlocProvider(
       providers: [
         BlocProvider(
@@ -49,6 +48,11 @@ class _CategoriesPageInternal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Al construir la página o cuando entres, dispara la carga
+    context
+        .read<CategoryListBloc>()
+        .add(const CategoryListEvent.fetched(query: ''));
+
     return BlocListener<CategoryListBloc, CategoryListState>(
       listener: (context, state) {
         state.maybeMap(
@@ -372,11 +376,15 @@ class _FloatingActionButton extends StatelessWidget {
           tooltip: 'Agregar Categoría',
           heroTag: 'add_button',
           child: const Icon(Icons.add),
-          onPressed: () {
-            context.beamToNamed('/categories/new');
-            context
-                .read<CategoryListBloc>()
-                .add(const CategoryListEvent.fetched(query: ''));
+          onPressed: () async {
+            final result = await Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const CategoryNewPage()),
+            );
+            if (result == true) {
+              context
+                  .read<CategoryListBloc>()
+                  .add(const CategoryListEvent.fetched(query: ''));
+            }
           },
         ),
       ],

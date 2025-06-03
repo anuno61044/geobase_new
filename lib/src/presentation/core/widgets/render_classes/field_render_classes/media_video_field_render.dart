@@ -32,12 +32,14 @@ class MediaVideoFieldRender implements IFieldRenderClass {
   @override
   Widget getInputWidget(
     ColumnGetEntity column,
-    LyInput<FieldValueEntity> fieldInputBloc,
-  ) {
+    LyInput<FieldValueEntity> fieldInputBloc, {
+    void Function(Object?)? onChanged, // 👈 esto es necesario
+  }) {
     return MediaVideoFieldInputWidget(
       key: Key('FieldInput${column.name}${column.id}'),
       column: column,
       inputBloc: fieldInputBloc,
+      onChanged: onChanged,
     );
   }
 

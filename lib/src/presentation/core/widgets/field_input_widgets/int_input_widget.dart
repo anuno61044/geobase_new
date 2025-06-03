@@ -10,7 +10,10 @@ class IntFieldInputWidget extends FieldInputWidget {
     super.key,
     required super.column,
     required super.inputBloc,
+    this.onChanged,
   });
+
+  final void Function(Object?)? onChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -18,31 +21,41 @@ class IntFieldInputWidget extends FieldInputWidget {
       key: key,
       column: column,
       bloc: inputBloc,
+      onChanged: onChanged,
     );
   }
 }
 
 class _InternalTextInput extends StatefulWidget {
   const _InternalTextInput({
-    super. key,
+    super.key,
     required this.column,
     required this.bloc,
-  }) ;
+    this.onChanged,
+  });
 
   final ColumnGetEntity column;
   final LyInput<FieldValueEntity> bloc;
+  final void Function(Object?)? onChanged;
 
   @override
   State<_InternalTextInput> createState() => _InternalTextInputState();
 }
 
 class _InternalTextInputState extends State<_InternalTextInput> {
-  late TextEditingController controller;
+  late final TextEditingController controller;
 
   @override
   void initState() {
-    controller = TextEditingController();
+    final initialText = widget.bloc.state.value.value?.toString() ?? '';
+    controller = TextEditingController(text: initialText);
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
   }
 
   @override
@@ -52,15 +65,14 @@ class _InternalTextInputState extends State<_InternalTextInput> {
       builder: (context, state) {
         return TextInputWidget(
           labelText: widget.column.name,
-          onChanged: (newValue) {
-            widget.bloc.dirty(state.value.copyWithValue(newValue));
-          },
-          controller: controller
-            ..setValue(
-              state.value.value?.toString() ?? '',
-            ),
-          keyboardType: const TextInputType.numberWithOptions(signed: true),
+          controller: controller,
           errorText: state.error,
+          keyboardType: const TextInputType.numberWithOptions(signed: true),
+          onChanged: (newValue) {
+            final newEntity = state.value.copyWithValue(newValue);
+            widget.bloc.dirty(newEntity);
+            widget.onChanged?.call(newValue);
+          },
         );
       },
     );

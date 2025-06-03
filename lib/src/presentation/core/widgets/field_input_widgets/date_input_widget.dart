@@ -9,7 +9,10 @@ class DateFieldInputWidget extends FieldInputWidget {
     super.key,
     required super.column,
     required super.inputBloc,
+    this.onChanged,
   });
+
+  final void Function(Object?)? onChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -48,11 +51,13 @@ class DateFieldInputWidget extends FieldInputWidget {
               },
             );
             if (result != null) {
+              final String date = result.toString().split(' ')[0];
               inputBloc.dirty(
                 state.value.copyWithValue(
-                  result.toString().split(' ')[0],
+                  date,
                 ),
               );
+              onChanged?.call(date);
             }
           },
           child: AbsorbPointer(

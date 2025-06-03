@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter_lyform/flutter_lyform.dart';
 import 'package:geobase/src/domain/entities/entities.dart';
 import 'package:geobase/src/presentation/core/app.dart';
@@ -9,7 +11,10 @@ class DateTimeFieldInputWidget extends FieldInputWidget {
     super.key,
     required super.column,
     required super.inputBloc,
+    this.onChanged,
   });
+
+  final void Function(Object?)? onChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -85,17 +90,19 @@ class DateTimeFieldInputWidget extends FieldInputWidget {
                 },
               );
               if (resultTime != null) {
-                inputBloc.dirty(
-                  state.value.copyWithValue(
-                    DateTime(
+                final String datetime = DateTime(
                       resultDate.year,
                       resultDate.month,
                       resultDate.day,
                       resultTime.hour,
                       resultTime.minute,
-                    ).toString().split('.')[0],
+                    ).toString().split('.')[0];
+                inputBloc.dirty(
+                  state.value.copyWithValue(
+                    datetime,
                   ),
                 );
+                onChanged?.call(datetime);
               }
             }
           },
@@ -105,7 +112,6 @@ class DateTimeFieldInputWidget extends FieldInputWidget {
               labelText: column.name,
               onChanged: (newValue) {
                 FocusScope.of(context).unfocus();
-                // inputBloc.dirty(state.value.copyWithValue(newValue));
               },
               controller: TextEditingCustom.fromValue(
                 state.value.value?.toString().split('.')[0] ?? '',

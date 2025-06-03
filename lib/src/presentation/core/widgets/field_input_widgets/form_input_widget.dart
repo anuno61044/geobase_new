@@ -22,15 +22,32 @@ class FormFieldInputWidget extends FieldInputWidget {
   Widget build(BuildContext context) {
     // Check if the column has form columns directly
     if (column.type.extradata?['columns'] != null) {
-      
-      List<ColumnGetEntity> columns = [];
+      final List<ColumnGetEntity> columns = (column.type.extradata?['columns']
+              as List)
+          .map((col) => ColumnGetEntity.fromMap(col as Map<String, dynamic>))
+          .toList();
 
-      for (Map<String, dynamic> col in column.type.extradata?['columns']) {
-        columns.add(ColumnGetEntity.fromMap(col));
-      }
+      final Map<ColumnGetEntity, LyInput<FieldValueEntity>> columnInputsMap =
+          Map.fromEntries(
+        columns.map(
+          (e) => MapEntry(
+            e,
+            FieldRenderResolver.getInputBloc(
+                  e,
+                  FieldValuePostEntity(value: null, columnId: e.id),
+                ) ??
+                LyInput<FieldValueEntity>(
+                  pureValue: FieldValuePostEntity(
+                    columnId: e.id,
+                    value: null,
+                  ),
+                ),
+          ),
+        ),
+      );
 
       return _FormFieldsExpansion(
-        columns: columns,
+        columnInputsMap: columnInputsMap,
         inputBloc: inputBloc,
         column: column,
       );
@@ -67,52 +84,67 @@ class FormFieldInputWidget extends FieldInputWidget {
 
 class _FormFieldsExpansion extends StatefulWidget {
   const _FormFieldsExpansion({
-    required this.columns,
     required this.inputBloc,
     required this.column,
+    required this.columnInputsMap,
   });
 
-  final List<ColumnGetEntity> columns;
   final LyInput<FieldValueEntity> inputBloc;
   final ColumnGetEntity column;
+  final Map<ColumnGetEntity, LyInput<FieldValueEntity>> columnInputsMap;
 
   @override
   State<_FormFieldsExpansion> createState() => _FormFieldsExpansionState();
 }
 
 class _FormFieldsExpansionState extends State<_FormFieldsExpansion> {
+  late final Map<ColumnGetEntity, LyInput<FieldValueEntity>> columnInputsMap;
   final Map<int, FieldValueGetEntity> formValues = {};
+
+  @override
+  void initState() {
+    super.initState();
+    columnInputsMap = widget.columnInputsMap; // conserva las instancias
+  }
 
   @override
   Widget build(BuildContext context) {
     return ExpansionTile(
       title: Text(widget.column.name),
       children: [
-        ListView.builder(
-          shrinkWrap: true, // ¡Solución clave!
-          physics: NeverScrollableScrollPhysics(), // Opcional pero recomendado
-          padding: EdgeInsets.all(16), // Espaciado interno
-          itemCount: widget.columns.length,
-          itemBuilder: (context, index) {
-            final column = widget.columns[index];
-            return Padding(
-              padding: EdgeInsets.only(bottom: 12), // Espacio entre campos
-              child: TextFormField(
-                decoration: InputDecoration(
-                  labelText: column.name,
-                  border: OutlineInputBorder(), // Borde más claro
+        Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: columnInputsMap.entries.map((entry) {
+              final column = entry.key;
+              final input = entry.value;
+
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: FieldRenderResolver.getInputWidget(
+                  column,
+                  input,
+                  onChanged: (value) => setState(() {
+                    formValues[column.id] = FieldValueGetEntity(
+                      value: value,
+                      column: column,
+                      geodataId: 1,
+                      id: 1,
+                    );
+                    widget.inputBloc.dirty(
+                      FieldValuePostEntity(
+                        value: formValues,
+                        columnId: widget.column.id,
+                      ),
+                    );
+                  }),
                 ),
-                onChanged: (value) {
-                  setState(() {
-                    formValues[column.id] = FieldValueGetEntity(value: value, column: column, geodataId: 1, id: 1);
-                    widget.inputBloc.dirty(FieldValuePostEntity(value: formValues, columnId: widget.column.id));
-                  });
-                },
-              ),
-            );
-          },
+              );
+            }).toList(),
+          ),
         ),
       ],
     );
   }
 }
+

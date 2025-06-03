@@ -1,22 +1,25 @@
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_lyform/flutter_lyform.dart';
 import 'package:geobase/src/domain/entities/entities.dart';
 import 'package:geobase/src/presentation/core/app.dart';
 import 'package:geobase/src/presentation/core/utils/file_utilis.dart';
 import 'package:geobase/src/presentation/core/widgets/field_input_widgets/field_input_widget.dart';
-
+import 'package:permission_handler/permission_handler.dart';
 import 'package:record/record.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 class MediaAudioFieldInputWidget extends FieldInputWidget {
   const MediaAudioFieldInputWidget({
     super.key,
     required super.column,
     required super.inputBloc,
+    this.onChanged,
   });
+
+  final void Function(Object?)? onChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -58,6 +61,7 @@ class MediaAudioFieldInputWidget extends FieldInputWidget {
             final result = await _showPicker(context);
             if (result != null && state.value.value != result) {
               inputBloc.dirty(state.value.copyWithValue(result));
+              onChanged?.call(result);
             }
           },
         );
@@ -65,6 +69,7 @@ class MediaAudioFieldInputWidget extends FieldInputWidget {
     );
   }
 }
+
 
 
 

@@ -7,10 +7,13 @@ import 'package:geobase/src/presentation/core/widgets/commons/dropdown_field.dar
 import 'package:geobase/src/presentation/core/widgets/field_input_widgets/field_input_widget.dart';
 
 class StaticSelectionFieldInputWidget extends FieldInputWidget {
+  final ValueChanged<String?>? onChanged;
+
   const StaticSelectionFieldInputWidget({
     super.key,
     required super.column,
     required super.inputBloc,
+    this.onChanged,
   });
 
   @override
@@ -30,12 +33,15 @@ class StaticSelectionFieldInputWidget extends FieldInputWidget {
                 (e) => DropdownMenuItem<String>(value: e, child: Text(e)),
               )
               .toList(),
-          value: state.value.value as String?,
+          value: value,
           errorText: state.error,
           labelText: column.name,
-          onChanged: (newValue) => inputBloc.dirty(
-            state.value.copyWithValue(newValue),
-          ),
+          onChanged: (newValue) {
+            inputBloc.dirty(state.value.copyWithValue(newValue));
+            if (onChanged != null) {
+              onChanged!(newValue);
+            }
+          },
         );
       },
     );

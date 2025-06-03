@@ -11,8 +11,9 @@ abstract class IFieldRenderClass {
 
   Widget getInputWidget(
     ColumnGetEntity column,
-    LyInput<FieldValueEntity> inputBloc,
-  );
+    LyInput<FieldValueEntity> inputBloc, {
+    void Function(Object?)? onChanged,
+  });
 
   Widget getViewWidget(FieldValueGetEntity fieldValue);
 }

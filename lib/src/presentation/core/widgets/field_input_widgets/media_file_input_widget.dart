@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_lyform/flutter_lyform.dart';
 import 'package:geobase/src/domain/entities/entities.dart';
 import 'package:geobase/src/presentation/core/app.dart';
@@ -12,7 +13,10 @@ class MediaFileFieldInputWidget extends FieldInputWidget {
     super.key,
     required super.column,
     required super.inputBloc,
+    this.onChanged,
   });
+
+  final void Function(Object?)? onChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -54,6 +58,7 @@ class MediaFileFieldInputWidget extends FieldInputWidget {
             final result = await _showPicker();
             if (result != null && state.value.value != result) {
               inputBloc.dirty(state.value.copyWithValue(result));
+              onChanged?.call(result);
             }
           },
         );

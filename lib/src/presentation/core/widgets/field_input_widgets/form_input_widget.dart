@@ -20,6 +20,7 @@ class FormFieldInputWidget extends FieldInputWidget {
 
   @override
   Widget build(BuildContext context) {
+    Map<ColumnGetEntity, LyInput<FieldValueEntity>> columnInputsMap = {};
     // Check if the column has form columns directly
     if (column.type.extradata?['columns'] != null) {
       final List<ColumnGetEntity> columns = (column.type.extradata?['columns']
@@ -27,24 +28,59 @@ class FormFieldInputWidget extends FieldInputWidget {
           .map((col) => ColumnGetEntity.fromMap(col as Map<String, dynamic>))
           .toList();
 
-      final Map<ColumnGetEntity, LyInput<FieldValueEntity>> columnInputsMap =
-          Map.fromEntries(
-        columns.map(
-          (e) => MapEntry(
-            e,
-            FieldRenderResolver.getInputBloc(
-                  e,
-                  FieldValuePostEntity(value: null, columnId: e.id),
-                ) ??
-                LyInput<FieldValueEntity>(
-                  pureValue: FieldValuePostEntity(
-                    columnId: e.id,
-                    value: null,
+      final FieldValueEntity fieldValue = inputBloc.value;
+
+      if (fieldValue is FieldValuePostEntity) {
+        columnInputsMap = Map.fromEntries(
+          columns.map(
+            (e) => MapEntry(
+              e,
+              FieldRenderResolver.getInputBloc(
+                    e,
+                    FieldValuePostEntity(
+                        value: null, columnId: e.id),
+                  ) ??
+                  LyInput<FieldValueEntity>(
+                    pureValue: FieldValuePostEntity(
+                      columnId: e.id,
+                      value: null,
+                    ),
                   ),
-                ),
+            ),
           ),
-        ),
-      );
+        );
+      } else if (fieldValue is FieldValuePutEntity) {
+        Map<int, FieldValueGetEntity> inputValues = {};
+        if(fieldValue.value is String) {
+          inputValues = deserializeFieldValues(fieldValue.value as String);
+        }
+        else {
+          inputValues = fieldValue.value as Map<int, FieldValueGetEntity>;
+        }
+
+        columnInputsMap = Map.fromEntries(
+          columns.map(
+            (e) => MapEntry(
+              e,
+              FieldRenderResolver.getInputBloc(
+                    e,
+                    FieldValuePutEntity(
+                        geodataId: inputValues[e.id]!.geodataId,
+                        id: inputValues[e.id]!.id,
+                        value: inputValues[e.id]!.value,
+                        columnId: e.id),
+                  ) ??
+                  LyInput<FieldValueEntity>(
+                    pureValue: FieldValuePutEntity(
+                        geodataId: inputValues[e.id]!.geodataId,
+                        id: inputValues[e.id]!.id,
+                        value: inputValues[e.id]!.value,
+                        columnId: e.id),
+                  ),
+            ),
+          ),
+        );
+      }
 
       return _FormFieldsExpansion(
         columnInputsMap: columnInputsMap,
@@ -99,12 +135,13 @@ class _FormFieldsExpansion extends StatefulWidget {
 
 class _FormFieldsExpansionState extends State<_FormFieldsExpansion> {
   late final Map<ColumnGetEntity, LyInput<FieldValueEntity>> columnInputsMap;
-  final Map<int, FieldValueGetEntity> formValues = {};
+  Map<int, FieldValueGetEntity> formValues = {};
 
   @override
   void initState() {
     super.initState();
     columnInputsMap = widget.columnInputsMap; // conserva las instancias
+    formValues = columnInputsMap.map((key, value) => MapEntry(key.id, FieldValueGetEntity(column: key, value: columnInputsMap[key]!.value.value, id: 1, geodataId: 1)));
   }
 
   @override
@@ -119,27 +156,55 @@ class _FormFieldsExpansionState extends State<_FormFieldsExpansion> {
               final column = entry.key;
               final input = entry.value;
 
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: FieldRenderResolver.getInputWidget(
-                  column,
-                  input,
-                  onChanged: (value) => setState(() {
-                    formValues[column.id] = FieldValueGetEntity(
-                      value: value,
-                      column: column,
-                      geodataId: 1,
-                      id: 1,
-                    );
-                    widget.inputBloc.dirty(
-                      FieldValuePostEntity(
-                        value: formValues,
-                        columnId: widget.column.id,
-                      ),
-                    );
-                  }),
-                ),
-              );
+              if(widget.inputBloc.value is FieldValuePutEntity) {
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: FieldRenderResolver.getInputWidget(
+                    column,
+                    input,
+                    onChanged: (value) => setState(() {
+                      formValues[column.id] = FieldValueGetEntity(
+                        value: value,
+                        column: column,
+                        geodataId: 1,
+                        id: 1,
+                      );
+                      widget.inputBloc.dirty(
+                        FieldValuePutEntity(
+                          value: formValues,
+                          columnId: widget.column.id,
+                          id: (widget.inputBloc.value as FieldValuePutEntity).id,
+                          geodataId: (widget.inputBloc.value as FieldValuePutEntity).geodataId,
+                        ),
+                      );
+                    }),
+                  ),
+                );
+              }
+              else {
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: FieldRenderResolver.getInputWidget(
+                    column,
+                    input,
+                    onChanged: (value) => setState(() {
+                      formValues[column.id] = FieldValueGetEntity(
+                        value: value,
+                        column: column,
+                        geodataId: 1,
+                        id: 1,
+                      );
+                      widget.inputBloc.dirty(
+                        FieldValuePostEntity(
+                          value: formValues,
+                          columnId: widget.column.id,
+                        ),
+                      );
+                    }),
+                  ),
+                );
+              }
+              
             }).toList(),
           ),
         ),
@@ -148,3 +213,35 @@ class _FormFieldsExpansionState extends State<_FormFieldsExpansion> {
   }
 }
 
+Map<int, FieldValueGetEntity> deserializeFieldValues(String jsonValue) {
+  try {
+    // Paso 1: Decodificar el String JSON a un Map
+    final Map<String, dynamic> valueMap =
+        json.decode(jsonValue) as Map<String, dynamic>;
+
+    // Paso 2: Mapear cada entrada a un Map<int, FieldValueGetEntity>
+    final Map<int, FieldValueGetEntity> result = {};
+
+    valueMap.forEach((key, value) {
+      final columnData = value as Map<String, dynamic>;
+      final column =
+          ColumnGetEntity.fromMap(columnData['column'] as Map<String, dynamic>);
+
+      // Crear el objeto FieldValueGetEntity completo
+      final fieldValue = FieldValueGetEntity(
+        value: columnData['value'],
+        id: columnData['id'] as int,
+        geodataId: columnData['geodataId'] as int,
+        column: column,
+      );
+
+      // Usar column.id como clave (o columnData['id'] si prefieres)
+      result[column.id] = fieldValue;
+    });
+
+    return result;
+  } catch (e) {
+    log('Error deserializando FieldValueGetEntity: $e');
+    return {}; // Retorna un mapa vacío en caso de error
+  }
+}

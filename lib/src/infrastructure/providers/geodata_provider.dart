@@ -58,7 +58,20 @@ class GeodataSQLiteProvider implements IGeodataProvider {
       ).save();
       if (geodataId == null) throw Exception('Edit Geodata Denied');
       for (final fv in model.fieldValues) {
-        await getIt<IFieldValueProvider>().edit(fv);
+        // Verificar si corresponde a un formulario
+        if (fv.value is Map<int, FieldValueGetEntity>) {
+          final value = jsonEncode(fv.value.map((key, value) => MapEntry(key.toString(), value.toMap())));
+          await getIt<IFieldValueProvider>().edit(
+            FieldValuePutModel(
+              id: fv.id,
+              columnId: fv.columnId,
+              geodataId: geodataId,
+              value: value,
+            ),
+          );
+        } else {
+          await getIt<IFieldValueProvider>().edit(fv);
+        }
       }
       return geodataId;
     } catch (e) {

@@ -6,7 +6,6 @@ import 'package:geobase/src/presentation/core/widgets/basic_inputs/basic_inputs.
 import 'package:geobase/src/presentation/core/widgets/field_input_widgets/field_input_widget.dart';
 
 class StringFieldInputWidget extends FieldInputWidget {
-  final ValueChanged<String>? onChanged;
 
   const StringFieldInputWidget({
     super.key,
@@ -14,6 +13,7 @@ class StringFieldInputWidget extends FieldInputWidget {
     required super.inputBloc,
     this.onChanged,
   });
+  final ValueChanged<String>? onChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +47,8 @@ class _InternalTextInputState extends State<_InternalTextInput> {
 
   @override
   void initState() {
-    controller = TextEditingController();
+    final initialText = widget.bloc.state.value.value?.toString() ?? '';
+    controller = TextEditingController(text: initialText);
     super.initState();
   }
 

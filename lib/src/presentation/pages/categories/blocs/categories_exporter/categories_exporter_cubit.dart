@@ -10,7 +10,6 @@ import 'package:geobase/src/domain/entities/category_get_entity.dart';
 import 'package:geobase/src/domain/entities/entities.dart';
 import 'package:geobase/src/domain/services/interfaces/interfaces.dart';
 import 'package:path/path.dart' as path;
-import 'package:permission_handler/permission_handler.dart';
 
 part 'categories_exporter_cubit.freezed.dart';
 part 'categories_exporter_state.dart';

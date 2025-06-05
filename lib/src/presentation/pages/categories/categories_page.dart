@@ -11,6 +11,7 @@ import 'package:geobase/src/presentation/pages/categories/blocs/categories_expor
 import 'package:geobase/src/presentation/pages/categories/blocs/categories_importer/categories_importer_cubit.dart';
 import 'package:geobase/src/presentation/pages/categories/blocs/categorylist/categorylist_bloc.dart';
 import 'package:geobase/src/presentation/pages/categories/category_new_page.dart';
+import 'package:geobase/src/presentation/pages/categories/category_view_page.dart';
 
 class CategoriesPage extends StatelessWidget {
   const CategoriesPage({super.key});
@@ -262,31 +263,33 @@ class _CategoryWidget extends StatelessWidget {
           child: ListTile(
             title: SelectableText(category.name, style: titleSmall),
             subtitle: Text(category.description ?? '', style: bodyMedium),
-            onTap: () {
-              context.beamToNamed('/categories/${category.id}');
-              context
-                  .read<CategoryListBloc>()
-                  .add(const CategoryListEvent.fetched(query: ''));
+            onTap: () async {
+              final result = await Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => BlocProvider.value(
+                    value: context.read<CategoryListBloc>(),
+                    child: CategoryViewPage(categoryId: category.id),
+                  ),
+                ),
+              );
+
+              // Recargar siempre que result sea true (eliminado o intento fallido)
+              if (result == true) {
+                context.read<CategoryListBloc>().add(
+                      const CategoryListEvent.fetched(query: ''),
+                    );
+              }
             },
             leading: Icon(
               IconCodeUtils.decode(category.icon) ??
                   Icons.question_mark_rounded,
             ),
-            trailing: IconButton(
-              tooltip: 'Ver detalles de la Categoría',
-              icon: Icon(
-                Icons.keyboard_arrow_right,
-                color: Theme.of(context)
-                    .colorScheme
-                    .secondary
-                    .getContrastColor(color),
-              ),
-              onPressed: () {
-                context.beamToNamed('/categories/${category.id}');
-                context
-                    .read<CategoryListBloc>()
-                    .add(const CategoryListEvent.fetched(query: ''));
-              },
+            trailing: Icon(
+              Icons.keyboard_arrow_right,
+              color: Theme.of(context)
+                  .colorScheme
+                  .secondary
+                  .getContrastColor(color),
             ),
           ),
         ),

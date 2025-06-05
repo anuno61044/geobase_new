@@ -92,52 +92,55 @@ class _Body extends StatelessWidget {
   final focusNode = FocusNode();
 
   @override
-Widget build(BuildContext context) {
-  return MultiBlocListener(
-    listeners: [
-      BlocListener<CategoriesExporterCubit, CategoriesExporterState>(
-        listener: (context, state) {
-          if (state.status.isLoading) return;
+  Widget build(BuildContext context) {
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<CategoriesExporterCubit, CategoriesExporterState>(
+          listener: (context, state) {
+            if (state.status.isLoading) return;
 
-          if (state.status.isFailure || state.message != null) {
-            NotificationHelper.showErrorSnackbar(
-              context,
-              message: state.message!,
-            );
-            return;
-          }
-
-          if (state.status == CategoryExporterStatus.FetchSuccessNotFound ||
-              state.message != null) {
-            NotificationHelper.showInfoSnackbar(
-              context,
-              message: state.message!,
-            );
-          } else if (state.status == CategoryExporterStatus.ExportSuccess ||
-              state.message != null) {
-            NotificationHelper.showSuccessSnackbar(
-              context,
-              message: state.message!,
-            );
-          }
-        },
-      ),
-      BlocListener<CategoriesImporterCubit, CategoriesImporterState>(
-        listener: (context, state) {
-          if (state.status == CategoryImporterStatus.success) {
-            // Recarga categorías al importar exitosamente
-            context
-                .read<CategoryListBloc>()
-                .add(const CategoryListEvent.fetched(query: ''));
-            NotificationHelper.showSuccessSnackbar(context,
-                message: state.message ?? 'Importación exitosa');
-          } else if (state.status == CategoryImporterStatus.error) {
-            NotificationHelper.showErrorSnackbar(context,
-                message: state.message ?? 'Fallo la importación');
-          }
-        },
-      ),
-    ],
+            switch (state.status) {
+              case CategoryExporterStatus.ExportFailure:
+                NotificationHelper.showErrorSnackbar(
+                  context,
+                  message: state.message ?? 'Error al exportar categorías.',
+                );
+                break;
+              case CategoryExporterStatus.FetchSuccessNotFound:
+                NotificationHelper.showInfoSnackbar(
+                  context,
+                  message: state.message ??
+                      'No se encontraron categorías para exportar.',
+                );
+                break;
+              case CategoryExporterStatus.ExportSuccess:
+                NotificationHelper.showSuccessSnackbar(
+                  context,
+                  message: state.message ?? 'Exportación exitosa.',
+                );
+                break;
+              default:
+                // No hacer nada para otros estados
+                break;
+            }
+          },
+        ),
+        BlocListener<CategoriesImporterCubit, CategoriesImporterState>(
+          listener: (context, state) {
+            if (state.status == CategoryImporterStatus.success) {
+              // Recarga categorías al importar exitosamente
+              context
+                  .read<CategoryListBloc>()
+                  .add(const CategoryListEvent.fetched(query: ''));
+              NotificationHelper.showSuccessSnackbar(context,
+                  message: state.message ?? 'Importación exitosa');
+            } else if (state.status == CategoryImporterStatus.error) {
+              NotificationHelper.showErrorSnackbar(context,
+                  message: state.message ?? 'Fallo la importación');
+            }
+          },
+        ),
+      ],
       child: BlocBuilder<CategoryListBloc, CategoryListState>(
         bloc: context.read<CategoryListBloc>(),
         builder: (context, state) {

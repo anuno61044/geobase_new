@@ -80,10 +80,21 @@ class CategoriesImporterCubit extends Cubit<CategoriesImporterState> {
               },
             );
           }
-          else if (column['metaType'] == 'StaticSelection') {
-            // TODO
-            // Implementar deserializar e importar una seleccion estatica
-            log('aun no implementado');
+          else if (column['type']['metaType']== 'StaticSelection') {
+            FieldTypeStaticSelectionPostEntity sel = FieldTypeStaticSelectionPostEntity.fromMap(column['type']['extradata'] as Map<String, dynamic>);
+            final result = await staticselectionService.createStaticSelection(sel);
+            result.fold(
+              (failure) {
+                emit(state.copyWith(
+                  status: CategoryImporterStatus.error,
+                  message: 'Error al crear la Selección Estática ${sel.name}.',
+                ));
+                return;
+              },
+              (selId) {
+                columns.add(ColumnPostEntity(name: column['name'] as String, typeId: selId));
+              },
+            );
           }
           else {
             columns.add(ColumnPostEntity(

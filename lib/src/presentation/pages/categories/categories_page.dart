@@ -9,6 +9,7 @@ import 'package:geobase/src/presentation/core/utils/utils.dart';
 import 'package:geobase/src/presentation/core/widgets/widgets.dart';
 import 'package:geobase/src/presentation/pages/categories/blocs/categories_exporter/categories_exporter_cubit.dart';
 import 'package:geobase/src/presentation/pages/categories/blocs/categories_importer/categories_importer_cubit.dart';
+import 'package:geobase/src/presentation/pages/categories/blocs/categories_importer/categories_importer_state.dart';
 import 'package:geobase/src/presentation/pages/categories/blocs/categorylist/categorylist_bloc.dart';
 import 'package:geobase/src/presentation/pages/categories/category_new_page.dart';
 import 'package:geobase/src/presentation/pages/categories/category_view_page.dart';
@@ -91,27 +92,52 @@ class _Body extends StatelessWidget {
   final focusNode = FocusNode();
 
   @override
-  Widget build(BuildContext context) {
-    return BlocListener<CategoriesExporterCubit, CategoriesExporterState>(
-      listener: (context, state) {
-        if (state.status.isLoading)
-          return;
-        else if (state.status.isFailure || state.message != null) {
-          NotificationHelper.showErrorSnackbar(
-            context,
-            message: state.message!,
-          );
-          return;
-        } else if (state.status ==
-                CategoryExporterStatus.FetchSuccessNotFound ||
-            state.message != null) {
-          NotificationHelper.showInfoSnackbar(context, message: state.message!);
-        } else if (state.status == CategoryExporterStatus.ExportSuccess ||
-            state.message != null) {
-          NotificationHelper.showSuccessSnackbar(context,
-              message: state.message!);
-        }
-      },
+Widget build(BuildContext context) {
+  return MultiBlocListener(
+    listeners: [
+      BlocListener<CategoriesExporterCubit, CategoriesExporterState>(
+        listener: (context, state) {
+          if (state.status.isLoading) return;
+
+          if (state.status.isFailure || state.message != null) {
+            NotificationHelper.showErrorSnackbar(
+              context,
+              message: state.message!,
+            );
+            return;
+          }
+
+          if (state.status == CategoryExporterStatus.FetchSuccessNotFound ||
+              state.message != null) {
+            NotificationHelper.showInfoSnackbar(
+              context,
+              message: state.message!,
+            );
+          } else if (state.status == CategoryExporterStatus.ExportSuccess ||
+              state.message != null) {
+            NotificationHelper.showSuccessSnackbar(
+              context,
+              message: state.message!,
+            );
+          }
+        },
+      ),
+      BlocListener<CategoriesImporterCubit, CategoriesImporterState>(
+        listener: (context, state) {
+          if (state.status == CategoryImporterStatus.success) {
+            // Recarga categorías al importar exitosamente
+            context
+                .read<CategoryListBloc>()
+                .add(const CategoryListEvent.fetched(query: ''));
+            NotificationHelper.showSuccessSnackbar(context,
+                message: state.message ?? 'Importación exitosa');
+          } else if (state.status == CategoryImporterStatus.error) {
+            NotificationHelper.showErrorSnackbar(context,
+                message: state.message ?? 'Fallo la importación');
+          }
+        },
+      ),
+    ],
       child: BlocBuilder<CategoryListBloc, CategoryListState>(
         bloc: context.read<CategoryListBloc>(),
         builder: (context, state) {

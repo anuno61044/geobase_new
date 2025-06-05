@@ -12,10 +12,6 @@ import 'package:geobase/src/presentation/core/utils/shorten_str.dart';
 import 'package:geobase/src/presentation/core/widgets/widgets.dart';
 import 'package:geobase/src/presentation/pages/geodata/blocs/blocs.dart';
 import 'package:geobase/src/presentation/pages/geodata/misc/misc.dart';
-import 'package:excel/excel.dart';
-import 'dart:io';
-import 'package:path_provider/path_provider.dart';
-import 'package:file_picker/file_picker.dart';
 
 class GeodataPage extends StatelessWidget {
   const GeodataPage({

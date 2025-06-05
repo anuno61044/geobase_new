@@ -16,7 +16,10 @@ class FormFieldInputWidget extends FieldInputWidget {
     super.key,
     required super.column,
     required super.inputBloc,
+    this.onChangedToParent,
   });
+
+  final void Function(Object?)? onChangedToParent;
 
   @override
   Widget build(BuildContext context) {
@@ -37,8 +40,7 @@ class FormFieldInputWidget extends FieldInputWidget {
               e,
               FieldRenderResolver.getInputBloc(
                     e,
-                    FieldValuePostEntity(
-                        value: null, columnId: e.id),
+                    FieldValuePostEntity(value: null, columnId: e.id),
                   ) ??
                   LyInput<FieldValueEntity>(
                     pureValue: FieldValuePostEntity(
@@ -51,10 +53,9 @@ class FormFieldInputWidget extends FieldInputWidget {
         );
       } else if (fieldValue is FieldValuePutEntity) {
         Map<int, FieldValueGetEntity> inputValues = {};
-        if(fieldValue.value is String) {
+        if (fieldValue.value is String) {
           inputValues = deserializeFieldValues(fieldValue.value as String);
-        }
-        else {
+        } else {
           inputValues = fieldValue.value as Map<int, FieldValueGetEntity>;
         }
 
@@ -86,6 +87,7 @@ class FormFieldInputWidget extends FieldInputWidget {
         columnInputsMap: columnInputsMap,
         inputBloc: inputBloc,
         column: column,
+        onChangedToParent: onChangedToParent,
       );
     } else {
       // Fallback to dropdown if no form columns are available
@@ -119,15 +121,16 @@ class FormFieldInputWidget extends FieldInputWidget {
 }
 
 class _FormFieldsExpansion extends StatefulWidget {
-  const _FormFieldsExpansion({
-    required this.inputBloc,
-    required this.column,
-    required this.columnInputsMap,
-  });
+  const _FormFieldsExpansion(
+      {required this.inputBloc,
+      required this.column,
+      required this.columnInputsMap,
+      required this.onChangedToParent});
 
   final LyInput<FieldValueEntity> inputBloc;
   final ColumnGetEntity column;
   final Map<ColumnGetEntity, LyInput<FieldValueEntity>> columnInputsMap;
+  final void Function(Object?)? onChangedToParent;
 
   @override
   State<_FormFieldsExpansion> createState() => _FormFieldsExpansionState();
@@ -141,7 +144,13 @@ class _FormFieldsExpansionState extends State<_FormFieldsExpansion> {
   void initState() {
     super.initState();
     columnInputsMap = widget.columnInputsMap; // conserva las instancias
-    formValues = columnInputsMap.map((key, value) => MapEntry(key.id, FieldValueGetEntity(column: key, value: columnInputsMap[key]!.value.value, id: 1, geodataId: 1)));
+    formValues = columnInputsMap.map((key, value) => MapEntry(
+        key.id,
+        FieldValueGetEntity(
+            column: key,
+            value: columnInputsMap[key]!.value.value,
+            id: 1,
+            geodataId: 1)));
   }
 
   @override
@@ -156,7 +165,7 @@ class _FormFieldsExpansionState extends State<_FormFieldsExpansion> {
               final column = entry.key;
               final input = entry.value;
 
-              if(widget.inputBloc.value is FieldValuePutEntity) {
+              if (widget.inputBloc.value is FieldValuePutEntity) {
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 12),
                   child: FieldRenderResolver.getInputWidget(
@@ -169,19 +178,21 @@ class _FormFieldsExpansionState extends State<_FormFieldsExpansion> {
                         geodataId: 1,
                         id: 1,
                       );
-                      widget.inputBloc.dirty(
-                        FieldValuePutEntity(
-                          value: formValues,
-                          columnId: widget.column.id,
-                          id: (widget.inputBloc.value as FieldValuePutEntity).id,
-                          geodataId: (widget.inputBloc.value as FieldValuePutEntity).geodataId,
-                        ),
+                      final FieldValuePutEntity fieldValue =
+                          FieldValuePutEntity(
+                        value: formValues,
+                        columnId: widget.column.id,
+                        id: (widget.inputBloc.value as FieldValuePutEntity).id,
+                        geodataId:
+                            (widget.inputBloc.value as FieldValuePutEntity)
+                                .geodataId,
                       );
+                      widget.inputBloc.dirty(fieldValue);
+                      widget.onChangedToParent?.call(formValues);
                     }),
                   ),
                 );
-              }
-              else {
+              } else {
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 12),
                   child: FieldRenderResolver.getInputWidget(
@@ -194,17 +205,17 @@ class _FormFieldsExpansionState extends State<_FormFieldsExpansion> {
                         geodataId: 1,
                         id: 1,
                       );
-                      widget.inputBloc.dirty(
-                        FieldValuePostEntity(
-                          value: formValues,
-                          columnId: widget.column.id,
-                        ),
+                      final FieldValuePostEntity fieldValue =
+                          FieldValuePostEntity(
+                        value: formValues,
+                        columnId: widget.column.id,
                       );
+                      widget.inputBloc.dirty(fieldValue);
+                      widget.onChangedToParent?.call(formValues);
                     }),
                   ),
                 );
               }
-              
             }).toList(),
           ),
         ),

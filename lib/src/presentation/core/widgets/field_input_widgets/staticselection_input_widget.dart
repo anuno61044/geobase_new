@@ -7,7 +7,6 @@ import 'package:geobase/src/presentation/core/widgets/commons/dropdown_field.dar
 import 'package:geobase/src/presentation/core/widgets/field_input_widgets/field_input_widget.dart';
 
 class StaticSelectionFieldInputWidget extends FieldInputWidget {
-  final ValueChanged<String?>? onChanged;
 
   const StaticSelectionFieldInputWidget({
     super.key,
@@ -15,6 +14,7 @@ class StaticSelectionFieldInputWidget extends FieldInputWidget {
     required super.inputBloc,
     this.onChanged,
   });
+  final ValueChanged<String?>? onChanged;
 
   @override
   Widget build(BuildContext context) {

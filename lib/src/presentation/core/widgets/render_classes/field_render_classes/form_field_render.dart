@@ -40,6 +40,7 @@ class FormFieldRender implements IFieldRenderClass {
       key: Key('FieldInput${column.name}${column.id}'),
       column: column,
       inputBloc: fieldInputBloc,
+      onChangedToParent: onChanged,
     );
   }
 

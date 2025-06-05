@@ -46,7 +46,7 @@ class _FormCreatePageInternal extends StatelessWidget {
           onSuccess: (context, state) => NotificationHelper.showSuccessSnackbar(
             context,
             message: 'El formulario fue creado correctamente.',
-            onShow: () => context.beamToNamed('/form'),
+            onShow: () => Navigator.of(context).pop(true),
           ),
           onFailure: (context, state) => NotificationHelper.showErrorSnackbar(
             context,

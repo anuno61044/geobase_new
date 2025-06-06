@@ -13,32 +13,53 @@ class FormFieldView extends FieldViewWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Obtenemos los valores del formulario como Map<int, FieldValuePostEntity>
-    final Map<int, FieldValueGetEntity> formValues =
-        (jsonDecode(fieldValue.value as String) as Map<String, dynamic>?)
-                ?.map<int, FieldValueGetEntity>(
-              (key, value) => MapEntry(
+    final List<Map<int, FieldValueGetEntity>> formValues = [];
+
+    for (final item in fieldValue.value) {
+      final Map<int, FieldValueGetEntity> subFormValue =
+          (jsonDecode(item as String) as Map<String, dynamic>?)
+                  ?.map<int, FieldValueGetEntity>(
+                (key, value) => MapEntry(
                   int.parse(key),
-                  FieldValueGetEntity.fromMap(value as Map<String, dynamic>)),
-            ) ??
-            {};
+                  FieldValueGetEntity.fromMap(value as Map<String, dynamic>),
+                ),
+              ) ??
+              {};
+      formValues.add(subFormValue);
+    }
 
     return ExpansionTile(
-      // Título principal del formulario
       title: Text(
         fieldValue.column.name,
         style: Theme.of(context).textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.bold,
             ),
       ),
-
-      // Campos internos del formulario
-      children: formValues.entries.map((entry) {
-        final fieldValue = entry.value;
+      children: formValues.asMap().entries.map((entry) {
+        final subFormFields = entry.value;
 
         return Padding(
-          padding: const EdgeInsets.only(left: 24.0, bottom: 8.0),
-          child: FieldRenderResolver.getViewWidget(fieldValue),
+          padding: const EdgeInsets.only(left: 16.0, bottom: 16.0),
+          child: Card(
+            margin: const EdgeInsets.symmetric(vertical: 4),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            elevation: 2,
+            child: Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: subFormFields.entries.map((fieldEntry) {
+                  final fieldValue = fieldEntry.value;
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 8.0),
+                    child: FieldRenderResolver.getViewWidget(fieldValue),
+                  );
+                }).toList(),
+              ),
+            ),
+          ),
         );
       }).toList(),
     );

@@ -93,7 +93,7 @@ class _GeodataEditFormBody extends StatelessWidget {
       onSuccess: (_) => NotificationHelper.showSuccessSnackbar(
         context,
         message: 'El punto fue correctamente actualizado.',
-        onShow: () => context.beamToNamed('/geodata/$geodataId'),
+        onShow: () => context.beamToNamed('/map'),
       ),
       onError: (error) => NotificationHelper.showSuccessSnackbar(
         context,

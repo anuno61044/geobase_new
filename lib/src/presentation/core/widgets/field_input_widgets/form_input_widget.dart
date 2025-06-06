@@ -34,59 +34,33 @@ class FormFieldInputWidget extends FieldInputWidget {
       final FieldValueEntity fieldValue = inputBloc.value;
 
       if (fieldValue is FieldValuePostEntity) {
-        columnInputsMap = Map.fromEntries(
-          columns.map(
-            (e) => MapEntry(
-              e,
-              FieldRenderResolver.getInputBloc(
-                    e,
-                    FieldValuePostEntity(value: null, columnId: e.id),
-                  ) ??
-                  LyInput<FieldValueEntity>(
-                    pureValue: FieldValuePostEntity(
-                      columnId: e.id,
-                      value: null,
-                    ),
-                  ),
-            ),
-          ),
-        );
-      } else if (fieldValue is FieldValuePutEntity) {
-        Map<int, FieldValueGetEntity> inputValues = {};
-        if (fieldValue.value is String) {
-          inputValues = deserializeFieldValues(fieldValue.value as String);
-        } else {
-          inputValues = fieldValue.value as Map<int, FieldValueGetEntity>;
-        }
-
-        columnInputsMap = Map.fromEntries(
-          columns.map(
-            (e) => MapEntry(
-              e,
-              FieldRenderResolver.getInputBloc(
-                    e,
-                    FieldValuePutEntity(
-                        geodataId: inputValues[e.id]!.geodataId,
-                        id: inputValues[e.id]!.id,
-                        value: inputValues[e.id]!.value,
-                        columnId: e.id),
-                  ) ??
-                  LyInput<FieldValueEntity>(
-                    pureValue: FieldValuePutEntity(
-                        geodataId: inputValues[e.id]!.geodataId,
-                        id: inputValues[e.id]!.id,
-                        value: inputValues[e.id]!.value,
-                        columnId: e.id),
-                  ),
-            ),
-          ),
+        return _DynamicFormList(
+          column: column,
+          inputBloc: inputBloc,
+          onChangedToParent: onChangedToParent,
+          isEditMode: false,
         );
       }
+
+      List<Map<int, FieldValueGetEntity>> inputList = [];
+
+      final rawList = fieldValue.value as List;
+      inputList = rawList.map<Map<int, FieldValueGetEntity>>((item) {
+        final map = jsonDecode(item as String) as Map<String, dynamic>;
+        return map.map<int, FieldValueGetEntity>((key, value) {
+          return MapEntry(
+            int.parse(key),
+            FieldValueGetEntity.fromMap(value as Map<String, dynamic>),
+          );
+        });
+      }).toList();
 
       return _DynamicFormList(
         column: column,
         inputBloc: inputBloc,
         onChangedToParent: onChangedToParent,
+        initialValues: inputList,
+        isEditMode: true,
       );
     } else {
       // Fallback to dropdown if no form columns are available
@@ -124,11 +98,15 @@ class _DynamicFormList extends StatefulWidget {
     required this.inputBloc,
     required this.column,
     required this.onChangedToParent,
+    this.initialValues,
+    required this.isEditMode,
   });
 
   final LyInput<FieldValueEntity> inputBloc;
   final ColumnGetEntity column;
   final void Function(Object?)? onChangedToParent;
+  final List<Map<int, FieldValueGetEntity>>? initialValues;
+  final bool isEditMode;
 
   @override
   State<_DynamicFormList> createState() => _DynamicFormListState();
@@ -168,31 +146,87 @@ class _DynamicFormListState extends State<_DynamicFormList> {
   }
 
   void _updateInputBloc() {
-    final List<Map<int, FieldValueGetEntity>> value = _formList.map((form) {
-      return form.map((col, input) {
-        final val = FieldValueGetEntity(
-          column: col,
-          geodataId: 1,
-          id: 1,
-          value: input.value.value,
-        );
-        return MapEntry(col.id, val);
-      });
-    }).toList();
+  final List<Map<int, FieldValueGetEntity>> value = _formList.map((form) {
+    return form.map((col, input) {
+      final val = FieldValueGetEntity(
+        column: col,
+        geodataId: 1,
+        id: 1,
+        value: input.value.value,
+      );
+      return MapEntry(col.id, val);
+    });
+  }).toList();
 
-    final updated = FieldValuePostEntity(
+  FieldValueEntity updated;
+
+  if (widget.isEditMode) {
+    FieldValuePutEntity putValue = widget.inputBloc.value as FieldValuePutEntity;
+    updated = FieldValuePutEntity(
+      id: putValue.id,
+      geodataId: putValue.geodataId,
       columnId: widget.column.id,
-      value: value,
+      value: value.map((e) => jsonEncode(
+        e.map((k, v) => MapEntry(
+          k.toString(),
+          v.toMap(),
+        )),
+      )).toList(),
     );
-
-    widget.inputBloc.dirty(updated);
-    widget.onChangedToParent?.call(value);
+  } else {
+    updated = FieldValuePostEntity(
+      columnId: widget.column.id,
+      value: value.map((e) => jsonEncode(
+        e.map((k, v) => MapEntry(
+          k.toString(),
+          v.toMap(),
+        )),
+      )).toList(),
+    );
   }
+
+  widget.inputBloc.dirty(updated);
+  widget.onChangedToParent?.call(value);
+}
+
 
   @override
   void initState() {
     super.initState();
-    _addForm(); // Agrega uno por defecto
+
+    if (widget.initialValues != null && widget.initialValues!.isNotEmpty) {
+      for (final formMap in widget.initialValues!) {
+        final mapped = <ColumnGetEntity, LyInput<FieldValueEntity>>{};
+        for (final entry in formMap.entries) {
+          final colId = entry.key;
+          final fieldVal = entry.value;
+          final column = subColumns.firstWhere((col) => col.id == colId);
+
+          mapped[column] = FieldRenderResolver.getInputBloc(
+                column,
+                FieldValuePutEntity(
+                  geodataId: fieldVal.geodataId,
+                  id: fieldVal.id,
+                  value: fieldVal.value,
+                  columnId: colId,
+                ),
+              ) ??
+              LyInput<FieldValueEntity>(
+                pureValue: FieldValuePutEntity(
+                  geodataId: fieldVal.geodataId,
+                  id: fieldVal.id,
+                  value: fieldVal.value,
+                  columnId: colId,
+                ),
+              );
+        }
+        _formList.add(mapped);
+      }
+    } else {
+      _addForm(); // Si no hay datos iniciales, agrega uno vacío
+    }
+
+    _updateInputBloc();
   }
 
   @override

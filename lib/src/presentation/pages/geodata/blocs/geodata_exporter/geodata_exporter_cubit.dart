@@ -92,52 +92,170 @@ class GeodataExporterCubit extends Cubit<GeodataExporterState> {
   }
 }
 
+// Generar los encabezados del excel por hojas segun categorias y formularios
+Map<String, List<String>> _buildExcelStruct(List<GeodataGetEntity> geodatas) {
+  Map<String, List<String>> struct = {};
+
+  for (final data in geodatas) {
+    if (struct.containsKey(data.category.name)) continue;
+
+    List<String> columnNames = ['Latitud', 'Longitud'];
+    for (final field in data.fields) {
+      columnNames.add(field.column.name);
+
+      if (field.column.type.metaType == 'Form') {
+        Map<String, List<String>> subStructure = _buildNestedFormsStruct(field);
+
+        for (final item in subStructure.entries) {
+          if (struct.containsKey(item.key)) continue;
+
+          struct[item.key] = item.value;
+        }
+      }
+    }
+    struct[data.category.name] = columnNames;
+  }
+
+  return struct;
+}
+
+Map<String, List<String>> _buildNestedFormsStruct(
+    FieldValueGetEntity fieldValueForm) {
+  Map<String, List<String>> struct = {};
+
+  // Nombred de las columnas del formulario
+  List<String> columnNames = ['ID'];
+
+  List<FieldValueGetEntity> fieldvalues = [];
+
+  // Si es un formulario su value será una lista de String con los subformularios que el usuario haya creado serializados
+  // Solo necesitamos el primero para obtener su estructura
+  final val = (fieldValueForm.value as List<dynamic>).first;
+
+  final map = json.decode(val as String) as Map<String, dynamic>;
+  fieldvalues = map.values
+      .map((e) => FieldValueGetEntity.fromMap(e as Map<String, dynamic>))
+      .toList();
+
+  for (final field in fieldvalues) {
+    columnNames.add(field.column.name);
+
+    if (field.column.type.metaType == 'Form') {
+      Map<String, List<String>> subStructure = _buildNestedFormsStruct(field);
+
+      for (final item in subStructure.entries) {
+        if (struct.containsKey(item.key)) continue;
+
+        struct[item.key] = item.value;
+      }
+    }
+  }
+
+  struct[fieldValueForm.column.type.name] = columnNames;
+
+  return struct;
+}
+
+Map<String, List<List<String>>> _buildFormRows(
+    FieldValueGetEntity fieldValueForm, String id) {
+  Map<String, List<List<String>>> rowsBySheet = {};
+
+  List<List<String>> rowsList = [];
+  for (final val in fieldValueForm.value) {
+    // Creamos la fila empezando con el id
+    List<String> row = [id];
+
+    final map = json.decode(val as String) as Map<String, dynamic>;
+
+    // Obtenemos los valores de las columnas del formulario
+    List<FieldValueGetEntity> fieldvalues = [];
+    fieldvalues = map.values
+        .map((e) => FieldValueGetEntity.fromMap(e as Map<String, dynamic>))
+        .toList();
+
+    for (final field in fieldvalues) {
+      if (field.column.type.metaType != 'Form') {
+        row.add(field.value.toString());
+        continue;
+      }
+
+      String id = DateTime.now().millisecondsSinceEpoch.toString();
+      String idValue = '${field.column.type.name}_$id';
+      // Referencia añadida en la hoja principal
+      row.add(idValue);
+
+      for (final item in _buildFormRows(field, idValue).entries) {
+        if (rowsBySheet.containsKey(item.key)) {
+          rowsBySheet[item.key]!.addAll(item.value);
+        } else {
+          rowsBySheet[item.key] = item.value;
+        }
+      }
+    }
+    rowsList.add(row);
+  }
+
+  rowsBySheet[fieldValueForm.column.type.name] = rowsList;
+
+  return rowsBySheet;
+}
+
 Future<String?> _saveGeodataToExcel(List<GeodataGetEntity> geodatas) async {
   log('$geodatas');
   try {
     // Crear archivo Excel
     final excel = Excel.createExcel();
-    final sheet = excel[excel.getDefaultSheet()!];
 
-    // Agregar encabezados
-    Set<String> allFieldNames = {};
+    List<GeodataGetEntity> onlyGeodatas = [];
+    for (GeodataGetEntity item in geodatas) {
+      onlyGeodatas.add(item);
+    }
+
+    Map<String, List<String>> structInExcel = _buildExcelStruct(geodatas);
+
+    // Encabezados de las hojas de formularios
+    for (final head in structInExcel.entries) {
+      excel[head.key].appendRow(head.value);
+    }
+
+    // *************************
+    //       Agregar datos
+    // *************************
+    Map<String, List<List<String>>> rowsBySheet = {};
     for (var geodata in geodatas) {
+      List<String> row = [geodata.latitude.toString(), geodata.longitude.toString()];
       for (var field in geodata.fields) {
-        allFieldNames.add(field.column.name);
+        if (field.column.type.metaType != 'Form') {
+          row.add(field.value.toString());
+          continue;
+        }
+
+        String id = DateTime.now().millisecondsSinceEpoch.toString();
+        String idValue = '${field.column.type.name}_$id';
+        // Referencia añadida en la hoja principal
+        row.add(idValue);
+
+        // Guardar los datos del tipo Form
+        for (final item in _buildFormRows(field, idValue).entries) {
+          if (rowsBySheet.containsKey(item.key)) {
+            rowsBySheet[item.key]!.addAll(item.value);
+          } else {
+            rowsBySheet[item.key] = item.value;
+          }
+        }
+      }
+
+      if (rowsBySheet.containsKey(geodata.category.name)) {
+        rowsBySheet[geodata.category.name]!.add(row);
+      } else {
+        rowsBySheet[geodata.category.name] = [row];
       }
     }
 
-    List<String> columnNames = [
-      'ID',
-      'Categoría',
-      'Latitud',
-      'Longitud',
-      ...allFieldNames // Ordenar alfabéticamente
-    ];
-    sheet.appendRow(columnNames);
-
-    // Agregar datos
-    for (var geodata in geodatas) {
-      // Crear mapa de campos para acceso rápido
-      final fieldMap = {
-        for (var field in geodata.fields)
-          field.column.name: field.value.toString()
-      };
-
-      // Construir fila con datos base
-      List<String> row = [
-        geodata.id.toString(),
-        geodata.category.name.toString(),
-        geodata.latitude.toString(),
-        geodata.longitude.toString(),
-      ];
-
-      // Agregar valores de campos dinámicos (en el mismo orden que los encabezados)
-      for (var fieldName in allFieldNames) {
-        row.add(fieldMap[fieldName] ?? '');
+    for (final item in rowsBySheet.entries) {
+      for (final row in item.value) {
+        excel[item.key].appendRow(row);
       }
-
-      sheet.appendRow(row);
     }
 
     // Guardar archivo

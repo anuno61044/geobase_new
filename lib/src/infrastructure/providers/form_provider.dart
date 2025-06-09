@@ -71,18 +71,19 @@ class FormSQLiteProvider implements IFieldTypeFormProvider {
       name: form.name!,
       metaType: form.plFieldTypeDBModel!.meta_type!,
       renderClass: form.plFieldTypeDBModel!.render_class!,
-      columns: await getIt<IColumnsProvider>()
-          .getAllFromForm(form.field_type_id!),
+      columns:
+          await getIt<IColumnsProvider>().getAllFromForm(form.field_type_id!),
     );
   }
 
   @override
   Future<void> remove(int id) async {
-    final result = await FormDBModel()
-      .select()
-      .field_type_id
-      .equals(id)
-      .delete();
+    List<ColumnGetModel> columns = await getIt<IColumnsProvider>().getAllFromForm(id);
+    for (final col in columns) {
+      await getIt<IColumnsProvider>().remove(col.id);
+    }
+    final result =
+        await FormDBModel().select().field_type_id.equals(id).delete();
     if (result.errorMessage?.isNotEmpty ?? false) {
       throw Exception(result.errorMessage);
     }

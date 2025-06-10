@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
@@ -8,6 +9,7 @@ import 'package:geobase/src/presentation/core/app.dart';
 import 'package:geobase/src/presentation/core/utils/file_utilis.dart';
 import 'package:geobase/src/presentation/core/widgets/field_input_widgets/field_input_widget.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class MediaImageFieldInputWidget extends FieldInputWidget {
   const MediaImageFieldInputWidget({
@@ -78,15 +80,22 @@ class MediaImageFieldInputWidget extends FieldInputWidget {
 }
 
 Future<String?> _imgFromCamera() async {
-  final XFile? result = await ImagePicker().pickImage(
-    source: ImageSource.camera,
-    imageQuality: 10,
-  );
-  if (result?.path != null) {
-    final file = await saveFile(
-      File(result!.path),
+  log('camaraaaa');
+  final hasPermission = await _requestCameraPermission();
+  if (!hasPermission) return null;
+
+  try {
+    final XFile? result = await ImagePicker().pickImage(
+      source: ImageSource.camera,
+      // imageQuality: 10, // TODO chequear esto
     );
-    return file?.path;
+
+    if (result?.path != null) {
+      final file = await saveFile(File(result!.path));
+      return file?.path;
+    }
+  } catch (e, s) {
+    log('Error al abrir cámara: $e\n$s');
   }
   return null;
 }
@@ -106,7 +115,7 @@ Future<String?> _imgFromGallery() async {
 }
 
 Future<String?> _showPicker(BuildContext context) async {
-  return showModalBottomSheet<String?>(
+  final source = await showModalBottomSheet<String>(
     context: context,
     builder: (BuildContext bc) {
       return SafeArea(
@@ -115,22 +124,29 @@ Future<String?> _showPicker(BuildContext context) async {
             ListTile(
               leading: const Icon(Icons.photo_library),
               title: const Text('Galería'),
-              onTap: () async {
-                await _imgFromGallery()
-                    .then((value) => Navigator.of(context).pop(value));
-              },
+              onTap: () => Navigator.of(bc).pop('gallery'),
             ),
             ListTile(
               leading: const Icon(Icons.photo_camera),
               title: const Text('Cámara'),
-              onTap: () async {
-                await _imgFromCamera()
-                    .then((value) => Navigator.of(context).pop(value));
-              },
+              onTap: () => Navigator.of(bc).pop('camera'),
             ),
           ],
         ),
       );
     },
   );
+
+  if (source == 'camera') {
+    return await _imgFromCamera();
+  } else if (source == 'gallery') {
+    return await _imgFromGallery();
+  }
+  return null;
+}
+
+Future<bool> _requestCameraPermission() async {
+  log('pidiendo permisos');
+  final status = await Permission.camera.request();
+  return status.isGranted;
 }

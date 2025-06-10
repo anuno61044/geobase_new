@@ -161,6 +161,7 @@ Map<String, List<List<String>>> _buildFormRows(
   Map<String, List<List<String>>> rowsBySheet = {};
 
   List<List<String>> rowsList = [];
+  List<List<String>> mediasList = [];
   for (final val in fieldValueForm.value) {
     // Creamos la fila empezando con el id
     List<String> row = [id];
@@ -174,37 +175,44 @@ Map<String, List<List<String>>> _buildFormRows(
         .toList();
 
     for (final field in fieldvalues) {
-      if (field.column.type.metaType != 'Form') {
-        row.add(field.value.toString());
-        continue;
-      }
+      if (field.column.type.metaType == 'Form') {
+        String id = DateTime.now().millisecondsSinceEpoch.toString();
+        String idValue = '${field.column.type.name}_$id';
+        // Referencia añadida en la hoja principal
+        row.add(idValue);
 
-      String id = DateTime.now().millisecondsSinceEpoch.toString();
-      String idValue = '${field.column.type.name}_$id';
-      // Referencia añadida en la hoja principal
-      row.add(idValue);
-
-      for (final item in _buildFormRows(field, idValue).entries) {
-        if (rowsBySheet.containsKey(item.key)) {
-          rowsBySheet[item.key]!.addAll(item.value);
-        } else {
-          rowsBySheet[item.key] = item.value;
+        for (final item in _buildFormRows(field, idValue).entries) {
+          if (rowsBySheet.containsKey(item.key)) {
+            rowsBySheet[item.key]!.addAll(item.value);
+          } else {
+            rowsBySheet[item.key] = item.value;
+          }
         }
+      } else if (field.column.type.metaType == 'Media') {
+        String extension = path.extension(field.value.toString()); // .jpg
+        // Asignar un nuevo nombre
+        String mediaId = DateTime.now().microsecondsSinceEpoch.toString();
+        String newFileName = 'media_$mediaId$extension';
+
+        mediasList.add(['${field.value}%$newFileName']);
+        row.add(newFileName);
+      } else {
+        row.add(field.value.toString());
       }
     }
     rowsList.add(row);
   }
 
   rowsBySheet[fieldValueForm.column.type.name] = rowsList;
-
+  rowsBySheet['media_files'] = mediasList;
   return rowsBySheet;
 }
 
 Future<String?> _saveGeodataToExcel(List<GeodataGetEntity> geodatas) async {
-  log('$geodatas');
   try {
     // Crear archivo Excel
     final excel = Excel.createExcel();
+    excel.delete('Sheet1');
 
     List<GeodataGetEntity> onlyGeodatas = [];
     for (GeodataGetEntity item in geodatas) {
@@ -222,26 +230,38 @@ Future<String?> _saveGeodataToExcel(List<GeodataGetEntity> geodatas) async {
     //       Agregar datos
     // *************************
     Map<String, List<List<String>>> rowsBySheet = {};
+    List<List<String>> mediasList = [];
     for (var geodata in geodatas) {
-      List<String> row = [geodata.latitude.toString(), geodata.longitude.toString()];
+      // Valores de la columna de ese punto
+      List<String> row = [
+        geodata.latitude.toString(),
+        geodata.longitude.toString()
+      ];
       for (var field in geodata.fields) {
-        if (field.column.type.metaType != 'Form') {
-          row.add(field.value.toString());
-          continue;
-        }
+        if (field.column.type.metaType == 'Form') {
+          String id = DateTime.now().microsecondsSinceEpoch.toString();
+          String idValue = '${field.column.type.name}_$id';
+          // Referencia añadida en la hoja principal
+          row.add(idValue);
 
-        String id = DateTime.now().millisecondsSinceEpoch.toString();
-        String idValue = '${field.column.type.name}_$id';
-        // Referencia añadida en la hoja principal
-        row.add(idValue);
-
-        // Guardar los datos del tipo Form
-        for (final item in _buildFormRows(field, idValue).entries) {
-          if (rowsBySheet.containsKey(item.key)) {
-            rowsBySheet[item.key]!.addAll(item.value);
-          } else {
-            rowsBySheet[item.key] = item.value;
+          // Guardar los datos del tipo Form
+          for (final item in _buildFormRows(field, idValue).entries) {
+            if (rowsBySheet.containsKey(item.key)) {
+              rowsBySheet[item.key]!.addAll(item.value);
+            } else {
+              rowsBySheet[item.key] = item.value;
+            }
           }
+        } else if (field.column.type.metaType == 'Media') {
+          String extension = path.extension(field.value.toString()); // .jpg
+          // Asignar un nuevo nombre
+          String mediaId = DateTime.now().microsecondsSinceEpoch.toString();
+          String newFileName = 'media_$mediaId$extension';
+
+          mediasList.add([newFileName]);
+          row.add(newFileName);
+        } else {
+          row.add(field.value.toString());
         }
       }
 
@@ -252,20 +272,41 @@ Future<String?> _saveGeodataToExcel(List<GeodataGetEntity> geodatas) async {
       }
     }
 
+    if (rowsBySheet.containsKey('media_files')) {
+      rowsBySheet['media_files']!.addAll(mediasList);
+    } else {
+      rowsBySheet['media_files'] = mediasList;
+    }
+
     for (final item in rowsBySheet.entries) {
+      if (item.key == 'media_files') continue;
       for (final row in item.value) {
         excel[item.key].appendRow(row);
       }
     }
 
-    // Guardar archivo
     final selectedDirectory = await FilePicker.platform.getDirectoryPath();
     if (selectedDirectory == null) {
       return '';
     }
 
-    final filePath =
-        '$selectedDirectory/Geodata_Export_${DateTime.now().millisecondsSinceEpoch}.xlsx';
+    // Crear el directorio de destino si no existe
+    String destinationDirectory =
+        '$selectedDirectory/export_${DateTime.now().millisecondsSinceEpoch}';
+    
+    await Directory(destinationDirectory).create(recursive: true);
+    await Directory('$destinationDirectory/medias').create(recursive: true);
+
+    for (final media in rowsBySheet['media_files']!) {
+      String originalFilePath = media[0].substring(0, media[0].indexOf('%'));
+      String newFileName = media[0].substring(media[0].indexOf('%') + 1);
+
+      // Copiar el archivo
+      await File(originalFilePath).copy('$destinationDirectory/medias/$newFileName');
+    }
+
+    // Guardar archivo
+    final filePath = '$destinationDirectory/Geodata.xlsx';
     await File(filePath).writeAsBytes(excel.encode()!);
 
     return filePath;

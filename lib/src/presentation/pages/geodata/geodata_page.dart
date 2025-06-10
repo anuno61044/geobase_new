@@ -327,27 +327,68 @@ class _FloatingActionButton extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        // Botón de Exportación
-        FloatingActionButton(
-          tooltip: 'Exportar geodatas',
-          heroTag: 'export_button',
-          child: context.read<GeodataExporterCubit>().state.status.isLoading
-              ? const CircularProgressIndicator(
-                  color: Colors.white,
-                  strokeWidth: 2,
-                )
-              : const Icon(Icons.download),
-          onPressed: () => context.read<GeodataExporterCubit>().exportGeodata(),
+        // Botón de Exportación con mejor feedback visual
+        BlocConsumer<GeodataExporterCubit, GeodataExporterState>(
+          listener: (context, state) {
+            if (state.status.isLoaded) {
+              NotificationHelper.showSuccessSnackbar(
+                context,
+                message: 'Datos exportados correctamente',
+              );
+              if (state.filePath != null) {
+                log('Archivo exportado en: ${state.filePath}');
+              }
+            }
+            if (state.status.isFailure) {
+              NotificationHelper.showErrorSnackbar(
+                context,
+                message: 'Error al exportar los datos',
+              );
+            }
+          },
+          builder: (context, state) {
+            return Stack(
+              alignment: Alignment.center,
+              children: [
+                FloatingActionButton(
+                  tooltip: 'Exportar geodatas',
+                  heroTag: 'export_button',
+                  onPressed: state.status.isLoading 
+                      ? null 
+                      : () => context.read<GeodataExporterCubit>().exportGeodata(),
+                  child: const Icon(Icons.download),
+                ),
+                if (state.status.isLoading)
+                  Positioned(
+                    right: 10,
+                    top: 10,
+                    child: Container(
+                      padding: const EdgeInsets.all(2),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).primaryColor,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const SizedBox(
+                        width: 12,
+                        height: 12,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            );
+          },
         ),
         const SizedBox(height: 16),
-        // Botón de Agregar (existente)
+        // Botón de Agregar
         FloatingActionButton(
           tooltip: 'Agregar Punto de Interés',
           child: const Icon(Icons.add),
-          onPressed: () {
-            context.beamToNamed('/geodata/new');
-          },
-        )
+          onPressed: () => context.beamToNamed('/geodata/new'),
+        ),
       ],
     );
   }

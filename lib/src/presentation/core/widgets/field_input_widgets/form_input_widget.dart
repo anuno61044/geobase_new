@@ -184,16 +184,24 @@ class DynamicFormList extends StatelessWidget {
             ...form.entries.map((entry) {
               final col = entry.key;
               final input = entry.value;
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: FieldRenderResolver.getInputWidget(
-                  col,
-                  input,
-                  onChanged: (val) {
-                    input.dirty(input.value.copyWithValue(val));
-                  },
-                ),
-              );
+              try {
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: FieldRenderResolver.getInputWidget(
+                    col,
+                    input,
+                    onChanged: (val) {
+                      input.dirty(input.value.copyWithValue(val));
+                      context
+                          .read<DynamicFormCubit>()
+                          .onFieldChanged(); // <- NUEVO
+                    },
+                  ),
+                );
+              } catch (e, st) {
+                log('Error en inputWidget: $e\n$st');
+                return const Text('Error al cargar el campo');
+              }
             }),
 
             // Botón para eliminar subformulario

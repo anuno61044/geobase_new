@@ -105,4 +105,8 @@ class DynamicFormCubit extends Cubit<DynamicFormState> {
       return jsonEncode(mapToSerialize);
     }).toList();
   }
+
+  void onFieldChanged() {
+    emit(DynamicFormState(forms: [...state.forms]));
+  }
 }

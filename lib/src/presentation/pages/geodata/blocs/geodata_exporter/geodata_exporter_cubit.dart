@@ -258,7 +258,7 @@ Future<String?> _saveGeodataToExcel(List<GeodataGetEntity> geodatas) async {
           String mediaId = DateTime.now().microsecondsSinceEpoch.toString();
           String newFileName = 'media_$mediaId$extension';
 
-          mediasList.add([newFileName]);
+          mediasList.add(['${field.value}%$newFileName']);
           row.add(newFileName);
         } else {
           row.add(field.value.toString());

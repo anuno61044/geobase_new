@@ -12,15 +12,26 @@ class FieldTypeStaticSelectionGetEntity extends FieldTypeGetEntity {
 
   factory FieldTypeStaticSelectionGetEntity.fromMap(Map<String, dynamic> map) {
     try {
-      return FieldTypeStaticSelectionGetEntity(
-        name: map['name'] as String,
-        metaType: map['metaType'] as String,
-        id: map['id'] as int,
-        renderClass: map['renderClass'] as String,
-        options: parseOptions(map['extradata']['options'] as String),
-      );
+      if (map['extradata'] != null) {
+        return FieldTypeStaticSelectionGetEntity(
+          name: map['name'] as String,
+          metaType: map['metaType'] as String,
+          id: map['id'] as int,
+          renderClass: map['renderClass'] as String,
+          options: parseOptions(map['extradata']['options'] as String),
+        );
+      } else {
+        return FieldTypeStaticSelectionGetEntity(
+          name: map['name'] as String,
+          metaType: map['metaType'] as String,
+          id: map['id'] as int,
+          renderClass: map['renderClass'] as String,
+          options: (map['options'] as List<dynamic>).map((e) => e.toString()).toList(),
+        );
+      }
     } catch (e) {
-      throw FormatException('Failed to parse FieldTypeStaticSelectionGetEntity: $e');
+      throw FormatException(
+          'Failed to parse FieldTypeStaticSelectionGetEntity: $e');
     }
   }
 

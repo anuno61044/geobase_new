@@ -18,7 +18,13 @@ class StaticSelectionFieldInputWidget extends FieldInputWidget {
 
   @override
   Widget build(BuildContext context) {
-    final List<String> items = getOptions(column.type.extradata?['options']);
+    List<String> items = [];
+    if(column.type.extradata?['options'] != null) {
+      items = getOptions(column.type.extradata?['options']);
+    }
+    else {
+      items = (column.type as FieldTypeStaticSelectionGetEntity).options;
+    }
     return LyInputBuilder<FieldValueEntity>(
       lyInput: inputBloc,
       builder: (context, state) {

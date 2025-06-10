@@ -30,7 +30,9 @@ class CategoriesShowerCubit extends Cubit<CategoriesShowerState> {
                     icon: '',
                     columns: [])
             ]);
-    emit(state.copyWith(categories: categories));
+    if (!isClosed) {
+      emit(state.copyWith(categories: categories));
+    }
   }
 
   void changeCategory(int? category) {

@@ -22,73 +22,68 @@ class FormFieldInputWidget extends FieldInputWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (column.type.extradata?['columns'] != null) {
-      final FieldValueEntity fieldValue = inputBloc.value;
+    final FieldValueEntity fieldValue = inputBloc.value;
 
-      // Para modo creación (sin datos previos)
-      if (fieldValue is FieldValuePostEntity) {
-        return DynamicFormList(
-          column: column,
-          inputBloc: inputBloc,
-          onChangedToParent: onChangedToParent,
-          isEditMode: false,
-        );
-      }
-
-      // Para modo edición (con datos cargados)
-      List<Map<int, FieldValueGetEntity>> inputList = [];
-
-      try {
-        final rawList = fieldValue.value as List;
-        inputList = rawList.map<Map<int, FieldValueGetEntity>>((item) {
-          final map = jsonDecode(item as String) as Map<String, dynamic>;
-          return map.map<int, FieldValueGetEntity>((key, value) {
-            return MapEntry(
-              int.parse(key),
-              FieldValueGetEntity.fromMap(value as Map<String, dynamic>),
-            );
-          });
-        }).toList();
-      } catch (e, st) {
-        log('Error al deserializar subformularios: $e\n$st');
-      }
-
+    // Para modo creación (sin datos previos)
+    if (fieldValue is FieldValuePostEntity) {
       return DynamicFormList(
         column: column,
         inputBloc: inputBloc,
         onChangedToParent: onChangedToParent,
-        initialValues: inputList,
-        isEditMode: true,
+        isEditMode: false,
       );
-    } else {
-      // Si no hay subcolumnas, mostrar dropdown simple como fallback
-      return _buildDropdown([], context);
     }
-  }
 
-  Widget _buildDropdown(List<String> items, BuildContext context) {
-    return LyInputBuilder<FieldValueEntity>(
-      lyInput: inputBloc,
-      builder: (context, state) {
-        final value = state.value.value as String?;
-        if (value != null && !items.contains(value)) {
-          items.add(value);
-        }
-        return DropdownButtonFormFieldWidget<String>(
-          key: key,
-          items: items
-              .map((e) => DropdownMenuItem<String>(value: e, child: Text(e)))
-              .toList(),
-          value: value,
-          errorText: state.error,
-          labelText: column.name,
-          onChanged: (newValue) => inputBloc.dirty(
-            state.value.copyWithValue(newValue),
-          ),
-        );
-      },
+    // Para modo edición (con datos cargados)
+    List<Map<int, FieldValueGetEntity>> inputList = [];
+
+    try {
+      final rawList = fieldValue.value as List;
+      inputList = rawList.map<Map<int, FieldValueGetEntity>>((item) {
+        final map = jsonDecode(item as String) as Map<String, dynamic>;
+        return map.map<int, FieldValueGetEntity>((key, value) {
+          return MapEntry(
+            int.parse(key),
+            FieldValueGetEntity.fromMap(value as Map<String, dynamic>),
+          );
+        });
+      }).toList();
+    } catch (e, st) {
+      log('Error al deserializar subformularios: $e\n$st');
+    }
+
+    return DynamicFormList(
+      column: column,
+      inputBloc: inputBloc,
+      onChangedToParent: onChangedToParent,
+      initialValues: inputList,
+      isEditMode: true,
     );
   }
+
+  // Widget _buildDropdown(List<String> items, BuildContext context) {
+  //   return LyInputBuilder<FieldValueEntity>(
+  //     lyInput: inputBloc,
+  //     builder: (context, state) {
+  //       final value = state.value.value as String?;
+  //       if (value != null && !items.contains(value)) {
+  //         items.add(value);
+  //       }
+  //       return DropdownButtonFormFieldWidget<String>(
+  //         key: key,
+  //         items: items
+  //             .map((e) => DropdownMenuItem<String>(value: e, child: Text(e)))
+  //             .toList(),
+  //         value: value,
+  //         errorText: state.error,
+  //         labelText: column.name,
+  //         onChanged: (newValue) => inputBloc.dirty(
+  //           state.value.copyWithValue(newValue),
+  //         ),
+  //       );
+  //     },
+  //   );
+  // }
 }
 
 class DynamicFormList extends StatelessWidget {
@@ -184,24 +179,16 @@ class DynamicFormList extends StatelessWidget {
             ...form.entries.map((entry) {
               final col = entry.key;
               final input = entry.value;
-              try {
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
-                  child: FieldRenderResolver.getInputWidget(
-                    col,
-                    input,
-                    onChanged: (val) {
-                      input.dirty(input.value.copyWithValue(val));
-                      context
-                          .read<DynamicFormCubit>()
-                          .onFieldChanged(); // <- NUEVO
-                    },
-                  ),
-                );
-              } catch (e, st) {
-                log('Error en inputWidget: $e\n$st');
-                return const Text('Error al cargar el campo');
-              }
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: FieldRenderResolver.getInputWidget(
+                  col,
+                  input,
+                  onChanged: (val) {
+                    input.dirty(input.value.copyWithValue(val));
+                  },
+                ),
+              );
             }),
 
             // Botón para eliminar subformulario

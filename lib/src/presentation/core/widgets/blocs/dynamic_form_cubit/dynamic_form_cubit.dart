@@ -21,10 +21,22 @@ class DynamicFormCubit extends Cubit<DynamicFormState> {
   final bool isEditMode;
   final List<Map<int, FieldValueGetEntity>>? initialValues;
 
-  List<ColumnGetEntity> get subColumns =>
-      (column.type.extradata?['columns'] as List)
+  List<ColumnGetEntity> get subColumns {
+    // Verificar si extradata tiene columnas
+    if (column.type.extradata?['columns'] != null) {
+      return (column.type.extradata!['columns'] as List)
           .map((e) => ColumnGetEntity.fromMap(e as Map<String, dynamic>))
           .toList();
+    }
+
+    // Si no, verificar si column.type tiene la propiedad columns
+    if (column.type is FieldTypeFormGetEntity) {
+      return (column.type as FieldTypeFormGetEntity).columns;
+    }
+
+    // Si no hay ninguna, retornar lista vacía
+    return [];
+  }
 
   void _initializeForms() {
     if (initialValues != null && initialValues!.isNotEmpty) {
@@ -83,10 +95,13 @@ class DynamicFormCubit extends Cubit<DynamicFormState> {
   }
 
   void removeForm(int index) {
-    if (state.forms.length <= 1) return;
+    final newForms =
+        List<Map<ColumnGetEntity, LyInput<FieldValueEntity>>>.from(state.forms);
+    newForms.removeAt(index);
+    emit(state.copyWith(forms: newForms));
 
-    final updated = [...state.forms]..removeAt(index);
-    emit(state.copyWith(forms: updated));
+    // Forzar reconstrucción de todos los widgets
+    emit(state.copyWith());
   }
 
   List<String> toSerializedList() {

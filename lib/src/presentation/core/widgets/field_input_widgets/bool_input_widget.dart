@@ -16,11 +16,24 @@ class BoolFieldInputWidget extends FieldInputWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _InternalCheckboxInput(
-      key: key,
-      column: column,
-      bloc: inputBloc,
-      onChanged: onChanged,
+    return LyInputBuilder<FieldValueEntity>(
+      lyInput: inputBloc,
+      builder: (context, state) {
+        final currentValue = (state.value.value as bool?) ?? false;
+        
+        return CheckboxListTile(
+          controlAffinity: ListTileControlAffinity.leading,
+          title: Text(column.name),
+          value: currentValue,
+          onChanged: (newValue) {
+            if (newValue != null) {
+              final newEntity = state.value.copyWithValue(newValue);
+              inputBloc.dirty(newEntity);
+              onChanged?.call(newValue);
+            }
+          },
+        );
+      },
     );
   }
 }

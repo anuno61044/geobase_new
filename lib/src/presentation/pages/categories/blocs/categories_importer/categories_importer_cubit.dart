@@ -77,6 +77,12 @@ class CategoriesImporterCubit extends Cubit<CategoriesImporterState> {
 
       // Recorrer las categorias buscando formularios o selecciones estaticas y guardarlas en la base de datos
       await saveFieldTypesByCategories(categories);
+
+      emit(state.copyWith(
+        status: CategoryImporterStatus.success,
+        message: 'Categorías importadas con éxito',
+      ));
+
     } catch (e) {
       emit(state.copyWith(
         status: CategoryImporterStatus.error,

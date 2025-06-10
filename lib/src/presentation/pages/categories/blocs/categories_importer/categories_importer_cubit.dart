@@ -11,9 +11,7 @@ import 'package:geobase/src/presentation/pages/categories/blocs/categories_impor
 
 @injectable
 class CategoriesImporterCubit extends Cubit<CategoriesImporterState> {
-
-  CategoriesImporterCubit()
-      : super(const CategoriesImporterState());
+  CategoriesImporterCubit() : super(const CategoriesImporterState());
 
   Future<void> importFromJson() async {
     emit(state.copyWith(status: CategoryImporterStatus.loading, message: null));
@@ -39,12 +37,14 @@ class CategoriesImporterCubit extends Cubit<CategoriesImporterState> {
       final jsonData = jsonDecode(content) as Map<String, dynamic>;
 
       // Por cada metatype (Form o Seleccion Estatica) retorna una lista con todos los nombres en el json
-      final Map<String, List<String>> typeNames = extractTypedNamesFromJson(jsonData);
+      final Map<String, List<String>> typeNames =
+          extractTypedNamesFromJson(jsonData);
 
       // Servicios necesarios para crear y obtener las entidades
       final ICategoryService categoryService = getIt<ICategoryService>();
       final IFieldTypeFormService formService = getIt<IFieldTypeFormService>();
-      final IFieldTypeStaticSelectionService staticselectionService = getIt<IFieldTypeStaticSelectionService>();
+      final IFieldTypeStaticSelectionService staticselectionService =
+          getIt<IFieldTypeStaticSelectionService>();
 
       // Cargar formularios y selecciones existentes desde la base de datos
       final formsResult = await formService.loadAll();
@@ -52,7 +52,15 @@ class CategoriesImporterCubit extends Cubit<CategoriesImporterState> {
       final existingForms = formsResult.getOrElse(() => []);
       final existingSelections = selectionsResult.getOrElse(() => []);
 
-      if (existsInEntities<FieldTypeFormGetEntity>(existingForms,typeNames,'Form',(form)=> typeNames['Form']!.contains(form.name)) || existsInEntities<FieldTypeStaticSelectionGetEntity>(existingSelections,typeNames,'StaticSelection',(selection)=> typeNames['StaticSelection']!.contains(selection.name))) {
+      // Revisar si las entidades que se van a crear ya existen con esos nombres
+      if (existsInEntities<FieldTypeFormGetEntity>(existingForms, typeNames,
+              'Form', (form) => typeNames['Form']!.contains(form.name)) ||
+          existsInEntities<FieldTypeStaticSelectionGetEntity>(
+              existingSelections,
+              typeNames,
+              'StaticSelection',
+              (selection) =>
+                  typeNames['StaticSelection']!.contains(selection.name))) {
         emit(state.copyWith(
           status: CategoryImporterStatus.error,
           message: 'Existen tipos con los mismos nombres a importar.',
@@ -61,91 +69,127 @@ class CategoriesImporterCubit extends Cubit<CategoriesImporterState> {
       }
 
       final rawCategories = jsonData['categories'] ?? [];
-      for (Map<String,dynamic> category in rawCategories) {
-        List<ColumnPostEntity> columns = [];
-        for (Map<String, dynamic> column in category['columns']) {
-          if (column['type']['metaType'] == 'Form') {
-            FieldTypeFormPostEntity form = FieldTypeFormPostEntity.fromMap(column['type']['extradata'] as Map<String, dynamic>);
-            final result = await formService.createForm(form);
-            result.fold(
-              (failure) {
-                emit(state.copyWith(
-                  status: CategoryImporterStatus.error,
-                  message: 'Error al crear el formulario ${form.name}.',
-                ));
-                return;
-              },
-              (formId) {
-                columns.add(ColumnPostEntity(name: column['name'] as String, typeId: formId));
-              },
-            );
-          }
-          else if (column['type']['metaType']== 'StaticSelection') {
-            FieldTypeStaticSelectionPostEntity sel = FieldTypeStaticSelectionPostEntity.fromMap(column['type']['extradata'] as Map<String, dynamic>);
-            final result = await staticselectionService.createStaticSelection(sel);
-            result.fold(
-              (failure) {
-                emit(state.copyWith(
-                  status: CategoryImporterStatus.error,
-                  message: 'Error al crear la Selección Estática ${sel.name}.',
-                ));
-                return;
-              },
-              (selId) {
-                columns.add(ColumnPostEntity(name: column['name'] as String, typeId: selId));
-              },
-            );
-          }
-          else {
-            columns.add(ColumnPostEntity(
-              name: column['name'] as String, 
-              typeId: column['type']['id'] as int
-            ));
-          }
-        }
-        final id = await categoryService.createCategory(
-          CategoryPostEntity(
-            name: category['name'] as String, 
-            description: category['description'] as String, 
-            color: category['color'] as int?, 
-            icon: category['icon'] as String, 
-            columns: columns));
-        log('Se creo la cat $id');
+      List<CategoryGetEntity> categories = [];
+
+      for (Map<String, dynamic> category in rawCategories) {
+        categories.add(CategoryGetEntity.fromMap(category));
       }
 
-      // 🔄 Obtener categorías existentes desde la base de datos
-      final resultDB = await categoryService.loadCategoriesWhere();
-
-      resultDB.fold(
-        (error) {
-          emit(state.copyWith(
-            status: CategoryImporterStatus.error,
-            message: 'Error al cargar categorías existentes: ${error.message}',
-          ));
-        },
-        (existingCategories) {
-          // 🟢 Emitir nuevo estado con ambas listas
-          emit(state.copyWith(
-            status: CategoryImporterStatus.success,
-            categories: existingCategories,
-          ));
-        },
-      );
+      // Recorrer las categorias buscando formularios o selecciones estaticas y guardarlas en la base de datos
+      await saveFieldTypesByCategories(categories);
     } catch (e) {
       emit(state.copyWith(
         status: CategoryImporterStatus.error,
         message: 'Error al importar categorías: ${e.toString()}',
       ));
+      log('$e');
     }
   }
 
-  Map<String, List<String>> extractTypedNamesFromJson(Map<String, dynamic> json) {
+  Future<Map<String, int>> saveFieldTypesByCategories(
+      List<CategoryGetEntity> categories) async {
+    Map<String, int> result = {};
+
+    for (final category in categories) {
+      Map<String, int> newEntries =
+          await saveFieldTypesByColumns(category.columns, result);
+      result.addEntries(newEntries.entries);
+
+      List<ColumnPostEntity> categoryColumns = [];
+      for (final categoryColumn in category.columns) {
+        if (result.containsKey(categoryColumn.type.name)) {
+          categoryColumns.add(ColumnPostEntity(
+              name: categoryColumn.name,
+              typeId: result[categoryColumn.type.name]!));
+        } else {
+          categoryColumns.add(ColumnPostEntity(
+              name: categoryColumn.name, typeId: categoryColumn.type.id));
+        }
+      }
+      final responseDB = await getIt<ICategoryService>().createCategory(
+          CategoryPostEntity(
+              name: category.name,
+              description: category.description,
+              color: category.color,
+              icon: category.icon,
+              columns: categoryColumns));
+      responseDB.fold(
+          (error) => emit(state.copyWith(
+                status: CategoryImporterStatus.error,
+                message:
+                    'Error al cargar categorías por problemas en el archivo',
+              )),
+          (id) => null);
+    }
+
+    return result;
+  }
+
+  Future<Map<String, int>> saveFieldTypesByColumns(
+      List<ColumnGetEntity> columns, Map<String, int> fieldTypesCreated) async {
+    Map<String, int> result = {};
+
+    for (final column in columns) {
+      if (column.type is FieldTypeFormGetEntity) {
+        FieldTypeFormGetEntity form = column.type as FieldTypeFormGetEntity;
+        Map<String, int> newEntries =
+            await saveFieldTypesByColumns(form.columns, result);
+        result.addEntries(newEntries.entries);
+
+        List<ColumnPostEntity> formColumns = [];
+        for (final formColumn in form.columns) {
+          if (result.containsKey(formColumn.type.name)) {
+            formColumns.add(ColumnPostEntity(
+                name: formColumn.name, typeId: result[formColumn.type.name]!));
+          } else {
+            formColumns.add(ColumnPostEntity(
+                name: formColumn.name, typeId: formColumn.type.id));
+          }
+        }
+        final responseDB = await getIt<IFieldTypeFormService>()
+            .createForm(FieldTypeFormPostEntity(
+          name: form.name,
+          columns: formColumns,
+        ));
+        responseDB.fold(
+            (error) => emit(state.copyWith(
+                  status: CategoryImporterStatus.error,
+                  message:
+                      'Error al cargar categorías por problemas en el archivo',
+                )),
+            (id) => result[form.name] = id);
+      } else if (column.type is FieldTypeStaticSelectionGetEntity) {
+        FieldTypeStaticSelectionGetEntity sel =
+            column.type as FieldTypeStaticSelectionGetEntity;
+        if (result.containsKey(sel.name)) continue;
+        final responseDB = await getIt<IFieldTypeStaticSelectionService>()
+            .createStaticSelection(FieldTypeStaticSelectionPostEntity(
+          name: sel.name,
+          options: sel.options,
+        ));
+
+        responseDB.fold(
+            (error) => emit(state.copyWith(
+                  status: CategoryImporterStatus.error,
+                  message:
+                      'Error al cargar categorías por problemas en el archivo',
+                )),
+            (id) => result[sel.name] = id);
+      }
+    }
+
+    return result;
+  }
+
+  Map<String, List<String>> extractTypedNamesFromJson(
+      Map<String, dynamic> json) {
     final Map<String, Set<String>> result = {};
 
     final categories = json['categories'] as List<dynamic>? ?? [];
 
     for (final category in categories) {
-      final columns = (category as Map<String, dynamic>)['columns'] as List<dynamic>? ?? [];
+      final columns =
+          (category as Map<String, dynamic>)['columns'] as List<dynamic>? ?? [];
 
       for (final column in columns) {
         final columnMap = column as Map<String, dynamic>;
@@ -181,5 +225,4 @@ class CategoriesImporterCubit extends Cubit<CategoriesImporterState> {
 
     return false;
   }
-
 }

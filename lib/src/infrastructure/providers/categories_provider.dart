@@ -169,6 +169,8 @@ class CategoriesSQLiteProvider implements ICategoriesProvider {
 
       final modifiedColumn = ColumnGetModel(
           id: column.id,
+          categoryId: column.categoryId,
+          formId: column.formId,
           name: column.name,
           type: FieldTypeGetModel(
             name: column.type.name,

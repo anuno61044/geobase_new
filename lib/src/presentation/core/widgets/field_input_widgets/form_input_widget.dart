@@ -61,29 +61,6 @@ class FormFieldInputWidget extends FieldInputWidget {
     );
   }
 
-  // Widget _buildDropdown(List<String> items, BuildContext context) {
-  //   return LyInputBuilder<FieldValueEntity>(
-  //     lyInput: inputBloc,
-  //     builder: (context, state) {
-  //       final value = state.value.value as String?;
-  //       if (value != null && !items.contains(value)) {
-  //         items.add(value);
-  //       }
-  //       return DropdownButtonFormFieldWidget<String>(
-  //         key: key,
-  //         items: items
-  //             .map((e) => DropdownMenuItem<String>(value: e, child: Text(e)))
-  //             .toList(),
-  //         value: value,
-  //         errorText: state.error,
-  //         labelText: column.name,
-  //         onChanged: (newValue) => inputBloc.dirty(
-  //           state.value.copyWithValue(newValue),
-  //         ),
-  //       );
-  //     },
-  //   );
-  // }
 }
 
 class DynamicFormList extends StatelessWidget {
@@ -153,7 +130,7 @@ class DynamicFormList extends StatelessWidget {
                     ElevatedButton.icon(
                       onPressed: cubit.addForm,
                       icon: const Icon(Icons.add),
-                      label: const Text('Agregar'),
+                      label: Text('Agregar ${column.type.name}'),
                     ),
                   ],
                 ),

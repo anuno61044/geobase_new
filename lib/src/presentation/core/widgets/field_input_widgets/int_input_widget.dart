@@ -34,7 +34,7 @@ class IntFieldInputWidget extends FieldInputWidget {
           errorText: state.error,
           keyboardType: const TextInputType.numberWithOptions(signed: true),
           onChanged: (newValue) {
-            final intValue = int.tryParse(newValue ?? '');
+            final intValue = int.tryParse(newValue);
             final newEntity = state.value.copyWithValue(intValue);
             inputBloc.dirty(newEntity);
             onChanged?.call(intValue);

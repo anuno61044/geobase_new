@@ -34,7 +34,7 @@ class BaseStringFieldRender implements IFieldRenderClass {
   Widget getInputWidget(
     ColumnGetEntity column,
     LyInput<FieldValueEntity> fieldInputBloc, {
-    void Function(Object?)? onChanged, // 👈 esto es necesario
+    void Function(Object?)? onChanged,
   }) {
     return StringFieldInputWidget(
       key: Key('FieldInput${column.name}${column.id}'),

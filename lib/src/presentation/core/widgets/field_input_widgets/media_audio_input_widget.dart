@@ -4,7 +4,6 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_lyform/flutter_lyform.dart';
 import 'package:geobase/src/domain/entities/entities.dart';
-import 'package:geobase/src/presentation/core/app.dart';
 import 'package:geobase/src/presentation/core/utils/file_utilis.dart';
 import 'package:geobase/src/presentation/core/widgets/field_input_widgets/field_input_widget.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -71,17 +70,13 @@ class MediaAudioFieldInputWidget extends FieldInputWidget {
 }
 
 
-
-
 Future<String?> _audioFromFiles() async {
   final FilePickerResult? result = await FilePicker.platform.pickFiles(
     type: FileType.audio,
     withData: true,
   );
   if ((result?.files.isNotEmpty ?? false) && result!.files.first.path != null) {
-    final file = await saveFile(
-      File(result.files.first.path!),
-    );
+    final file = await saveFile(File(result.files.first.path!));
     return file?.path;
   }
   return null;
@@ -98,16 +93,16 @@ Future<String?> _showPicker(BuildContext context) async {
               leading: const Icon(Icons.file_present),
               title: const Text('Notas Almacenadas'),
               onTap: () async {
-                await _audioFromFiles()
-                    .then((value) => Navigator.of(context).pop(value));
+                final path = await _audioFromFiles();
+                Navigator.of(context).pop(path);
               },
             ),
             ListTile(
               leading: const Icon(Icons.mic),
               title: const Text('Grabar Sonido'),
               onTap: () async {
-                await _audioFromMicrofone(context)
-                    .then((value) => Navigator.of(context).pop(value));
+                final path = await _audioFromMicrofone(context);
+                Navigator.of(context).pop(path);
               },
             ),
           ],
@@ -118,12 +113,7 @@ Future<String?> _showPicker(BuildContext context) async {
 }
 
 Future<bool> _checkPermissions() async {
-  // Verificar si ya tiene permisos
-  if (await Permission.microphone.isGranted) {
-    return true;
-  }
-
-  // Solicitar permisos
+  if (await Permission.microphone.isGranted) return true;
   final status = await Permission.microphone.request();
   return status.isGranted;
 }
@@ -131,7 +121,6 @@ Future<bool> _checkPermissions() async {
 Future<String?> _audioFromMicrofone(BuildContext context) async {
   final record = Record();
 
-  // Verificar permisos
   final hasPermission = await _checkPermissions();
   if (!hasPermission) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -140,11 +129,9 @@ Future<String?> _audioFromMicrofone(BuildContext context) async {
     return null;
   }
 
-  // Obtener la ruta del directorio temporal para guardar la grabación
   final directory = await getTemporaryDirectory();
-  final filePath = '${directory.path}/recording.m4a';
+  final tempPath = '${directory.path}/recording_${DateTime.now().millisecondsSinceEpoch}.m4a';
 
-  // Mostrar un diálogo para grabar audio
   return showDialog<String>(
     context: context,
     builder: (context) {
@@ -153,7 +140,7 @@ Future<String?> _audioFromMicrofone(BuildContext context) async {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text('Presiona el botón para comenzar a grabar.'),
+            const Text('Presiona el botón para comenzar/detener la grabación.'),
             const SizedBox(height: 20),
             StreamBuilder<RecordState>(
               stream: record.onStateChanged(),
@@ -163,14 +150,13 @@ Future<String?> _audioFromMicrofone(BuildContext context) async {
                   icon: Icon(isRecording ? Icons.stop : Icons.mic),
                   onPressed: () async {
                     if (isRecording) {
-                      // Detener la grabación
                       await record.stop();
-                      Navigator.of(context).pop(filePath); // Retornar la ruta del archivo
+                      final savedFile = await saveFile(File(tempPath));
+                      Navigator.of(context).pop(savedFile?.path);
                     } else {
-                      // Comenzar la grabación
                       await record.start(
-                        path: filePath,
-                        encoder: AudioEncoder.aacLc, // Formato de audio
+                        path: tempPath,
+                        encoder: AudioEncoder.aacLc,
                       );
                     }
                   },
@@ -182,7 +168,8 @@ Future<String?> _audioFromMicrofone(BuildContext context) async {
         actions: [
           TextButton(
             onPressed: () {
-              Navigator.of(context).pop(); // Cerrar el diálogo sin grabar
+              record.stop();
+              Navigator.of(context).pop(); // Cancelar
             },
             child: const Text('Cancelar'),
           ),

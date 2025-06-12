@@ -17,7 +17,7 @@ class MediaFieldView extends FieldViewWidget {
         fieldValue.value != null ? '${fieldValue.value.split('/').last}' : '',
       ),
       subtitle: Text(
-        '${fieldValue.column.name} '
+        '${fieldValue.column.name}'
         '(${fieldValue.column.type.metaType}.${fieldValue.column.type.name})',
       ),
       onTap: () async {

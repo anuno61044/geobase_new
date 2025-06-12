@@ -45,7 +45,7 @@ class MediaVideoFieldRender implements IFieldRenderClass {
 
   @override
   Widget getViewWidget(FieldValueGetEntity fieldValue) {
-    return MediaFieldView(
+    return MediaVideoFieldView(
       fieldValue: fieldValue,
     );
   }

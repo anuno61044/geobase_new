@@ -17,7 +17,7 @@ class GeodataSQLiteProvider implements IGeodataProvider {
         model.longitude,
         model.latitude,
         model.categoryId,
-      ).save();
+      ).saveOrThrow();
       if (geodataId == null) throw Exception('Create Geodata Denied');
       for (final fv in model.fieldValues) {
         dynamic value = fv.value;

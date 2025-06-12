@@ -5,11 +5,13 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_lyform/flutter_lyform.dart';
 import 'package:geobase/src/domain/entities/entities.dart';
-import 'package:geobase/src/presentation/core/app.dart';
 import 'package:geobase/src/presentation/core/utils/file_utilis.dart';
 import 'package:geobase/src/presentation/core/widgets/field_input_widgets/field_input_widget.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:open_file/open_file.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:video_thumbnail/video_thumbnail.dart';
 
 class MediaVideoFieldInputWidget extends FieldInputWidget {
   const MediaVideoFieldInputWidget({
@@ -26,41 +28,81 @@ class MediaVideoFieldInputWidget extends FieldInputWidget {
     return LyInputBuilder<FieldValueEntity>(
       lyInput: inputBloc,
       builder: (context, state) {
-        return ListTile(
-          title: Text(
-            state.value.value != null
-                ? '${state.value.value.split('/').last}'
-                : '',
-          ),
-          subtitle: Text(column.name),
-          leading: CircleAvatar(
-            radius: 50,
-            backgroundColor: Colors.transparent,
-            child: Icon(
-              Icons.video_camera_back,
-              color: state.value.value != null
-                  ? Colors.green[700]
-                  : Colors.grey[800],
-            ),
-          ),
-          trailing: state.error != null
-              ? Icon(
-                  Icons.info_outline_rounded,
-                  color: Colors.red.withOpacity(0.5),
-                )
-              : null,
-          onTap: () async {
-            final result = await _showPicker(context);
-            if (result != null && state.value.value != result) {
-              inputBloc.dirty(state.value.copyWithValue(result));
-              onChanged?.call(result);
-            }
+        final path = state.value.value as String?;
+
+        return FutureBuilder<String?>(
+          future: _getVideoThumbnail(path),
+          builder: (context, snapshot) {
+            final thumbPath = snapshot.data;
+
+            return ListTile(
+              leading: thumbPath != null && File(thumbPath).existsSync()
+                  ? ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.file(
+                        File(thumbPath),
+                        width: 56,
+                        height: 56,
+                        fit: BoxFit.cover,
+                      ),
+                    )
+                  : Container(
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      borderRadius: BorderRadius.circular(45),
+                    ),
+                    width: 80,
+                    height: 80,
+                    child: Icon(
+                      Icons.video_camera_back_rounded,
+                      color: Colors.grey[800],
+                    ),
+                  ),
+              title: Text(path != null ? path.split('/').last : ''),
+              subtitle: Text(column.name),
+              trailing: state.error != null
+                  ? Icon(Icons.info_outline_rounded,
+                      color: Colors.red.withOpacity(0.5))
+                  : null,
+              onTap: () async {
+                final result = await _showPicker(context);
+                if (result != null && result != path) {
+                  inputBloc.dirty(state.value.copyWithValue(result));
+                  onChanged?.call(result);
+                }
+              },
+              onLongPress: () {
+                if (path != null) {
+                  OpenFile.open(path);
+                }
+              },
+            );
           },
         );
       },
     );
   }
+
+  Future<String?> _getVideoThumbnail(String? videoPath) async {
+    if (videoPath == null || !File(videoPath).existsSync()) return null;
+
+    try {
+      final tempDir = await getTemporaryDirectory();
+      final thumbPath = await VideoThumbnail.thumbnailFile(
+        video: videoPath,
+        thumbnailPath: tempDir.path,
+        imageFormat: ImageFormat.PNG,
+        maxHeight: 128,
+        quality: 75,
+      );
+      return thumbPath;
+    } catch (e) {
+      log('Error al generar miniatura de video: $e');
+      return null;
+    }
+  }
 }
+
 
 Future<bool> _checkPermissions() async {
   final cameraStatus = await Permission.camera.status;

@@ -80,7 +80,6 @@ class MediaImageFieldInputWidget extends FieldInputWidget {
 }
 
 Future<String?> _imgFromCamera() async {
-  log('camaraaaa');
   final hasPermission = await _requestCameraPermission();
   if (!hasPermission) return null;
 

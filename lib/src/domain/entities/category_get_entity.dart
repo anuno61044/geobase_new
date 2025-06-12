@@ -35,11 +35,11 @@ class CategoryGetEntity extends CategoryEntity {
   final List<ColumnGetEntity> columns;
 
   @override
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> toMap() {
     return {
-      ...super.toJson(), // Incluye los campos de CategoryEntity
+      ...super.toMap(), // Incluye los campos de CategoryEntity
       'id': id,
-      'columns': columns.map((e) => e.toJson()).toList(),
+      'columns': columns.map((e) => e.toMap()).toList(),
     };
   }
 }

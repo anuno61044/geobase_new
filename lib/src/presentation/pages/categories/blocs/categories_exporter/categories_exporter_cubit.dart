@@ -101,7 +101,7 @@ class CategoriesExporterCubit extends Cubit<CategoriesExporterState> {
       // 1. Convertir datos a JSON
       final jsonData = jsonEncode({
         'exportedAt': DateTime.now().toIso8601String(),
-        'categories': categories.map((e) => e.toJson()).toList(),
+        'categories': categories.map((e) => e.toMap()).toList(),
       });
 
       // 2. Pedir al usuario que seleccione una carpeta

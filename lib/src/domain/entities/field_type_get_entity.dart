@@ -11,7 +11,7 @@ abstract class FieldTypeEntity {
 
   final String metaType;
 
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> toMap() {
     return {
       'name': name,
       'metaType': metaType,
@@ -64,9 +64,9 @@ class FieldTypeGetEntity extends FieldTypeEntity {
   final Map<String, dynamic>? extradata;
 
   @override
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> toMap() {
     return {
-      ...super.toJson(),
+      ...super.toMap(),
       'id': id,
       'renderClass': renderClass,
       'extradata': extradata,

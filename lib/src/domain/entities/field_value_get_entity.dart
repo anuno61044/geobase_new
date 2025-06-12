@@ -37,19 +37,15 @@ class FieldValueGetEntity extends FieldValueEntity {
         'value': jsonEncode(value.map((key, value) => MapEntry(key.toString(), value.toMap()))),
         'id': id,
         'geodataId': geodataId,
-        'column': column.toJson(),
+        'column': column.toMap(),
       };
     }
     return {
       'value': value,
       'id': id,
       'geodataId': geodataId,
-      'column': column.toJson(),
+      'column': column.toMap(),
     };
-  }
-
-  Map<String, dynamic> toJson() {
-    return toMap();
   }
 
   FieldValueGetEntity copyWith({

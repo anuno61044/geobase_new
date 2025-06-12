@@ -5,7 +5,7 @@ abstract class ColumnEntity {
 
   final String name;
 
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> toMap() {
     return {
       'name': name
     };

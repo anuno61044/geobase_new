@@ -14,7 +14,7 @@ abstract class CategoryEntity {
 
   final String icon;
 
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> toMap() {
     return {
       'name': name,
       'description': description,

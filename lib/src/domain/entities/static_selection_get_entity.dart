@@ -38,9 +38,9 @@ class FieldTypeStaticSelectionGetEntity extends FieldTypeGetEntity {
   final List<String> options;
 
   @override
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> toMap() {
     return {
-      ...super.toJson(),
+      ...super.toMap(),
       'options': options,
     };
   }

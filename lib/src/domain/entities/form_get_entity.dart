@@ -46,10 +46,10 @@ class FieldTypeFormGetEntity extends FieldTypeGetEntity {
   final List<ColumnGetEntity> columns;
 
   @override
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> toMap() {
     return {
-      ...super.toJson(),
-      'columns': columns.map((column) => column.toJson()).toList(),
+      ...super.toMap(),
+      'columns': columns.map((column) => column.toMap()).toList(),
     };
   }
 }

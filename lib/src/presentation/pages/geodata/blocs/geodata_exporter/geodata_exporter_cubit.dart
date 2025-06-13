@@ -203,8 +203,22 @@ Map<String, List<List<String>>> _buildFormRows(
     rowsList.add(row);
   }
 
-  rowsBySheet[fieldValueForm.column.type.name] = rowsList;
-  rowsBySheet['media_files'] = mediasList;
+  // Agregar los datos del formulario
+  if (rowsBySheet.containsKey(fieldValueForm.column.type.name)) {
+    rowsBySheet[fieldValueForm.column.type.name]?.addAll(rowsList);
+  }
+  else {
+    rowsBySheet[fieldValueForm.column.type.name] = rowsList;
+  }
+
+  // Agregar las medias
+  if (rowsBySheet.containsKey('media_files')) {
+    rowsBySheet['media_files']!.addAll(mediasList);
+  }
+  else {
+    rowsBySheet['media_files'] = mediasList;
+  }
+
   return rowsBySheet;
 }
 

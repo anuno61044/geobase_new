@@ -13,40 +13,77 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
 
-class MediaVideoFieldInputWidget extends FieldInputWidget {
+class MediaVideoFieldInputWidget extends StatefulWidget {
   const MediaVideoFieldInputWidget({
     super.key,
-    required super.column,
-    required super.inputBloc,
+    required this.column,
+    required this.inputBloc,
     this.onChanged,
   });
 
+  final ColumnGetEntity column;
+  final LyInput<FieldValueEntity> inputBloc;
   final void Function(Object?)? onChanged;
+
+  @override
+  State<MediaVideoFieldInputWidget> createState() =>
+      _MediaVideoFieldInputWidgetState();
+}
+
+class _MediaVideoFieldInputWidgetState
+    extends State<MediaVideoFieldInputWidget> {
+  String? thumbPath;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadThumbnail(widget.inputBloc.value.value as String?);
+  }
+
+  void _loadThumbnail(String? path) async {
+    if (path == null || !File(path).existsSync()) return;
+
+    try {
+      final tempDir = await getTemporaryDirectory();
+      final generated = await VideoThumbnail.thumbnailFile(
+        video: path,
+        thumbnailPath: tempDir.path,
+        imageFormat: ImageFormat.PNG,
+        maxHeight: 128,
+        quality: 75,
+      );
+      if (mounted) {
+        setState(() {
+          thumbPath = generated;
+        });
+      }
+    } catch (e) {
+      log('Error al generar miniatura de video: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return LyInputBuilder<FieldValueEntity>(
-      lyInput: inputBloc,
+      lyInput: widget.inputBloc,
       builder: (context, state) {
         final path = state.value.value as String?;
 
-        return FutureBuilder<String?>(
-          future: _getVideoThumbnail(path),
-          builder: (context, snapshot) {
-            final thumbPath = snapshot.data;
-
-            return ListTile(
-              leading: thumbPath != null && File(thumbPath).existsSync()
-                  ? ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: Image.file(
-                        File(thumbPath),
-                        width: 56,
-                        height: 56,
-                        fit: BoxFit.cover,
-                      ),
-                    )
-                  : Container(
+        return ListTile(
+          leading: CircleAvatar(
+            radius: 50,
+            backgroundColor: Colors.transparent,
+            child: thumbPath != null && File(thumbPath!).existsSync()
+                ? ClipRRect(
+                    borderRadius: BorderRadius.circular(100),
+                    child: Image.file(
+                      File(thumbPath!),
+                      width: 80,
+                      height: 80,
+                      fit: BoxFit.cover,
+                    ),
+                  )
+                : Container(
                     decoration: BoxDecoration(
                       color: Colors.grey[200],
                       borderRadius: BorderRadius.circular(45),
@@ -58,51 +95,33 @@ class MediaVideoFieldInputWidget extends FieldInputWidget {
                       color: Colors.grey[800],
                     ),
                   ),
-              title: Text(path != null ? path.split('/').last : ''),
-              subtitle: Text(column.name),
-              trailing: state.error != null
-                  ? Icon(Icons.info_outline_rounded,
-                      color: Colors.red.withOpacity(0.5))
-                  : null,
-              onTap: () async {
-                final result = await _showPicker(context);
-                if (result != null && result != path) {
-                  inputBloc.dirty(state.value.copyWithValue(result));
-                  onChanged?.call(result);
-                }
-              },
-              onLongPress: () {
-                if (path != null) {
-                  OpenFile.open(path);
-                }
-              },
-            );
+          ),
+          title: Text(path != null ? path.split('/').last : ''),
+          subtitle: Text(widget.column.name),
+          trailing: state.error != null
+              ? Icon(
+                  Icons.info_outline_rounded,
+                  color: Colors.red.withOpacity(0.5),
+                )
+              : null,
+          onTap: () async {
+            final result = await _showPicker(context);
+            if (result != null && result != path) {
+              widget.inputBloc.dirty(state.value.copyWithValue(result));
+              widget.onChanged?.call(result);
+              _loadThumbnail(result); // recargar miniatura
+            }
+          },
+          onLongPress: () {
+            if (path != null) {
+              OpenFile.open(path);
+            }
           },
         );
       },
     );
   }
-
-  Future<String?> _getVideoThumbnail(String? videoPath) async {
-    if (videoPath == null || !File(videoPath).existsSync()) return null;
-
-    try {
-      final tempDir = await getTemporaryDirectory();
-      final thumbPath = await VideoThumbnail.thumbnailFile(
-        video: videoPath,
-        thumbnailPath: tempDir.path,
-        imageFormat: ImageFormat.PNG,
-        maxHeight: 128,
-        quality: 75,
-      );
-      return thumbPath;
-    } catch (e) {
-      log('Error al generar miniatura de video: $e');
-      return null;
-    }
-  }
 }
-
 
 Future<bool> _checkPermissions() async {
   final cameraStatus = await Permission.camera.status;

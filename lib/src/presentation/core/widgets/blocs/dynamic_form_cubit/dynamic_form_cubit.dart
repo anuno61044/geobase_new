@@ -72,8 +72,6 @@ class DynamicFormCubit extends Cubit<DynamicFormState> {
       }
 
       emit(DynamicFormState(forms: forms));
-    } else {
-      addForm();
     }
   }
 

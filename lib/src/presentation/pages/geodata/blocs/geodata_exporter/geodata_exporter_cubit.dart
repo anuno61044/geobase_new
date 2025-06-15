@@ -156,6 +156,7 @@ Map<String, List<String>> _buildNestedFormsStruct(
   return struct;
 }
 
+// Generar las filas de los datos
 Map<String, List<List<String>>> _buildFormRows(
     FieldValueGetEntity fieldValueForm, String id) {
   Map<String, List<List<String>>> rowsBySheet = {};
@@ -222,6 +223,7 @@ Map<String, List<List<String>>> _buildFormRows(
   return rowsBySheet;
 }
 
+// Método principal de exportación
 Future<String?> _saveGeodataToExcel(List<GeodataGetEntity> geodatas) async {
   try {
     // Crear archivo Excel

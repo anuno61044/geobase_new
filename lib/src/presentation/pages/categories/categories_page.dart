@@ -400,8 +400,35 @@ class _FloatingActionButton extends StatelessWidget {
                   strokeWidth: 2,
                 )
               : const Icon(Icons.download),
-          onPressed: () =>
-              context.read<CategoriesExporterCubit>().exportToJson(),
+          onPressed: () async {
+            final mode = await showDialog<CategoryExportMode>(
+              context: context,
+              builder: (context) => AlertDialog(
+                title: const Text('Modo de exportación'),
+                content: const Text('¿Dónde deseas guardar el archivo?'),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(
+                        context, CategoryExportMode.defaultDirectory),
+                    child: const Text('Carpeta predefinida'),
+                  ),
+                  TextButton(
+                    onPressed: () => Navigator.pop(
+                        context, CategoryExportMode.manualSelection),
+                    child: const Text('Seleccionar carpeta'),
+                  ),
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, null),
+                    child: const Text('Cancelar'),
+                  ),
+                ],
+              ),
+            );
+
+            if (mode != null) {
+              await context.read<CategoriesExporterCubit>().exportToJson(mode);
+            }
+          },
         ),
         const SizedBox(height: 16),
         FloatingActionButton(

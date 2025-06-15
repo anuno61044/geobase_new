@@ -14,6 +14,11 @@ import 'package:path/path.dart' as path;
 part 'categories_exporter_cubit.freezed.dart';
 part 'categories_exporter_state.dart';
 
+enum CategoryExportMode {
+  defaultDirectory,
+  manualSelection,
+}
+
 @injectable
 class CategoriesExporterCubit extends Cubit<CategoriesExporterState> {
   CategoriesExporterCubit(this.categoryService)
@@ -30,25 +35,25 @@ class CategoriesExporterCubit extends Cubit<CategoriesExporterState> {
     ));
   }
 
-  Future<void> exportToJson() async {
+  Future<void> exportToJson(CategoryExportMode mode) async {
     if (state.status.isLoading) return;
-    
+
     emit(state.copyWith(message: null, filePath: null));
 
     try {
       if (state.categories.isEmpty) {
-        return _exportAll();
+        await _exportAll(mode);
       } else {
-        return _exportLoaded();
+        await _exportLoaded(mode);
       }
     } catch (e) {
       emit(state.copyWith(
-        message: 'Error al solicitar permisos: ${e.toString()}'
-      ));
+          message: 'Error al exportar: ${e.toString()}',
+          status: CategoryExporterStatus.ExportFailure));
     }
   }
 
-  Future<void> _exportLoaded() async {
+  Future<void> _exportLoaded(CategoryExportMode mode) async {
     emit(state.copyWith(status: CategoryExporterStatus.ExportInProgress));
     try {
       if (state.categories.isEmpty) {
@@ -57,23 +62,32 @@ class CategoriesExporterCubit extends Cubit<CategoriesExporterState> {
             message: 'No hay categorías disponibles para exportar'));
         return;
       }
-      final filePath = await _saveCategoriesToJsonWithPicker(state.categories);
 
-      if (isClosed) return;
+      String? filePath;
+
+      switch (mode) {
+        case CategoryExportMode.defaultDirectory:
+          filePath =
+              await _saveCategoriesToJsonAtPredefinedPath(state.categories);
+          break;
+        case CategoryExportMode.manualSelection:
+          filePath = await _saveCategoriesToJsonWithPicker(state.categories);
+          break;
+      }
+
       emit(state.copyWith(
         status: CategoryExporterStatus.ExportSuccess,
         filePath: filePath ?? 'Ruta no disponible',
       ));
     } catch (e) {
-      if (!isClosed) {
-        emit(state.copyWith(
-            status: CategoryExporterStatus.ExportFailure,
-            message: e.toString()));
-      }
+      emit(state.copyWith(
+        status: CategoryExporterStatus.ExportFailure,
+        message: e.toString(),
+      ));
     }
   }
 
-  Future<void> _exportAll() async {
+  Future<void> _exportAll(CategoryExportMode mode) async {
     emit(state.copyWith(status: CategoryExporterStatus.FetchInProgress));
     final response = await categoryService.loadCategoriesWhere();
     response.fold(
@@ -89,10 +103,11 @@ class CategoriesExporterCubit extends Cubit<CategoriesExporterState> {
           message:
               categories.isEmpty ? 'No hay categorías configuradas.' : null)),
     );
+
     if (response.isLeft() ||
         state.status == CategoryExporterStatus.FetchSuccessNotFound) return;
 
-    await _exportLoaded();
+    await _exportLoaded(mode);
   }
 
   Future<String?> _saveCategoriesToJsonWithPicker(
@@ -126,6 +141,37 @@ class CategoriesExporterCubit extends Cubit<CategoriesExporterState> {
       return filePath;
     } catch (e) {
       log('Error al guardar: $e');
+      throw Exception('Error al exportar: ${e.toString()}');
+    }
+  }
+
+  Future<String?> _saveCategoriesToJsonAtPredefinedPath(
+      List<CategoryGetEntity> categories) async {
+    try {
+      final jsonData = jsonEncode({
+        'exportedAt': DateTime.now().toIso8601String(),
+        'categories': categories.map((e) => e.toMap()).toList(),
+      });
+
+      // 📁 Ruta predefinida: aquí puedes cambiar a otra carpeta si lo deseas
+      const String predefinedDirectory = '/storage/emulated/0/Download';
+
+      // Verifica que la carpeta existe
+      final directory = Directory(predefinedDirectory);
+      if (!await directory.exists()) {
+        await directory.create(recursive: true);
+      }
+
+      final fileName =
+          'geobase_categories_${DateTime.now().millisecondsSinceEpoch}.json';
+      final filePath = path.join(predefinedDirectory, fileName);
+
+      final file = File(filePath);
+      await file.writeAsString(jsonData, flush: true);
+
+      return filePath;
+    } catch (e) {
+      log('Error al guardar en ruta predefinida: $e');
       throw Exception('Error al exportar: ${e.toString()}');
     }
   }

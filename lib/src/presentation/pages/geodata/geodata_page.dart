@@ -171,7 +171,6 @@ class _Body extends StatelessWidget {
                   );
                 },
               ),
-
             ],
           );
         },
@@ -353,9 +352,20 @@ class _FloatingActionButton extends StatelessWidget {
                 FloatingActionButton(
                   tooltip: 'Exportar geodatas',
                   heroTag: 'export_button',
-                  onPressed: state.status.isLoading 
-                      ? null 
-                      : () => context.read<GeodataExporterCubit>().exportGeodata(),
+                  onPressed: state.status.isLoading
+                      ? null
+                      : () async {
+                          final mode = await showDialog<GeodataExportMode>(
+                            context: context,
+                            builder: (_) => const _ExportOptionDialog(),
+                          );
+
+                          if (mode != null) {
+                            await context
+                                .read<GeodataExporterCubit>()
+                                .exportGeodataWithMode(mode);
+                          }
+                        },
                   child: const Icon(Icons.download),
                 ),
                 if (state.status.isLoading)
@@ -393,3 +403,33 @@ class _FloatingActionButton extends StatelessWidget {
     );
   }
 }
+
+class _ExportOptionDialog extends StatelessWidget {
+  const _ExportOptionDialog();
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Exportar Geodatos'),
+      content: const Text(
+        '¿Dónde desea exportar los datos?\n'
+        'Puede usar la carpeta predefinida o seleccionar una manualmente.',
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(GeodataExportMode.defaultDirectory),
+          child: const Text('Ruta Predefinida'),
+        ),
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(GeodataExportMode.manualSelection),
+          child: const Text('Seleccionar Carpeta'),
+        ),
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Cancelar'),
+        ),
+      ],
+    );
+  }
+}
+

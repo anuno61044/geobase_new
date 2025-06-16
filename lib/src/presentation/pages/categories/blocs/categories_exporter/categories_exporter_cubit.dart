@@ -153,9 +153,11 @@ class CategoriesExporterCubit extends Cubit<CategoriesExporterState> {
         'categories': categories.map((e) => e.toMap()).toList(),
       });
 
-      // 📁 Ruta predefinida: aquí puedes cambiar a otra carpeta si lo deseas
-      const String predefinedDirectory = '/storage/emulated/0/Download';
-
+      final predefinedDirectory = await getDownloadsPath();
+      if (predefinedDirectory == null) {
+        throw Exception('No se pudo obtener la carpeta Downloads.');
+      }
+      
       // Verifica que la carpeta existe
       final directory = Directory(predefinedDirectory);
       if (!await directory.exists()) {
@@ -175,4 +177,18 @@ class CategoriesExporterCubit extends Cubit<CategoriesExporterState> {
       throw Exception('Error al exportar: ${e.toString()}');
     }
   }
+}
+
+Future<String?> getDownloadsPath() async {
+  if (Platform.isAndroid) {
+    // Solo Android
+    final downloadsDir = Directory('/storage/emulated/0/Download');
+
+    if (!downloadsDir.existsSync()) {
+      downloadsDir.createSync(recursive: true);
+    }
+    return downloadsDir.path;
+  }
+  // iOS o otros
+  return null;
 }

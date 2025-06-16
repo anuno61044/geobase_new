@@ -10,9 +10,16 @@ import 'package:geobase/injection.dart';
 import 'package:geobase/src/domain/entities/entities.dart';
 import 'package:geobase/src/domain/services/interfaces/interfaces.dart';
 import 'package:path/path.dart' as path;
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 part 'geodata_exporter_cubit.freezed.dart';
 part 'geodata_exporter_state.dart';
+
+enum GeodataExportMode {
+  defaultDirectory,
+  manualSelection,
+}
 
 @injectable
 class GeodataExporterCubit extends Cubit<GeodataExporterState> {
@@ -20,6 +27,22 @@ class GeodataExporterCubit extends Cubit<GeodataExporterState> {
       : super(GeodataExporterState.state());
 
   final IGeodataService geodataService;
+
+  Future<void> exportGeodataWithMode(GeodataExportMode mode) async {
+    if (state.status.isLoading) return;
+
+    try {
+      if (state.geodatas.isEmpty) {
+        await _exportAllWithMode(mode);
+      } else {
+        await _exportLoadedWithMode(mode);
+      }
+    } catch (e) {
+      emit(state.copyWith(
+        message: 'Error al exportar: ${e.toString()}',
+      ));
+    }
+  }
 
   Future<void> updateLoaded(List<GeodataGetEntity> geodatas) async {
     emit(state.copyWith(
@@ -30,47 +53,41 @@ class GeodataExporterCubit extends Cubit<GeodataExporterState> {
     ));
   }
 
-  Future<void> exportGeodata() async {
-    if (state.status.isLoading) return;
-
-    try {
-      if (state.geodatas.isEmpty) {
-        return _exportAll();
-      } else {
-        return _exportLoaded();
-      }
-    } catch (e) {
-      emit(state.copyWith(
-          message: 'Error al solicitar permisos: ${e.toString()}'));
-    }
-  }
-
-  Future<void> _exportLoaded() async {
+  Future<void> _exportLoadedWithMode(GeodataExportMode mode) async {
     emit(state.copyWith(status: GeodataExporterStatus.ExportInProgress));
     try {
       if (state.geodatas.isEmpty) {
         emit(state.copyWith(
-            status: GeodataExporterStatus.FetchSuccessNotFound,
-            message: 'No hay categorías disponibles para exportar'));
+          status: GeodataExporterStatus.FetchSuccessNotFound,
+          message: 'No hay puntos disponibles para exportar',
+        ));
         return;
       }
-      final filePath = await _saveGeodataToExcel(state.geodatas);
+
+      String? filePath;
+
+      switch (mode) {
+        case GeodataExportMode.defaultDirectory:
+          filePath = await _saveGeodataToPredefinedPath(state.geodatas);
+          break;
+        case GeodataExportMode.manualSelection:
+          filePath = await _saveGeodataToManualPath(state.geodatas);
+          break;
+      }
 
       if (isClosed) return;
-      emit(state.copyWith(
-        status: GeodataExporterStatus.ExportSuccess,
-        filePath: filePath ?? 'Ruta no disponible',
-      ));
+      emit(state.copyWith(status: GeodataExporterStatus.ExportSuccess, filePath: filePath));
     } catch (e) {
       if (!isClosed) {
         emit(state.copyWith(
-            status: GeodataExporterStatus.ExportFailure,
-            message: e.toString()));
+          status: GeodataExporterStatus.ExportFailure,
+          message: e.toString(),
+        ));
       }
     }
   }
 
-  Future<void> _exportAll() async {
+  Future<void> _exportAllWithMode(GeodataExportMode mode) async {
     emit(state.copyWith(status: GeodataExporterStatus.FetchInProgress));
     final response = await geodataService.loadGeodataWhere();
     response.fold(
@@ -79,17 +96,55 @@ class GeodataExporterCubit extends Cubit<GeodataExporterState> {
         message: error.message ?? error.toString(),
       )),
       (geodatas) => emit(state.copyWith(
-          geodatas: geodatas,
-          status: geodatas.isEmpty
-              ? GeodataExporterStatus.FetchSuccessNotFound
-              : state.status,
-          message: geodatas.isEmpty ? 'No hay puntos creados.' : null)),
+        geodatas: geodatas,
+        status: geodatas.isEmpty
+            ? GeodataExporterStatus.FetchSuccessNotFound
+            : state.status,
+        message: geodatas.isEmpty ? 'No hay puntos creados.' : null,
+      )),
     );
+
     if (response.isLeft() ||
         state.status == GeodataExporterStatus.FetchSuccessNotFound) return;
 
-    await _exportLoaded();
+    await _exportLoadedWithMode(mode);
   }
+}
+
+Future<String?> _saveGeodataToPredefinedPath(List<GeodataGetEntity> geodatas) async {
+  
+  final downloadsPath = await getDownloadsPath();
+  if (downloadsPath == null) {
+    throw Exception('No se pudo obtener la carpeta Downloads.');
+  }
+
+  final exportDir = Directory('$downloadsPath/GeobaseExport');
+  if (!exportDir.existsSync()) {
+    exportDir.createSync(recursive: true);
+  }
+
+  return await _saveGeodataToExcel(geodatas, exportDir.path);
+}
+
+Future<String?> getDownloadsPath() async {
+  if (Platform.isAndroid) {
+    // Solo Android
+    final downloadsDir = Directory('/storage/emulated/0/Download');
+
+    if (!downloadsDir.existsSync()) {
+      downloadsDir.createSync(recursive: true);
+    }
+    return downloadsDir.path;
+  }
+  // iOS o otros
+  return null;
+}
+
+Future<String?> _saveGeodataToManualPath(
+    List<GeodataGetEntity> geodatas) async {
+  final selectedDirectory = await FilePicker.platform.getDirectoryPath();
+  if (selectedDirectory == null) return null;
+  return await _saveGeodataToExcel(geodatas, selectedDirectory);
 }
 
 // Generar los encabezados del excel por hojas segun categorias y formularios
@@ -207,16 +262,14 @@ Map<String, List<List<String>>> _buildFormRows(
   // Agregar los datos del formulario
   if (rowsBySheet.containsKey(fieldValueForm.column.type.name)) {
     rowsBySheet[fieldValueForm.column.type.name]?.addAll(rowsList);
-  }
-  else {
+  } else {
     rowsBySheet[fieldValueForm.column.type.name] = rowsList;
   }
 
   // Agregar las medias
   if (rowsBySheet.containsKey('media_files')) {
     rowsBySheet['media_files']!.addAll(mediasList);
-  }
-  else {
+  } else {
     rowsBySheet['media_files'] = mediasList;
   }
 
@@ -224,7 +277,10 @@ Map<String, List<List<String>>> _buildFormRows(
 }
 
 // Método principal de exportación
-Future<String?> _saveGeodataToExcel(List<GeodataGetEntity> geodatas) async {
+Future<String?> _saveGeodataToExcel(
+  List<GeodataGetEntity> geodatas,
+  String destinationRoot,
+) async {
   try {
     // Crear archivo Excel
     final excel = Excel.createExcel();
@@ -301,30 +357,22 @@ Future<String?> _saveGeodataToExcel(List<GeodataGetEntity> geodatas) async {
       }
     }
 
-    final selectedDirectory = await FilePicker.platform.getDirectoryPath();
-    if (selectedDirectory == null) {
-      return '';
-    }
-
-    // Crear el directorio de destino si no existe
-    String destinationDirectory =
-        '$selectedDirectory/export_${DateTime.now().millisecondsSinceEpoch}';
-    
-    await Directory(destinationDirectory).create(recursive: true);
-    await Directory('$destinationDirectory/medias').create(recursive: true);
+    final exportDir =
+        '$destinationRoot/export_${DateTime.now().millisecondsSinceEpoch}';
+    await Directory(exportDir).create(recursive: true);
+    await Directory('$exportDir/medias').create(recursive: true);
 
     for (final media in rowsBySheet['media_files']!) {
       String originalFilePath = media[0].substring(0, media[0].indexOf('%'));
       String newFileName = media[0].substring(media[0].indexOf('%') + 1);
 
       // Copiar el archivo
-      await File(originalFilePath).copy('$destinationDirectory/medias/$newFileName');
+      await File(originalFilePath).copy('$exportDir/medias/$newFileName');
     }
 
     // Guardar archivo
-    final filePath = '$destinationDirectory/Geodata.xlsx';
+    final filePath = '$exportDir/Geodata.xlsx';
     await File(filePath).writeAsBytes(excel.encode()!);
-
     return filePath;
   } catch (e) {
     log('Error al guardar: $e');

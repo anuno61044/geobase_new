@@ -178,6 +178,10 @@ Map<String, List<String>> _buildNestedFormsStruct(
     FieldValueGetEntity fieldValueForm) {
   Map<String, List<String>> struct = {};
 
+  if (fieldValueForm.value.length == 0) {
+    return {};
+  }
+
   // Nombred de las columnas del formulario
   List<String> columnNames = ['ID'];
 

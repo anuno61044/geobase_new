@@ -87,19 +87,24 @@ class StaticSelectionLocation extends BeamLocation<BeamState> {
       ];
 
   @override
-  List<BeamPage> buildPages(
-    BuildContext context,
-    BeamState state,
-  ) {
+  List<BeamPage> buildPages(BuildContext context, BeamState state) {
+    final uri = Uri.parse(state.uri.toString());
+
     return [
-      StaticSelectionListPage.getPage(context),
-      if (state.fieldTypeId != null)
-        StaticSelectionViewPage.getPage(context, state.fieldTypeId!)
-      else if (state.contains(1, 'new'))
+      if (state.uri.path == '/staticselection')
+        BeamPage(
+          key: ValueKey('StaticSelectionList-${DateTime.now().millisecondsSinceEpoch}'),
+          title: 'Selecciones Estáticas configuradas',
+          child: const StaticSelectionListPage(),
+        ),
+      if (state.uri.path == '/staticselection/new')
         StaticSelectionNewPage.getPage(context),
+      if (state.pathParameters.containsKey(FIELD_TYPE_ID))
+        StaticSelectionViewPage.getPage(context, state.fieldTypeId!),
     ];
   }
 }
+
 
 class FormLocation extends BeamLocation<BeamState> {
   @override

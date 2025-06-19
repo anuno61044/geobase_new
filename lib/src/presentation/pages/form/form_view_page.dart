@@ -62,7 +62,8 @@ class _FormViewBody extends StatelessWidget {
     return BlocBuilder<FormViewCubit, FormViewState>(
       builder: (context, state) {
         return state.when(
-          fetchInProgress: () => const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+          fetchInProgress: () =>
+              const Center(child: CircularProgressIndicator(strokeWidth: 2)),
           fetchSuccess: (form) => _FormViewBodyFetchSuccess(form: form),
           fetchFailure: (failure) => FailureAndRetryWidget(
             errorText: failure,
@@ -103,16 +104,24 @@ class _FormViewBodyFetchSuccess extends StatelessWidget {
                       context: context,
                       builder: (context) => AlertDialog(
                         title: const Text('Eliminar Formulario'),
-                        content: const Text('¿Está seguro? Esta acción es irreversible.'),
+                        content: const Text(
+                            '¿Está seguro? Esta acción es irreversible.'),
                         actions: [
-                          TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('Sí')),
-                          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('No')),
+                          TextButton(
+                              onPressed: () => Navigator.pop(context, true),
+                              child: const Text('Sí')),
+                          TextButton(
+                              onPressed: () => Navigator.pop(context, false),
+                              child: const Text('No')),
                         ],
                       ),
                     );
                     if (confirm ?? false) {
-                      await context.read<FormViewCubit>().remove(form.id);
-                      context.beamToNamed('/form');
+                      final wasDeleted =
+                          await context.read<FormViewCubit>().remove(form.id);
+                      if (wasDeleted) {
+                        Navigator.of(context).pop(true);
+                      }
                     }
                   },
                   color: Colors.red.withOpacity(0.7),

@@ -53,7 +53,7 @@ class _Body extends StatelessWidget {
       onSuccess: (contex, state) => NotificationHelper.showSuccessSnackbar(
         context,
         message: 'La selección estática fue correctamente creada.',
-        onShow: () => context.beamToNamed('/staticselection'),
+        onShow: () => context.beamBack(),
       ),
       onFailure: (context, state) => NotificationHelper.showErrorSnackbar(
         context,

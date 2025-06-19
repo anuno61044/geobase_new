@@ -7,15 +7,24 @@ import 'package:geobase/src/presentation/core/widgets/commons/dropdown_field.dar
 import 'package:geobase/src/presentation/core/widgets/field_input_widgets/field_input_widget.dart';
 
 class StaticSelectionFieldInputWidget extends FieldInputWidget {
+
   const StaticSelectionFieldInputWidget({
     super.key,
     required super.column,
     required super.inputBloc,
+    this.onChanged,
   });
+  final ValueChanged<String?>? onChanged;
 
   @override
   Widget build(BuildContext context) {
-    final List<String> items = getOptions(column.type.extradata?['options']);
+    List<String> items = [];
+    if(column.type.extradata?['options'] != null) {
+      items = getOptions(column.type.extradata?['options']);
+    }
+    else {
+      items = (column.type as FieldTypeStaticSelectionGetEntity).options;
+    }
     return LyInputBuilder<FieldValueEntity>(
       lyInput: inputBloc,
       builder: (context, state) {
@@ -30,12 +39,15 @@ class StaticSelectionFieldInputWidget extends FieldInputWidget {
                 (e) => DropdownMenuItem<String>(value: e, child: Text(e)),
               )
               .toList(),
-          value: state.value.value as String?,
+          value: value,
           errorText: state.error,
           labelText: column.name,
-          onChanged: (newValue) => inputBloc.dirty(
-            state.value.copyWithValue(newValue),
-          ),
+          onChanged: (newValue) {
+            inputBloc.dirty(state.value.copyWithValue(newValue));
+            if (onChanged != null) {
+              onChanged!(newValue);
+            }
+          },
         );
       },
     );

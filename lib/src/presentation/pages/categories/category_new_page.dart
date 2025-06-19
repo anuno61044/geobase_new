@@ -45,11 +45,15 @@ class _CategoryCreatePageInternal extends StatelessWidget {
         ),
         body: FormBlocListener<CategoryCreateFormBloc, Unit, String>(
           formBloc: context.read<CategoryCreateFormBloc>(),
-          onSuccess: (contex, state) => NotificationHelper.showSuccessSnackbar(
-            context,
-            message: 'La Categoría fue correctamente creada.',
-            onShow: () => context.beamToNamed('/categories'),
-          ),
+          onSuccess: (context, state) {
+            NotificationHelper.showSuccessSnackbar(
+              context,
+              message: 'La Categoría fue correctamente creada.',
+              onShow: () {
+                Navigator.of(context).pop(true); // <-- Pop con resultado "true"
+              },
+            );
+          },
           onFailure: (context, state) => NotificationHelper.showErrorSnackbar(
             context,
             message: state.failureResponse ??

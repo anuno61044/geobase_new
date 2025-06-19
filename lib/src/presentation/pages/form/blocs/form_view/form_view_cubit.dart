@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:geobase/injection.dart';
@@ -26,7 +28,13 @@ class FormViewCubit extends Cubit<FormViewState> {
     );
   }
 
-  Future<void> remove(int fieldTypeId) async {
-    await formService.removeForm(fieldTypeId);
+  Future<bool> remove(int fieldTypeId) async {
+    try {
+      await formService.removeForm(fieldTypeId);
+      return true;
+    } catch (e) {
+      log('$e');
+      return false;
+    }
   }
 }

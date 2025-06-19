@@ -20,14 +20,28 @@ class StaticSelectionListPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider<StaticSelectionListCubit>(
-      create: (context) => getIt<StaticSelectionListCubit>()..fetch(),
+      create: (context) => getIt<StaticSelectionListCubit>(),
       child: const _StaticSelectionListInternalPage(),
     );
   }
 }
 
-class _StaticSelectionListInternalPage extends StatelessWidget {
+
+
+class _StaticSelectionListInternalPage extends StatefulWidget {
   const _StaticSelectionListInternalPage();
+
+  @override
+  State<_StaticSelectionListInternalPage> createState() => _StaticSelectionListInternalPageState();
+}
+
+class _StaticSelectionListInternalPageState extends State<_StaticSelectionListInternalPage> {
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Siempre recarga al entrar en la página
+    context.read<StaticSelectionListCubit>().fetch();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,10 +57,7 @@ class _StaticSelectionListInternalPage extends StatelessWidget {
           actions: [
             IconButton(
               onPressed: () => context.read<StaticSelectionListCubit>().fetch(),
-              icon: const Icon(
-                Icons.refresh,
-                color: Colors.white,
-              ),
+              icon: const Icon(Icons.refresh, color: Colors.white),
             )
           ],
         ),
@@ -56,6 +67,8 @@ class _StaticSelectionListInternalPage extends StatelessWidget {
     );
   }
 }
+
+
 
 class _Body extends StatelessWidget {
   const _Body();

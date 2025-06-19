@@ -268,7 +268,7 @@ class _GeodataViewBodyFetchSucessBottom extends StatelessWidget {
                 result.then((value) {
                   if (value ?? false) {
                     context.read<GeodataViewCubit>().remove(geodataId).then(
-                          (value) => context.beamToNamed('/geodata'),
+                          (value) => context.beamToNamed('/map'),
                         );
                   }
                 });

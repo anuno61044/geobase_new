@@ -57,10 +57,11 @@ class FieldRenderResolver {
   static Widget getInputWidget(
     ColumnGetEntity column,
     LyInput<FieldValueEntity> inputBloc,
+    {void Function(Object?)? onChanged}
   ) {
     try {
       final instance = _getInstance(column.type.renderClass);
-      final inputWidget = instance.getInputWidget(column, inputBloc);
+      final inputWidget = instance.getInputWidget(column, inputBloc, onChanged:onChanged);
       return inputWidget;
     } catch (e) {
       log(e.toString());

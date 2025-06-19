@@ -85,15 +85,17 @@ class GeodataCreateFormBloc extends IGeodataCreateFormBloc {
   
   @override
   Stream<LyFormState<Unit, Failure>> onSubmit() async* {
-    final response = await geodataService.createGeodata(
-      GeodataPostEntity(
+
+    final geodata = GeodataPostEntity(
         categoryId: categoryId.state.value,
         latitude: double.parse(latitude.state.value),
         longitude: double.parse(longitude.state.value),
         fieldValues: fieldValues.values
             .map((value) => value.state.value as FieldValuePostEntity)
             .toList(),
-      ),
+      );
+    final response = await geodataService.createGeodata(
+      geodata
     );
     yield response.fold(
       (error) => LyFormErrorState(error, inputStates),

@@ -43,9 +43,6 @@ class FieldValueSQLiteProvider implements IFieldValueProvider {
     for (FieldValueDBModel field in fields) {
       try {
         ColumnGetModel column = await getIt<IColumnsProvider>().getById(field.column_id!);
-        if (column.formId != null) {
-          continue;
-        }
 
         result.add(
           FieldValueGetModel(

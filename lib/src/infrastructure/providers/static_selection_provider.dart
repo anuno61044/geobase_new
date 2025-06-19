@@ -22,7 +22,7 @@ class StaticSelectionSQLiteProvider
         fieldTypeId,
       ).save();
       if (id == null) throw Exception('Create StaticSelection Denied');
-      return id;
+      return fieldTypeId;
     } catch (e) {
       rethrow;
     }

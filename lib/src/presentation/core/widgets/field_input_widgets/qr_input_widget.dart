@@ -5,10 +5,13 @@ import 'package:geobase/src/domain/entities/entities.dart';
 import 'package:geobase/src/presentation/core/widgets/field_input_widgets/field_input_widget.dart';
 
 class QRFieldInputWidget extends FieldInputWidget {
+  final ValueChanged<String>? onChanged;
+
   const QRFieldInputWidget({
     super.key,
     required super.column,
     required super.inputBloc,
+    this.onChanged,
   });
 
   @override
@@ -17,19 +20,22 @@ class QRFieldInputWidget extends FieldInputWidget {
       key: key,
       column: column,
       bloc: inputBloc,
+      onChanged: onChanged,
     );
   }
 }
 
 class _QRInputField extends StatefulWidget {
-  final ColumnGetEntity column;
-  final LyInput<FieldValueEntity> bloc;
 
   const _QRInputField({
-    Key? key,
+    super.key,
     required this.column,
     required this.bloc,
-  }) : super(key: key);
+    this.onChanged,
+  });
+  final ColumnGetEntity column;
+  final LyInput<FieldValueEntity> bloc;
+  final ValueChanged<String>? onChanged;
 
   @override
   State<_QRInputField> createState() => _QRInputFieldState();
@@ -58,12 +64,16 @@ class _QRInputFieldState extends State<_QRInputField> {
       
       final currentValue = widget.bloc.value;
       widget.bloc.dirty(currentValue.copyWithValue(scanData.code!));
+      
+      // Llamada al callback onChanged si está definido
+      if (widget.onChanged != null) {
+        widget.onChanged!(scanData.code!);
+      }
     });
   }
 
   Future<void> _startScanning() async {
     if (!_cameraReady) {
-      // Si la cámara no está lista, forzamos la recreación del widget QRView
       setState(() {
         _isScanning = false;
       });
@@ -77,12 +87,11 @@ class _QRInputFieldState extends State<_QRInputField> {
       try {
         await _qrController?.resumeCamera();
       } catch (e) {
-        // Si hay error, recreamos el escáner
         setState(() {
           _qrController?.dispose();
           _qrController = null;
           _cameraReady = false;
-          _isScanning = true; // Mantenemos el estado de escaneo
+          _isScanning = true;
         });
       }
     }
@@ -91,9 +100,7 @@ class _QRInputFieldState extends State<_QRInputField> {
   Future<void> _stopScanning() async {
     try {
       await _qrController?.pauseCamera();
-    } catch (e) {
-      // Ignoramos errores al pausar
-    }
+    } catch (e) {}
     if (mounted) {
       setState(() => _isScanning = false);
     }

@@ -147,11 +147,13 @@ class _CategoryViewBodyFetchSucessBottom extends StatelessWidget {
                   ),
                 );
                 result.then((value) {
-                  if (value ?? false) {
-                    context.read<CategoryViewCubit>().remove(categoryId).then(
-                          (value) => context.beamToNamed('/categories'),
-                        );
-                  }
+                  context
+                      .read<CategoryViewCubit>()
+                      .remove(categoryId)
+                      .whenComplete(() {
+                    Navigator.of(context)
+                        .pop(true);
+                  });
                 });
               },
               color: Colors.red.withOpacity(0.7),

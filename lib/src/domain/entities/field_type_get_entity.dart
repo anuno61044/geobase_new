@@ -1,18 +1,19 @@
 ///Base Class for TypeEntity.
+import 'package:geobase/src/domain/entities/entities.dart';
+
 abstract class FieldTypeEntity {
   FieldTypeEntity({
     required this.name,
     required this.metaType,
   });
-  
 
   final String name;
 
   final String metaType;
 
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> toMap() {
     return {
-      'name':name,
+      'name': name,
       'metaType': metaType,
     };
   }
@@ -26,7 +27,7 @@ class FieldTypeGetEntity extends FieldTypeEntity {
     required this.renderClass,
     this.extradata,
   });
-  
+
   FieldTypeGetEntity.empty()
       : id = 0,
         renderClass = '',
@@ -38,13 +39,22 @@ class FieldTypeGetEntity extends FieldTypeEntity {
 
   // Nuevo método fromMap (inverso de toMap)
   factory FieldTypeGetEntity.fromMap(Map<String, dynamic> map) {
-    return FieldTypeGetEntity(
-      id: map['id'] as int,
-      name: map['name'] as String,
-      metaType: map['metaType'] as String,
-      renderClass: map['renderClass'] as String,
-      extradata: map['extradata'] as Map<String, dynamic>?,
-    );
+    final metaType = map['metaType'] as String;
+
+    switch (metaType) {
+      case 'Form':
+        return FieldTypeFormGetEntity.fromMap(map);
+      case 'StaticSelection':
+        return FieldTypeStaticSelectionGetEntity.fromMap(map);
+      default:
+        return FieldTypeGetEntity(
+          id: map['id'] as int,
+          name: map['name'] as String,
+          metaType: map['metaType'] as String,
+          renderClass: map['renderClass'] as String,
+          extradata: map['extradata'] as Map<String, dynamic>?,
+        );
+    }
   }
 
   final int id;
@@ -54,14 +64,12 @@ class FieldTypeGetEntity extends FieldTypeEntity {
   final Map<String, dynamic>? extradata;
 
   @override
-  Map<String, dynamic> toJson() {
-
+  Map<String, dynamic> toMap() {
     return {
-      ...super.toJson(),
+      ...super.toMap(),
       'id': id,
-      'renderClass':renderClass,
+      'renderClass': renderClass,
       'extradata': extradata,
     };
   }
-
 }

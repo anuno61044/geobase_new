@@ -20,26 +20,26 @@ class GeodataSQLiteProvider implements IGeodataProvider {
       ).save();
       if (geodataId == null) throw Exception('Create Geodata Denied');
       for (final fv in model.fieldValues) {
+        dynamic value = fv.value;
+
         // Verificar si corresponde a un formulario
         if (fv.value is Map<int, FieldValueGetEntity>) {
-          final value = jsonEncode(fv.value.map((key, value) => MapEntry(key.toString(), value.toMap())));
-          await getIt<IFieldValueProvider>().create(
-            FieldValuePostModel(
-              columnId: fv.columnId,
-              geodataId: geodataId,
-              value: value,
-            ),
-          );
-        } else {
-          // Si no es array, procesar normalmente
-          await getIt<IFieldValueProvider>().create(
-            FieldValuePostModel(
-              columnId: fv.columnId,
-              geodataId: geodataId,
-              value: fv.value,
-            ),
-          );
+          value = jsonEncode(fv.value
+              .map((key, value) => MapEntry(key.toString(), value.toMap())));
+        } else if (fv.value is List<Map<int, FieldValueGetEntity>>) {
+          value = fv.value
+              .map((v) => jsonEncode(v.map((key, subvalue) =>
+                  MapEntry(key.toString(), subvalue.toMap()))))
+              .toList();
         }
+
+        await getIt<IFieldValueProvider>().create(
+          FieldValuePostModel(
+            columnId: fv.columnId,
+            geodataId: geodataId,
+            value: value,
+          ),
+        );
       }
       return geodataId;
     } catch (e) {
@@ -58,7 +58,27 @@ class GeodataSQLiteProvider implements IGeodataProvider {
       ).save();
       if (geodataId == null) throw Exception('Edit Geodata Denied');
       for (final fv in model.fieldValues) {
-        await getIt<IFieldValueProvider>().edit(fv);
+        dynamic value = fv.value;
+
+        // Verificar si corresponde a un formulario
+        if (fv.value is Map<int, FieldValueGetEntity>) {
+          value = jsonEncode(fv.value
+              .map((key, value) => MapEntry(key.toString(), value.toMap())));
+        } else if (fv.value is List<Map<int, FieldValueGetEntity>>) {
+          value = fv.value
+              .map((v) => jsonEncode(v.map((key, subvalue) =>
+                  MapEntry(key.toString(), subvalue.toMap()))))
+              .toList();
+        }
+
+        await getIt<IFieldValueProvider>().edit(
+          FieldValuePutModel(
+            id: fv.id,
+            columnId: fv.columnId,
+            geodataId: fv.geodataId,
+            value: value,
+          ),
+        );
       }
       return geodataId;
     } catch (e) {

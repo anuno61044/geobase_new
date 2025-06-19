@@ -5,6 +5,8 @@ import 'package:geobase/injection.dart';
 import 'package:geobase/src/domain/entities/entities.dart';
 import 'package:geobase/src/presentation/core/widgets/widgets.dart';
 import 'package:geobase/src/presentation/pages/form/blocs/form_list/form_list_cubit.dart';
+import 'package:geobase/src/presentation/pages/form/form_new_page.dart';
+import 'package:geobase/src/presentation/pages/form/form_view_page.dart';
 
 class FormListPage extends StatelessWidget {
   const FormListPage({super.key});
@@ -111,15 +113,22 @@ class _FormWidget extends StatelessWidget {
             title: SelectableText(form.name),
             subtitle: SelectableText('ID: ${form.id}'),
             trailing: IconButton(
-              tooltip: 'Ver detalles del Formulario',
-              icon: Icon(
-                Icons.keyboard_arrow_right,
-                color: Theme.of(context).colorScheme.secondary,
-              ),
-              onPressed: () {
-                context.beamToNamed('/form/${form.id}');
-              },
-            ),
+                tooltip: 'Ver detalles del Formulario',
+                icon: Icon(
+                  Icons.keyboard_arrow_right,
+                  color: Theme.of(context).colorScheme.secondary,
+                ),
+                onPressed: () async {
+                  final result = await Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => FormViewPage(formId: form.id),
+                    ),
+                  );
+
+                  if (result == true) {
+                    await context.read<FormListCubit>().fetch();
+                  }
+                }),
           ),
         ),
       ),
@@ -136,8 +145,16 @@ class _FloatingActionButton extends StatelessWidget {
       tooltip: 'Agregar Formulario',
       heroTag: null,
       child: const Icon(Icons.add),
-      onPressed: () {
-        context.beamToNamed('/form/new');
+      onPressed: () async {
+        final result = await Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => const FormNewPage(),
+          ),
+        );
+
+        if (result == true) {
+          await context.read<FormListCubit>().fetch();
+        }
       },
     );
   }

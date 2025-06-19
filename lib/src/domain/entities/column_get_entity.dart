@@ -37,13 +37,13 @@ class ColumnGetEntity extends ColumnEntity {
   final int? formId;
 
   @override
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> toMap() {
     return {
-      ...super.toJson(),
+      ...super.toMap(),
       'categoryId':categoryId,
       'formId': formId,
       'id': id,
-      'type': type.toJson(),
+      'type': type.toMap(),
     };
   }
 

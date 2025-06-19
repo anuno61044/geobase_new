@@ -49,12 +49,14 @@ class MarkerCubit extends Cubit<MarkerState> {
         emit(MarkerState.failure(failure));
       },
       (entity) {
-        emit(
-          MarkerState.filteredOut(
-            markers: entity.toSet(),
-            temporalMarkers: temporals,
-          ),
-        );
+        if (!isClosed) {
+          emit(
+            MarkerState.filteredOut(
+              markers: entity.toSet(),
+              temporalMarkers: temporals,
+            ),
+          );
+        }
       },
     );
   }

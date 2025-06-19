@@ -3,14 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geobase/injection.dart';
 import 'package:geobase/src/domain/entities/entities.dart';
-import 'package:geobase/src/domain/services/services.dart';
 import 'package:geobase/src/presentation/core/extensions/color_extension.dart';
 import 'package:geobase/src/presentation/core/utils/notification_helper.dart';
 import 'package:geobase/src/presentation/core/utils/utils.dart';
 import 'package:geobase/src/presentation/core/widgets/widgets.dart';
 import 'package:geobase/src/presentation/pages/categories/blocs/categories_exporter/categories_exporter_cubit.dart';
 import 'package:geobase/src/presentation/pages/categories/blocs/categories_importer/categories_importer_cubit.dart';
+import 'package:geobase/src/presentation/pages/categories/blocs/categories_importer/categories_importer_state.dart';
 import 'package:geobase/src/presentation/pages/categories/blocs/categorylist/categorylist_bloc.dart';
+import 'package:geobase/src/presentation/pages/categories/category_new_page.dart';
+import 'package:geobase/src/presentation/pages/categories/category_view_page.dart';
 
 class CategoriesPage extends StatelessWidget {
   const CategoriesPage({super.key});
@@ -25,7 +27,6 @@ class CategoriesPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return MultiBlocProvider(
       providers: [
         BlocProvider(
@@ -49,6 +50,11 @@ class _CategoriesPageInternal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Al construir la página o cuando entres, dispara la carga
+    context
+        .read<CategoryListBloc>()
+        .add(const CategoryListEvent.fetched(query: ''));
+
     return BlocListener<CategoryListBloc, CategoryListState>(
       listener: (context, state) {
         state.maybeMap(
@@ -87,26 +93,54 @@ class _Body extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<CategoriesExporterCubit, CategoriesExporterState>(
-      listener: (context, state) {
-        if (state.status.isLoading)
-          return;
-        else if (state.status.isFailure || state.message != null) {
-          NotificationHelper.showErrorSnackbar(
-            context,
-            message: state.message!,
-          );
-          return;
-        } else if (state.status ==
-                CategoryExporterStatus.FetchSuccessNotFound ||
-            state.message != null) {
-          NotificationHelper.showInfoSnackbar(context, message: state.message!);
-        } else if (state.status == CategoryExporterStatus.ExportSuccess ||
-            state.message != null) {
-          NotificationHelper.showSuccessSnackbar(context,
-              message: state.message!);
-        }
-      },
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<CategoriesExporterCubit, CategoriesExporterState>(
+          listener: (context, state) {
+            if (state.status.isLoading) return;
+
+            switch (state.status) {
+              case CategoryExporterStatus.ExportFailure:
+                NotificationHelper.showErrorSnackbar(
+                  context,
+                  message: state.message ?? 'Error al exportar categorías.',
+                );
+                break;
+              case CategoryExporterStatus.FetchSuccessNotFound:
+                NotificationHelper.showInfoSnackbar(
+                  context,
+                  message: state.message ??
+                      'No se encontraron categorías para exportar.',
+                );
+                break;
+              case CategoryExporterStatus.ExportSuccess:
+                NotificationHelper.showSuccessSnackbar(
+                  context,
+                  message: state.message ?? 'Exportación exitosa.',
+                );
+                break;
+              default:
+                // No hacer nada para otros estados
+                break;
+            }
+          },
+        ),
+        BlocListener<CategoriesImporterCubit, CategoriesImporterState>(
+          listener: (context, state) {
+            if (state.status == CategoryImporterStatus.success) {
+              // Recarga categorías al importar exitosamente
+              context
+                  .read<CategoryListBloc>()
+                  .add(const CategoryListEvent.fetched(query: ''));
+              NotificationHelper.showSuccessSnackbar(context,
+                  message: state.message ?? 'Importación exitosa');
+            } else if (state.status == CategoryImporterStatus.error) {
+              NotificationHelper.showErrorSnackbar(context,
+                  message: state.message ?? 'Fallo la importación');
+            }
+          },
+        ),
+      ],
       child: BlocBuilder<CategoryListBloc, CategoryListState>(
         bloc: context.read<CategoryListBloc>(),
         builder: (context, state) {
@@ -258,31 +292,33 @@ class _CategoryWidget extends StatelessWidget {
           child: ListTile(
             title: SelectableText(category.name, style: titleSmall),
             subtitle: Text(category.description ?? '', style: bodyMedium),
-            onTap: () {
-              context.beamToNamed('/categories/${category.id}');
-              context
-                  .read<CategoryListBloc>()
-                  .add(const CategoryListEvent.fetched(query: ''));
+            onTap: () async {
+              final result = await Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => BlocProvider.value(
+                    value: context.read<CategoryListBloc>(),
+                    child: CategoryViewPage(categoryId: category.id),
+                  ),
+                ),
+              );
+
+              // Recargar siempre que result sea true (eliminado o intento fallido)
+              if (result == true) {
+                context.read<CategoryListBloc>().add(
+                      const CategoryListEvent.fetched(query: ''),
+                    );
+              }
             },
             leading: Icon(
               IconCodeUtils.decode(category.icon) ??
                   Icons.question_mark_rounded,
             ),
-            trailing: IconButton(
-              tooltip: 'Ver detalles de la Categoría',
-              icon: Icon(
-                Icons.keyboard_arrow_right,
-                color: Theme.of(context)
-                    .colorScheme
-                    .secondary
-                    .getContrastColor(color),
-              ),
-              onPressed: () {
-                context.beamToNamed('/categories/${category.id}');
-                context
-                    .read<CategoryListBloc>()
-                    .add(const CategoryListEvent.fetched(query: ''));
-              },
+            trailing: Icon(
+              Icons.keyboard_arrow_right,
+              color: Theme.of(context)
+                  .colorScheme
+                  .secondary
+                  .getContrastColor(color),
             ),
           ),
         ),
@@ -364,19 +400,50 @@ class _FloatingActionButton extends StatelessWidget {
                   strokeWidth: 2,
                 )
               : const Icon(Icons.download),
-          onPressed: () =>
-              context.read<CategoriesExporterCubit>().exportToJson(),
+          onPressed: () async {
+            final mode = await showDialog<CategoryExportMode>(
+              context: context,
+              builder: (context) => AlertDialog(
+                title: const Text('Modo de exportación'),
+                content: const Text('¿Dónde deseas guardar el archivo?'),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(
+                        context, CategoryExportMode.defaultDirectory),
+                    child: const Text('Carpeta predefinida'),
+                  ),
+                  TextButton(
+                    onPressed: () => Navigator.pop(
+                        context, CategoryExportMode.manualSelection),
+                    child: const Text('Seleccionar carpeta'),
+                  ),
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, null),
+                    child: const Text('Cancelar'),
+                  ),
+                ],
+              ),
+            );
+
+            if (mode != null) {
+              await context.read<CategoriesExporterCubit>().exportToJson(mode);
+            }
+          },
         ),
         const SizedBox(height: 16),
         FloatingActionButton(
           tooltip: 'Agregar Categoría',
           heroTag: 'add_button',
           child: const Icon(Icons.add),
-          onPressed: () {
-            context.beamToNamed('/categories/new');
-            context
-                .read<CategoryListBloc>()
-                .add(const CategoryListEvent.fetched(query: ''));
+          onPressed: () async {
+            final result = await Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const CategoryNewPage()),
+            );
+            if (result == true) {
+              context
+                  .read<CategoryListBloc>()
+                  .add(const CategoryListEvent.fetched(query: ''));
+            }
           },
         ),
       ],

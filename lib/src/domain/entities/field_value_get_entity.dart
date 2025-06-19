@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:geobase/src/domain/entities/column_get_entity.dart';
 import 'package:geobase/src/domain/entities/field_value_entity.dart';
 
@@ -30,17 +32,20 @@ class FieldValueGetEntity extends FieldValueEntity {
 
   // Método para serialización
   Map<String, dynamic> toMap() {
+    if (value is Map<int, FieldValueGetEntity>) {
+      return {
+        'value': jsonEncode(value.map((key, value) => MapEntry(key.toString(), value.toMap()))),
+        'id': id,
+        'geodataId': geodataId,
+        'column': column.toMap(),
+      };
+    }
     return {
       'value': value,
       'id': id,
       'geodataId': geodataId,
-      'column': column.toJson(),
+      'column': column.toMap(),
     };
-  }
-
-  // Versión JSON (puede ser igual a toMap o diferente según necesidades)
-  Map<String, dynamic> toJson() {
-    return toMap();
   }
 
   FieldValueGetEntity copyWith({

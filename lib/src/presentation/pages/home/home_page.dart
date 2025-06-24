@@ -126,6 +126,9 @@ class _InternalHomePage extends StatelessWidget {
                   BlocProvider<LocationCubit>(
                     create: (context) => getIt<LocationCubit>(),
                   ),
+                  BlocProvider<ImportedGeodataCubit>(
+                    create: (context) => getIt<ImportedGeodataCubit>(),
+                  ),
                 ],
                 child: const _MapScreen(),
               ),
@@ -180,12 +183,10 @@ class _MapScreen extends StatelessWidget {
       alignment: Alignment.bottomCenter,
       children: const [
         GeoBaseMap(),
-        //Right top
         Positioned(top: 110, right: 20, child: _FiltersButton()),
-        //Right bottom
         Positioned(bottom: 50, right: 10, child: _GotoLocationButton()),
-        //Left top
         Positioned(top: 110, left: 20, child: _GeodataListButton()),
+        Positioned(bottom: 120, right: 10, child: _ImportPointsButton()),
       ],
     );
   }
@@ -328,6 +329,38 @@ class _FloatingActionButtonWidget extends StatelessWidget {
       ),
       elevation: 0,
       child: Icon(iconData),
+    );
+  }
+}
+
+class _ImportPointsButton extends StatelessWidget {
+  const _ImportPointsButton();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocConsumer<ImportedGeodataCubit, ImportedGeodataState>(
+      listener: (context, state) {
+        state.maybeWhen(
+          error: (message) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(message)),
+            );
+          },
+          loaded: (_) {
+            // Refrescar los marcadores después de importar
+            context.read<MarkerCubit>().refreshMarkers();
+          },
+          orElse: () {},
+        );
+      },
+      builder: (context, state) {
+        return _FloatingActionButtonWidget(
+          onPressed: () async {
+            await context.read<ImportedGeodataCubit>().importPoints();
+          },
+          iconData: Icons.file_download_rounded,
+        );
+      },
     );
   }
 }

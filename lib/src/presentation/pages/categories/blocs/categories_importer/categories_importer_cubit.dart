@@ -41,7 +41,6 @@ class CategoriesImporterCubit extends Cubit<CategoriesImporterState> {
           extractTypedNamesFromJson(jsonData);
 
       // Servicios necesarios para crear y obtener las entidades
-      final ICategoryService categoryService = getIt<ICategoryService>();
       final IFieldTypeFormService formService = getIt<IFieldTypeFormService>();
       final IFieldTypeStaticSelectionService staticselectionService =
           getIt<IFieldTypeStaticSelectionService>();

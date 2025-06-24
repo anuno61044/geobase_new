@@ -21,6 +21,8 @@ export 'geodata_get_entity.dart';
 export 'geodata_post_entity.dart';
 export 'geodata_put_entity.dart';
 export 'i_markable_entity.dart';
+export 'imported_geodata_markes.dart';
+export 'imported_geodata_point.dart';
 export 'map_configuration_entity.dart';
 export 'map_mode_entity.dart';
 export 'media_get_entity.dart';

@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:geobase/injection.dart';
 import 'package:geobase/src/domain/entities/entities.dart';
+import 'package:geobase/src/domain/services/imported_geodata_storage_service.dart';
 import 'package:geobase/src/domain/services/interfaces/interfaces.dart';
 import 'package:latlong2/latlong.dart';
 
@@ -13,10 +14,15 @@ class MarkerCubit extends Cubit<MarkerState> {
   MarkerCubit({
     required this.markerGetterService,
     required this.uPrefsReader,
-  }) : super(const MarkerState.filteredOut(markers: {}, temporalMarkers: {}));
-
+    required this.importedGeodataService,
+  }) : super(const MarkerState.filteredOut(
+            markers: {}, 
+            importedMarkers: {}, 
+            temporalMarkers: {}));
+      
   final IMarkerGetterService markerGetterService;
   final IUserPreferencesReaderService uPrefsReader;
+  final IImportedGeodataStorageService importedGeodataService;
 
   Future<void> refreshMarkers({
     FilterDataOptionsEntity? filters,
@@ -44,6 +50,15 @@ class MarkerCubit extends Cubit<MarkerState> {
       filteredOut: (state) => state.temporalMarkers,
     );
 
+    // Puntos importados
+    final importedPoints = await importedGeodataService.loadImportedPoints();
+    // List<ImportedGeodataPoint> importedPoints = [];
+
+    final importedMarkers = importedPoints
+        .map((point) => ImportedGeodataMarker(point) // Usando el adaptador
+            )
+        .toSet();
+
     either.fold(
       (failure) {
         emit(MarkerState.failure(failure));
@@ -53,6 +68,7 @@ class MarkerCubit extends Cubit<MarkerState> {
           emit(
             MarkerState.filteredOut(
               markers: entity.toSet(),
+              importedMarkers: importedMarkers,
               temporalMarkers: temporals,
             ),
           );

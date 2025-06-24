@@ -2,6 +2,7 @@ import 'package:beamer/beamer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:geobase/src/domain/entities/entities.dart';
 import 'package:geobase/src/presentation/core/utils/utils.dart';
 import 'package:geobase/src/presentation/core/widgets/widgets.dart';
 import 'package:geobase/src/presentation/pages/home/blocs/blocs.dart';
@@ -79,21 +80,19 @@ class GeoBaseMap extends StatelessWidget {
   Widget markerLayerOptions(BuildContext context) {
     return context.watch<MarkerCubit>().state.map(
           failure: (failure) => MarkerLayer(markers: []),
-          filteredOut: (markerState) => MarkerLayer(
-            // rotateAlignment: Alignment.center,
-            rotate: true,
-            markers: (markerState.markers)
+          filteredOut: (markerState) {
+            // 1. Marcadores normales (azules)
+            final normalMarkers = markerState.markers
                 .map(
                   (e) => Marker(
-                    key: e.id != null ? Key(e.id.toString()) : UniqueKey(),
+                    key: e.id != null ? Key('normal_${e.id}') : UniqueKey(),
                     point: e.location,
                     child: IconButton(
                       icon: Icon(
                         e.icon != null
                             ? IconCodeUtils.decode(e.icon)
-                            : Icons.blur_circular_outlined,
-                        color:
-                            e.color != null ? Color(e.color!) : Colors.black54,
+                            : Icons.location_on,
+                        color: e.color != null ? Color(e.color!) : Colors.blue,
                       ),
                       onPressed: () {
                         context.read<MapCubit>().markerTouched(e);
@@ -101,24 +100,52 @@ class GeoBaseMap extends StatelessWidget {
                       },
                     ),
                   ),
-                )
-                .followedBy(
-                  markerState.temporalMarkers.map(
-                    (e) => Marker(
-                      key: UniqueKey(),
-                      point: e.location,
-                      child: Icon(
+                );
+
+            // 2. Marcadores importados (rojos)
+            final importedMarkers = markerState.importedMarkers
+                .map(
+                  (e) => Marker(
+                    key: Key('imported_${e.id ?? 'no-id'}'),
+                    point: e.location,
+                    child: IconButton(
+                      icon: Icon(
                         e.icon != null
                             ? IconCodeUtils.decode(e.icon)
-                            : Icons.circle,
-                        color:
-                            e.color != null ? Color(e.color!) : Colors.blueGrey,
+                            : Icons.location_on,
+                        color: e.color != null ? Color(e.color!) : Colors.red,// Usar color rojo por defecto
                       ),
+                      onPressed: () {
+                        // context.read<MapCubit>().markerTouched(e);
+                        // context
+                        //     .read<SlidingUpPanelCubit>()
+                        //     .markerTouchedImported(e);
+                      },
                     ),
                   ),
-                )
-                .toList(),
-          ),
+                );
+
+            // 3. Marcadores temporales (grises)
+            final temporalMarkers = markerState.temporalMarkers.map(
+              (e) => Marker(
+                key: UniqueKey(),
+                point: e.location,
+                child: Icon(
+                  e.icon != null ? IconCodeUtils.decode(e.icon) : Icons.circle,
+                  color: e.color != null ? Color(e.color!) : Colors.blueGrey,
+                ),
+              ),
+            );
+
+            return MarkerLayer(
+              rotate: true,
+              markers: [
+                ...normalMarkers,
+                ...importedMarkers,
+                ...temporalMarkers,
+              ].toList(),
+            );
+          },
         );
   }
 

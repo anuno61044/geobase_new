@@ -20,6 +20,8 @@ mixin _$ImportedGeodataState {
   TResult when<TResult extends Object?>({
     required TResult Function() initial,
     required TResult Function() loading,
+    required TResult Function() importing,
+    required TResult Function() deleting,
     required TResult Function(List<ImportedGeodataPoint> importedPoints) loaded,
     required TResult Function(String message) error,
   }) =>
@@ -28,6 +30,8 @@ mixin _$ImportedGeodataState {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? initial,
     TResult? Function()? loading,
+    TResult? Function()? importing,
+    TResult? Function()? deleting,
     TResult? Function(List<ImportedGeodataPoint> importedPoints)? loaded,
     TResult? Function(String message)? error,
   }) =>
@@ -36,6 +40,8 @@ mixin _$ImportedGeodataState {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initial,
     TResult Function()? loading,
+    TResult Function()? importing,
+    TResult Function()? deleting,
     TResult Function(List<ImportedGeodataPoint> importedPoints)? loaded,
     TResult Function(String message)? error,
     required TResult orElse(),
@@ -45,6 +51,8 @@ mixin _$ImportedGeodataState {
   TResult map<TResult extends Object?>({
     required TResult Function(_Initial value) initial,
     required TResult Function(_Loading value) loading,
+    required TResult Function(_Importing value) importing,
+    required TResult Function(_Deleting value) deleting,
     required TResult Function(_Loaded value) loaded,
     required TResult Function(_Error value) error,
   }) =>
@@ -53,6 +61,8 @@ mixin _$ImportedGeodataState {
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(_Initial value)? initial,
     TResult? Function(_Loading value)? loading,
+    TResult? Function(_Importing value)? importing,
+    TResult? Function(_Deleting value)? deleting,
     TResult? Function(_Loaded value)? loaded,
     TResult? Function(_Error value)? error,
   }) =>
@@ -61,6 +71,8 @@ mixin _$ImportedGeodataState {
   TResult maybeMap<TResult extends Object?>({
     TResult Function(_Initial value)? initial,
     TResult Function(_Loading value)? loading,
+    TResult Function(_Importing value)? importing,
+    TResult Function(_Deleting value)? deleting,
     TResult Function(_Loaded value)? loaded,
     TResult Function(_Error value)? error,
     required TResult orElse(),
@@ -126,6 +138,8 @@ class _$_Initial implements _Initial {
   TResult when<TResult extends Object?>({
     required TResult Function() initial,
     required TResult Function() loading,
+    required TResult Function() importing,
+    required TResult Function() deleting,
     required TResult Function(List<ImportedGeodataPoint> importedPoints) loaded,
     required TResult Function(String message) error,
   }) {
@@ -137,6 +151,8 @@ class _$_Initial implements _Initial {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? initial,
     TResult? Function()? loading,
+    TResult? Function()? importing,
+    TResult? Function()? deleting,
     TResult? Function(List<ImportedGeodataPoint> importedPoints)? loaded,
     TResult? Function(String message)? error,
   }) {
@@ -148,6 +164,8 @@ class _$_Initial implements _Initial {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initial,
     TResult Function()? loading,
+    TResult Function()? importing,
+    TResult Function()? deleting,
     TResult Function(List<ImportedGeodataPoint> importedPoints)? loaded,
     TResult Function(String message)? error,
     required TResult orElse(),
@@ -163,6 +181,8 @@ class _$_Initial implements _Initial {
   TResult map<TResult extends Object?>({
     required TResult Function(_Initial value) initial,
     required TResult Function(_Loading value) loading,
+    required TResult Function(_Importing value) importing,
+    required TResult Function(_Deleting value) deleting,
     required TResult Function(_Loaded value) loaded,
     required TResult Function(_Error value) error,
   }) {
@@ -174,6 +194,8 @@ class _$_Initial implements _Initial {
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(_Initial value)? initial,
     TResult? Function(_Loading value)? loading,
+    TResult? Function(_Importing value)? importing,
+    TResult? Function(_Deleting value)? deleting,
     TResult? Function(_Loaded value)? loaded,
     TResult? Function(_Error value)? error,
   }) {
@@ -185,6 +207,8 @@ class _$_Initial implements _Initial {
   TResult maybeMap<TResult extends Object?>({
     TResult Function(_Initial value)? initial,
     TResult Function(_Loading value)? loading,
+    TResult Function(_Importing value)? importing,
+    TResult Function(_Deleting value)? deleting,
     TResult Function(_Loaded value)? loaded,
     TResult Function(_Error value)? error,
     required TResult orElse(),
@@ -239,6 +263,8 @@ class _$_Loading implements _Loading {
   TResult when<TResult extends Object?>({
     required TResult Function() initial,
     required TResult Function() loading,
+    required TResult Function() importing,
+    required TResult Function() deleting,
     required TResult Function(List<ImportedGeodataPoint> importedPoints) loaded,
     required TResult Function(String message) error,
   }) {
@@ -250,6 +276,8 @@ class _$_Loading implements _Loading {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? initial,
     TResult? Function()? loading,
+    TResult? Function()? importing,
+    TResult? Function()? deleting,
     TResult? Function(List<ImportedGeodataPoint> importedPoints)? loaded,
     TResult? Function(String message)? error,
   }) {
@@ -261,6 +289,8 @@ class _$_Loading implements _Loading {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initial,
     TResult Function()? loading,
+    TResult Function()? importing,
+    TResult Function()? deleting,
     TResult Function(List<ImportedGeodataPoint> importedPoints)? loaded,
     TResult Function(String message)? error,
     required TResult orElse(),
@@ -276,6 +306,8 @@ class _$_Loading implements _Loading {
   TResult map<TResult extends Object?>({
     required TResult Function(_Initial value) initial,
     required TResult Function(_Loading value) loading,
+    required TResult Function(_Importing value) importing,
+    required TResult Function(_Deleting value) deleting,
     required TResult Function(_Loaded value) loaded,
     required TResult Function(_Error value) error,
   }) {
@@ -287,6 +319,8 @@ class _$_Loading implements _Loading {
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(_Initial value)? initial,
     TResult? Function(_Loading value)? loading,
+    TResult? Function(_Importing value)? importing,
+    TResult? Function(_Deleting value)? deleting,
     TResult? Function(_Loaded value)? loaded,
     TResult? Function(_Error value)? error,
   }) {
@@ -298,6 +332,8 @@ class _$_Loading implements _Loading {
   TResult maybeMap<TResult extends Object?>({
     TResult Function(_Initial value)? initial,
     TResult Function(_Loading value)? loading,
+    TResult Function(_Importing value)? importing,
+    TResult Function(_Deleting value)? deleting,
     TResult Function(_Loaded value)? loaded,
     TResult Function(_Error value)? error,
     required TResult orElse(),
@@ -311,6 +347,258 @@ class _$_Loading implements _Loading {
 
 abstract class _Loading implements ImportedGeodataState {
   const factory _Loading() = _$_Loading;
+}
+
+/// @nodoc
+abstract class _$$_ImportingCopyWith<$Res> {
+  factory _$$_ImportingCopyWith(
+          _$_Importing value, $Res Function(_$_Importing) then) =
+      __$$_ImportingCopyWithImpl<$Res>;
+}
+
+/// @nodoc
+class __$$_ImportingCopyWithImpl<$Res>
+    extends _$ImportedGeodataStateCopyWithImpl<$Res, _$_Importing>
+    implements _$$_ImportingCopyWith<$Res> {
+  __$$_ImportingCopyWithImpl(
+      _$_Importing _value, $Res Function(_$_Importing) _then)
+      : super(_value, _then);
+}
+
+/// @nodoc
+
+class _$_Importing implements _Importing {
+  const _$_Importing();
+
+  @override
+  String toString() {
+    return 'ImportedGeodataState.importing()';
+  }
+
+  @override
+  bool operator ==(dynamic other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is _$_Importing);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() initial,
+    required TResult Function() loading,
+    required TResult Function() importing,
+    required TResult Function() deleting,
+    required TResult Function(List<ImportedGeodataPoint> importedPoints) loaded,
+    required TResult Function(String message) error,
+  }) {
+    return importing();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? initial,
+    TResult? Function()? loading,
+    TResult? Function()? importing,
+    TResult? Function()? deleting,
+    TResult? Function(List<ImportedGeodataPoint> importedPoints)? loaded,
+    TResult? Function(String message)? error,
+  }) {
+    return importing?.call();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? initial,
+    TResult Function()? loading,
+    TResult Function()? importing,
+    TResult Function()? deleting,
+    TResult Function(List<ImportedGeodataPoint> importedPoints)? loaded,
+    TResult Function(String message)? error,
+    required TResult orElse(),
+  }) {
+    if (importing != null) {
+      return importing();
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(_Initial value) initial,
+    required TResult Function(_Loading value) loading,
+    required TResult Function(_Importing value) importing,
+    required TResult Function(_Deleting value) deleting,
+    required TResult Function(_Loaded value) loaded,
+    required TResult Function(_Error value) error,
+  }) {
+    return importing(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_Initial value)? initial,
+    TResult? Function(_Loading value)? loading,
+    TResult? Function(_Importing value)? importing,
+    TResult? Function(_Deleting value)? deleting,
+    TResult? Function(_Loaded value)? loaded,
+    TResult? Function(_Error value)? error,
+  }) {
+    return importing?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(_Initial value)? initial,
+    TResult Function(_Loading value)? loading,
+    TResult Function(_Importing value)? importing,
+    TResult Function(_Deleting value)? deleting,
+    TResult Function(_Loaded value)? loaded,
+    TResult Function(_Error value)? error,
+    required TResult orElse(),
+  }) {
+    if (importing != null) {
+      return importing(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class _Importing implements ImportedGeodataState {
+  const factory _Importing() = _$_Importing;
+}
+
+/// @nodoc
+abstract class _$$_DeletingCopyWith<$Res> {
+  factory _$$_DeletingCopyWith(
+          _$_Deleting value, $Res Function(_$_Deleting) then) =
+      __$$_DeletingCopyWithImpl<$Res>;
+}
+
+/// @nodoc
+class __$$_DeletingCopyWithImpl<$Res>
+    extends _$ImportedGeodataStateCopyWithImpl<$Res, _$_Deleting>
+    implements _$$_DeletingCopyWith<$Res> {
+  __$$_DeletingCopyWithImpl(
+      _$_Deleting _value, $Res Function(_$_Deleting) _then)
+      : super(_value, _then);
+}
+
+/// @nodoc
+
+class _$_Deleting implements _Deleting {
+  const _$_Deleting();
+
+  @override
+  String toString() {
+    return 'ImportedGeodataState.deleting()';
+  }
+
+  @override
+  bool operator ==(dynamic other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is _$_Deleting);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() initial,
+    required TResult Function() loading,
+    required TResult Function() importing,
+    required TResult Function() deleting,
+    required TResult Function(List<ImportedGeodataPoint> importedPoints) loaded,
+    required TResult Function(String message) error,
+  }) {
+    return deleting();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? initial,
+    TResult? Function()? loading,
+    TResult? Function()? importing,
+    TResult? Function()? deleting,
+    TResult? Function(List<ImportedGeodataPoint> importedPoints)? loaded,
+    TResult? Function(String message)? error,
+  }) {
+    return deleting?.call();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? initial,
+    TResult Function()? loading,
+    TResult Function()? importing,
+    TResult Function()? deleting,
+    TResult Function(List<ImportedGeodataPoint> importedPoints)? loaded,
+    TResult Function(String message)? error,
+    required TResult orElse(),
+  }) {
+    if (deleting != null) {
+      return deleting();
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(_Initial value) initial,
+    required TResult Function(_Loading value) loading,
+    required TResult Function(_Importing value) importing,
+    required TResult Function(_Deleting value) deleting,
+    required TResult Function(_Loaded value) loaded,
+    required TResult Function(_Error value) error,
+  }) {
+    return deleting(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_Initial value)? initial,
+    TResult? Function(_Loading value)? loading,
+    TResult? Function(_Importing value)? importing,
+    TResult? Function(_Deleting value)? deleting,
+    TResult? Function(_Loaded value)? loaded,
+    TResult? Function(_Error value)? error,
+  }) {
+    return deleting?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(_Initial value)? initial,
+    TResult Function(_Loading value)? loading,
+    TResult Function(_Importing value)? importing,
+    TResult Function(_Deleting value)? deleting,
+    TResult Function(_Loaded value)? loaded,
+    TResult Function(_Error value)? error,
+    required TResult orElse(),
+  }) {
+    if (deleting != null) {
+      return deleting(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class _Deleting implements ImportedGeodataState {
+  const factory _Deleting() = _$_Deleting;
 }
 
 /// @nodoc
@@ -384,6 +672,8 @@ class _$_Loaded implements _Loaded {
   TResult when<TResult extends Object?>({
     required TResult Function() initial,
     required TResult Function() loading,
+    required TResult Function() importing,
+    required TResult Function() deleting,
     required TResult Function(List<ImportedGeodataPoint> importedPoints) loaded,
     required TResult Function(String message) error,
   }) {
@@ -395,6 +685,8 @@ class _$_Loaded implements _Loaded {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? initial,
     TResult? Function()? loading,
+    TResult? Function()? importing,
+    TResult? Function()? deleting,
     TResult? Function(List<ImportedGeodataPoint> importedPoints)? loaded,
     TResult? Function(String message)? error,
   }) {
@@ -406,6 +698,8 @@ class _$_Loaded implements _Loaded {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initial,
     TResult Function()? loading,
+    TResult Function()? importing,
+    TResult Function()? deleting,
     TResult Function(List<ImportedGeodataPoint> importedPoints)? loaded,
     TResult Function(String message)? error,
     required TResult orElse(),
@@ -421,6 +715,8 @@ class _$_Loaded implements _Loaded {
   TResult map<TResult extends Object?>({
     required TResult Function(_Initial value) initial,
     required TResult Function(_Loading value) loading,
+    required TResult Function(_Importing value) importing,
+    required TResult Function(_Deleting value) deleting,
     required TResult Function(_Loaded value) loaded,
     required TResult Function(_Error value) error,
   }) {
@@ -432,6 +728,8 @@ class _$_Loaded implements _Loaded {
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(_Initial value)? initial,
     TResult? Function(_Loading value)? loading,
+    TResult? Function(_Importing value)? importing,
+    TResult? Function(_Deleting value)? deleting,
     TResult? Function(_Loaded value)? loaded,
     TResult? Function(_Error value)? error,
   }) {
@@ -443,6 +741,8 @@ class _$_Loaded implements _Loaded {
   TResult maybeMap<TResult extends Object?>({
     TResult Function(_Initial value)? initial,
     TResult Function(_Loading value)? loading,
+    TResult Function(_Importing value)? importing,
+    TResult Function(_Deleting value)? deleting,
     TResult Function(_Loaded value)? loaded,
     TResult Function(_Error value)? error,
     required TResult orElse(),
@@ -528,6 +828,8 @@ class _$_Error implements _Error {
   TResult when<TResult extends Object?>({
     required TResult Function() initial,
     required TResult Function() loading,
+    required TResult Function() importing,
+    required TResult Function() deleting,
     required TResult Function(List<ImportedGeodataPoint> importedPoints) loaded,
     required TResult Function(String message) error,
   }) {
@@ -539,6 +841,8 @@ class _$_Error implements _Error {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? initial,
     TResult? Function()? loading,
+    TResult? Function()? importing,
+    TResult? Function()? deleting,
     TResult? Function(List<ImportedGeodataPoint> importedPoints)? loaded,
     TResult? Function(String message)? error,
   }) {
@@ -550,6 +854,8 @@ class _$_Error implements _Error {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initial,
     TResult Function()? loading,
+    TResult Function()? importing,
+    TResult Function()? deleting,
     TResult Function(List<ImportedGeodataPoint> importedPoints)? loaded,
     TResult Function(String message)? error,
     required TResult orElse(),
@@ -565,6 +871,8 @@ class _$_Error implements _Error {
   TResult map<TResult extends Object?>({
     required TResult Function(_Initial value) initial,
     required TResult Function(_Loading value) loading,
+    required TResult Function(_Importing value) importing,
+    required TResult Function(_Deleting value) deleting,
     required TResult Function(_Loaded value) loaded,
     required TResult Function(_Error value) error,
   }) {
@@ -576,6 +884,8 @@ class _$_Error implements _Error {
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(_Initial value)? initial,
     TResult? Function(_Loading value)? loading,
+    TResult? Function(_Importing value)? importing,
+    TResult? Function(_Deleting value)? deleting,
     TResult? Function(_Loaded value)? loaded,
     TResult? Function(_Error value)? error,
   }) {
@@ -587,6 +897,8 @@ class _$_Error implements _Error {
   TResult maybeMap<TResult extends Object?>({
     TResult Function(_Initial value)? initial,
     TResult Function(_Loading value)? loading,
+    TResult Function(_Importing value)? importing,
+    TResult Function(_Deleting value)? deleting,
     TResult Function(_Loaded value)? loaded,
     TResult Function(_Error value)? error,
     required TResult orElse(),

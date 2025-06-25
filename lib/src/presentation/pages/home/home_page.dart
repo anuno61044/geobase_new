@@ -322,35 +322,51 @@ class _ImportPointsButton extends StatelessWidget {
             );
           },
           loaded: (_) {
-            // Refrescar los marcadores después de cualquier cambio
             context.read<MarkerCubit>().refreshMarkers();
           },
           orElse: () {},
         );
       },
       builder: (context, state) {
+        // Corrección aquí: usar state.isLoading() o state.maybeWhen
+        final isLoading = state.maybeWhen(
+          loading: () => true,
+          orElse: () => false,
+        );
+
         final hasImportedPoints = state.maybeWhen(
           loaded: (points) => points.isNotEmpty,
           orElse: () => false,
         );
 
+        // Determinar si es una operación de importación o eliminación
+        final isImporting = isLoading && !hasImportedPoints;
+        final isDeleting = isLoading && hasImportedPoints;
+
         return Row(
           mainAxisSize: MainAxisSize.min,
           children: [
+            // Botón de importar
             _FloatingActionButtonWidget(
-              onPressed: () async {
-                await context.read<ImportedGeodataCubit>().importPoints();
-              },
+              onPressed: isLoading
+                  ? null
+                  : () async {
+                      await context.read<ImportedGeodataCubit>().importPoints();
+                    },
               iconData: Icons.file_download_rounded,
+              isLoading: isImporting,
             ),
-            
-            if (hasImportedPoints) const SizedBox(width: 8),
-            
-            if (hasImportedPoints)
+
+            if (hasImportedPoints || isDeleting) const SizedBox(width: 8),
+
+            if (hasImportedPoints || isDeleting)
               _FloatingActionButtonWidget(
-                onPressed: () => _showClearConfirmationDialog(context),
+                onPressed: isLoading
+                    ? null
+                    : () => _showClearConfirmationDialog(context),
                 iconData: Icons.delete_forever,
                 backgroundColor: Colors.red,
+                isLoading: isDeleting,
               ),
           ],
         );
@@ -379,7 +395,6 @@ class _ImportPointsButton extends StatelessWidget {
             onPressed: () async {
               Navigator.pop(context);
               await importedGeodataCubit.clear();
-              // Esperamos a que se complete la limpieza antes de refrescar
               await markerCubit.refreshMarkers();
             },
             child: const Text('Eliminar', style: TextStyle(color: Colors.red)),
@@ -390,30 +405,39 @@ class _ImportPointsButton extends StatelessWidget {
   }
 }
 
-// Modificación del _FloatingActionButtonWidget para aceptar color personalizado
 class _FloatingActionButtonWidget extends StatelessWidget {
   const _FloatingActionButtonWidget({
     required this.onPressed,
     required this.iconData,
     this.backgroundColor,
+    this.isLoading = false,
   });
 
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
   final IconData iconData;
   final Color? backgroundColor;
+  final bool isLoading;
 
   @override
   Widget build(BuildContext context) {
     return FloatingActionButton(
-      heroTag: UniqueKey(), // Usamos UniqueKey para evitar conflictos
+      heroTag: UniqueKey(),
       backgroundColor: backgroundColor ?? Colors.blueGrey.withOpacity(0.5),
-      splashColor: Colors.black,
       onPressed: onPressed,
       shape: const StadiumBorder(
         side: BorderSide(color: Colors.white, width: 2),
       ),
       elevation: 0,
-      child: Icon(iconData),
+      child: isLoading
+          ? SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: Colors.white,
+              ),
+            )
+          : Icon(iconData),
     );
   }
 }

@@ -38,8 +38,7 @@ class ImportedGeodataCubit extends Cubit<ImportedGeodataState> {
   }
 
   Future<void> importPoints() async {
-    emit(const ImportedGeodataState.loading());
-
+    emit(const ImportedGeodataState.loading()); // Estado de carga
     try {
       final result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
@@ -62,9 +61,7 @@ class ImportedGeodataCubit extends Cubit<ImportedGeodataState> {
       }
 
       final categories = await _loadCategories();
-
       final points = <ImportedGeodataPoint>[];
-
       int pointIdCounter = 1;
 
       for (final item in jsonData) {
@@ -80,6 +77,7 @@ class ImportedGeodataCubit extends Cubit<ImportedGeodataState> {
       emit(ImportedGeodataState.error('Error al importar: ${e.toString()}'));
     }
   }
+
 
   Future<List<CategoryGetEntity>> _loadCategories() async {
     final response = await _categoryService.loadCategoriesWhere();
@@ -129,7 +127,12 @@ class ImportedGeodataCubit extends Cubit<ImportedGeodataState> {
   }
 
   Future<void> clear() async {
-    await _storageService.clearImportedPoints();
-    emit(const ImportedGeodataState.loaded([]));
+    emit(const ImportedGeodataState.loading());
+    try {
+      await _storageService.clearImportedPoints();
+      emit(const ImportedGeodataState.loaded([]));
+    } catch (e) {
+      emit(ImportedGeodataState.error('Error al eliminar: ${e.toString()}'));
+    }
   }
 }

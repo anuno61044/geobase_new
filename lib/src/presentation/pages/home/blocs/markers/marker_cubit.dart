@@ -16,10 +16,8 @@ class MarkerCubit extends Cubit<MarkerState> {
     required this.uPrefsReader,
     required this.importedGeodataService,
   }) : super(const MarkerState.filteredOut(
-            markers: {}, 
-            importedMarkers: {}, 
-            temporalMarkers: {}));
-      
+            markers: {}, importedMarkers: {}, temporalMarkers: {}));
+
   final IMarkerGetterService markerGetterService;
   final IUserPreferencesReaderService uPrefsReader;
   final IImportedGeodataStorageService importedGeodataService;
@@ -50,31 +48,68 @@ class MarkerCubit extends Cubit<MarkerState> {
       filteredOut: (state) => state.temporalMarkers,
     );
 
-    // Puntos importados
+    // 1. Obtener puntos importados
     final importedPoints = await importedGeodataService.loadImportedPoints();
-    // List<ImportedGeodataPoint> importedPoints = [];
 
-    final importedMarkers = importedPoints
-        .map((point) => ImportedGeodataMarker(point) // Usando el adaptador
-            )
-        .toSet();
+    // 2. Convertir a marcadores importados
+    Set<ImportedGeodataMarker> importedMarkers =
+        importedPoints.map((point) => ImportedGeodataMarker(point)).toSet();
 
     either.fold(
       (failure) {
         emit(MarkerState.failure(failure));
       },
       (entity) {
-        if (!isClosed) {
-          emit(
-            MarkerState.filteredOut(
-              markers: entity.toSet(),
-              importedMarkers: importedMarkers,
-              temporalMarkers: temporals,
-            ),
-          );
+        if (isClosed) return;
+
+        // 3. Filtrar puntos importados que coincidan con puntos normales
+        final normalMarkers = entity.toSet();
+        final filteredImportedMarkers = _filterDuplicateImportedMarkers(
+          normalMarkers: normalMarkers,
+          importedMarkers: importedMarkers,
+        );
+
+        // 4. Si hay diferencias, actualizar el almacenamiento
+        if (filteredImportedMarkers.length != importedMarkers.length) {
+          _updateImportedPoints(filteredImportedMarkers);
         }
+
+        // 5. Emitir el nuevo estado
+        emit(
+          MarkerState.filteredOut(
+            markers: normalMarkers,
+            importedMarkers: filteredImportedMarkers,
+            temporalMarkers: temporals,
+          ),
+        );
       },
     );
+  }
+
+  /// Filtra marcadores importados que coincidan en ubicación con marcadores normales
+  Set<ImportedGeodataMarker> _filterDuplicateImportedMarkers({
+    required Set<IMarkable> normalMarkers,
+    required Set<ImportedGeodataMarker> importedMarkers,
+  }) {
+    return importedMarkers.where((imported) {
+      // Verificar si existe un marcador normal en la misma ubicación
+      return !normalMarkers.any(
+          (normal) => _areLocationsEqual(normal.location, imported.location));
+    }).toSet();
+  }
+
+  /// Compara dos ubicaciones con cierta tolerancia
+  bool _areLocationsEqual(LatLng loc1, LatLng loc2) {
+    const tolerance = 0.00001; // Aprox. 1 metro de tolerancia
+    return (loc1.latitude - loc2.latitude).abs() < tolerance &&
+        (loc1.longitude - loc2.longitude).abs() < tolerance;
+  }
+
+  /// Actualiza los puntos importados en el almacenamiento
+  Future<void> _updateImportedPoints(
+      Set<ImportedGeodataMarker> filteredMarkers) async {
+    final pointsToSave = filteredMarkers.map((m) => m.point).toList();
+    await importedGeodataService.saveImportedPoints(pointsToSave);
   }
 
   Future<void> clearTemporaryMarker() async {
@@ -82,6 +117,15 @@ class MarkerCubit extends Cubit<MarkerState> {
       failure: (failure) => null,
       filteredOut: (filteredOut) {
         emit(filteredOut.copyWith(temporalMarkers: {}));
+      },
+    );
+  }
+
+  Future<void> clearImportedMarkers() async {
+    state.map(
+      failure: (_) {},
+      filteredOut: (state) {
+        emit(state.copyWith(importedMarkers: {}));
       },
     );
   }

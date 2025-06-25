@@ -130,6 +130,6 @@ class ImportedGeodataCubit extends Cubit<ImportedGeodataState> {
 
   Future<void> clear() async {
     await _storageService.clearImportedPoints();
-    emit(const ImportedGeodataState.initial());
+    emit(const ImportedGeodataState.loaded([]));
   }
 }

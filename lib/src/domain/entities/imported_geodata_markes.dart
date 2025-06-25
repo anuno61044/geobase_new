@@ -20,4 +20,6 @@ class ImportedGeodataMarker implements IMarkable {
 
   @override
   int? get color => Colors.red.value; // Color rojo para puntos importados
+
+  int get categoryId => point.categoryId;
 }

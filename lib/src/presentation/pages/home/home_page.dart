@@ -308,31 +308,6 @@ class _GotoLocationButton extends StatelessWidget {
   }
 }
 
-class _FloatingActionButtonWidget extends StatelessWidget {
-  const _FloatingActionButtonWidget({
-    required this.onPressed,
-    required this.iconData,
-  });
-
-  final VoidCallback onPressed;
-  final IconData iconData;
-
-  @override
-  Widget build(BuildContext context) {
-    return FloatingActionButton(
-      heroTag: null,
-      backgroundColor: Colors.blueGrey.withOpacity(0.5),
-      splashColor: Colors.black,
-      onPressed: onPressed,
-      shape: const StadiumBorder(
-        side: BorderSide(color: Colors.white, width: 2),
-      ),
-      elevation: 0,
-      child: Icon(iconData),
-    );
-  }
-}
-
 class _ImportPointsButton extends StatelessWidget {
   const _ImportPointsButton();
 
@@ -347,20 +322,98 @@ class _ImportPointsButton extends StatelessWidget {
             );
           },
           loaded: (_) {
-            // Refrescar los marcadores después de importar
+            // Refrescar los marcadores después de cualquier cambio
             context.read<MarkerCubit>().refreshMarkers();
           },
           orElse: () {},
         );
       },
       builder: (context, state) {
-        return _FloatingActionButtonWidget(
-          onPressed: () async {
-            await context.read<ImportedGeodataCubit>().importPoints();
-          },
-          iconData: Icons.file_download_rounded,
+        final hasImportedPoints = state.maybeWhen(
+          loaded: (points) => points.isNotEmpty,
+          orElse: () => false,
+        );
+
+        return Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _FloatingActionButtonWidget(
+              onPressed: () async {
+                await context.read<ImportedGeodataCubit>().importPoints();
+              },
+              iconData: Icons.file_download_rounded,
+            ),
+            
+            if (hasImportedPoints) const SizedBox(width: 8),
+            
+            if (hasImportedPoints)
+              _FloatingActionButtonWidget(
+                onPressed: () => _showClearConfirmationDialog(context),
+                iconData: Icons.delete_forever,
+                backgroundColor: Colors.red,
+              ),
+          ],
         );
       },
+    );
+  }
+
+  void _showClearConfirmationDialog(BuildContext context) {
+    final importedGeodataCubit = context.read<ImportedGeodataCubit>();
+    final markerCubit = context.read<MarkerCubit>();
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Eliminar puntos importados'),
+        content: const Text(
+          '¿Estás seguro de que quieres eliminar todos los puntos importados? '
+          'Esta acción no se puede deshacer.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancelar'),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              await importedGeodataCubit.clear();
+              // Esperamos a que se complete la limpieza antes de refrescar
+              await markerCubit.refreshMarkers();
+            },
+            child: const Text('Eliminar', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// Modificación del _FloatingActionButtonWidget para aceptar color personalizado
+class _FloatingActionButtonWidget extends StatelessWidget {
+  const _FloatingActionButtonWidget({
+    required this.onPressed,
+    required this.iconData,
+    this.backgroundColor,
+  });
+
+  final VoidCallback onPressed;
+  final IconData iconData;
+  final Color? backgroundColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return FloatingActionButton(
+      heroTag: UniqueKey(), // Usamos UniqueKey para evitar conflictos
+      backgroundColor: backgroundColor ?? Colors.blueGrey.withOpacity(0.5),
+      splashColor: Colors.black,
+      onPressed: onPressed,
+      shape: const StadiumBorder(
+        side: BorderSide(color: Colors.white, width: 2),
+      ),
+      elevation: 0,
+      child: Icon(iconData),
     );
   }
 }

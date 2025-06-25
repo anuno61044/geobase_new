@@ -82,48 +82,53 @@ class GeoBaseMap extends StatelessWidget {
           failure: (failure) => MarkerLayer(markers: []),
           filteredOut: (markerState) {
             // 1. Marcadores normales (azules)
-            final normalMarkers = markerState.markers
-                .map(
-                  (e) => Marker(
-                    key: e.id != null ? Key('normal_${e.id}') : UniqueKey(),
-                    point: e.location,
-                    child: IconButton(
-                      icon: Icon(
-                        e.icon != null
-                            ? IconCodeUtils.decode(e.icon)
-                            : Icons.location_on,
-                        color: e.color != null ? Color(e.color!) : Colors.blue,
-                      ),
-                      onPressed: () {
-                        context.read<MapCubit>().markerTouched(e);
-                        context.read<SlidingUpPanelCubit>().markerTouched(e);
-                      },
-                    ),
+            final normalMarkers = markerState.markers.map(
+              (e) => Marker(
+                key: e.id != null ? Key('normal_${e.id}') : UniqueKey(),
+                point: e.location,
+                child: IconButton(
+                  icon: Icon(
+                    e.icon != null
+                        ? IconCodeUtils.decode(e.icon)
+                        : Icons.location_on,
+                    color: e.color != null ? Color(e.color!) : Colors.blue,
                   ),
-                );
+                  onPressed: () {
+                    context.read<MapCubit>().markerTouched(e);
+                    context.read<SlidingUpPanelCubit>().markerTouched(e);
+                  },
+                ),
+              ),
+            );
 
             // 2. Marcadores importados (rojos)
-            final importedMarkers = markerState.importedMarkers
-                .map(
-                  (e) => Marker(
-                    key: Key('imported_${e.id ?? 'no-id'}'),
-                    point: e.location,
-                    child: IconButton(
-                      icon: Icon(
-                        e.icon != null
-                            ? IconCodeUtils.decode(e.icon)
-                            : Icons.location_on,
-                        color: e.color != null ? Color(e.color!) : Colors.red,// Usar color rojo por defecto
-                      ),
-                      onPressed: () {
-                        // context.read<MapCubit>().markerTouched(e);
-                        // context
-                        //     .read<SlidingUpPanelCubit>()
-                        //     .markerTouchedImported(e);
-                      },
-                    ),
+            final importedMarkers = markerState.importedMarkers.map(
+              (e) => Marker(
+                key: Key('imported_${e.id ?? 'no-id'}'),
+                point: e.location,
+                child: IconButton(
+                  icon: Icon(
+                    e.icon != null
+                        ? IconCodeUtils.decode(e.icon)
+                        : Icons.location_on,
+                    color: e.color != null ? Color(e.color!) : Colors.red,
                   ),
-                );
+                  onPressed: () async {
+                    // Guardar el ID del punto importado temporalmente
+                    final importedId = (e as ImportedGeodataMarker).id;
+
+                    // Navegar a la pantalla de creación
+                    Beamer.of(context).beamToNamed(
+                      '/geodata/new?'
+                      '$LAT_PARAM=${e.location.latitude}&'
+                      '$LNG_PARAM=${e.location.longitude}&'
+                      '$CATEGORY_ID_PARAM=${e.categoryId}&'
+                      'importedId=$importedId',
+                    );
+                  },
+                ),
+              ),
+            );
 
             // 3. Marcadores temporales (grises)
             final temporalMarkers = markerState.temporalMarkers.map(
@@ -234,4 +239,32 @@ class _FailureGetTilesAndRetry extends StatelessWidget {
       ),
     );
   }
+}
+
+void _showClearConfirmationDialog(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: const Text('Eliminar puntos importados'),
+      content: const Text(
+        '¿Estás seguro de que quieres eliminar todos los puntos importados? '
+        'Esta acción no se puede deshacer.',
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancelar'),
+        ),
+        TextButton(
+          onPressed: () {
+            Navigator.pop(context);
+            context.read<ImportedGeodataCubit>().clear();
+            // También puedes querer limpiar los marcadores del mapa
+            context.read<MarkerCubit>().clearImportedMarkers();
+          },
+          child: const Text('Eliminar', style: TextStyle(color: Colors.red)),
+        ),
+      ],
+    ),
+  );
 }
